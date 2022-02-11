@@ -1,6 +1,6 @@
-package de.hsrw.dimitriosbarkas.ute.controller.config;
+package de.hsrw.dimitriosbarkas.ute.controller.tasks;
 
-import de.hsrw.dimitriosbarkas.ute.controller.config.response.TaskConfigResponseTO;
+import de.hsrw.dimitriosbarkas.ute.controller.tasks.response.TaskConfigResponseTO;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.CannotLoadConfigException;
 import lombok.extern.log4j.Log4j2;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Log4j2
 @RestController
-public class ConfigController {
+public class TaskController {
 
     @Autowired
     private ConfigService configService;
 
-    @GetMapping(value = "/api/config")
+    @GetMapping(value = "/api/tasks")
     public ResponseEntity<?> getConfig() {
         try {
             return new ResponseEntity<>(

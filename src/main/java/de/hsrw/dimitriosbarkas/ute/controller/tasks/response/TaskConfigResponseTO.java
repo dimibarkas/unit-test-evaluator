@@ -1,4 +1,4 @@
-package de.hsrw.dimitriosbarkas.ute.controller.config.response;
+package de.hsrw.dimitriosbarkas.ute.controller.tasks.response;
 
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
 import lombok.AllArgsConstructor;
