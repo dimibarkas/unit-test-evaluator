@@ -1,4 +1,4 @@
-import {Badge, Col, Container, Row, Tab, Tabs} from "react-bootstrap";
+import {Badge, Container, Tab, Tabs} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import Editor from "@monaco-editor/react";
 import Workspace from "./Workspace";
@@ -21,12 +21,10 @@ function TaskTabContent(props) {
                     defaultLanguage={"java"}
                     theme={"vs-dark"}
                     defaultValue={atob(encodedFileString)}
-                    options={{
-                        readOnly: true
-                    }}
+                    options={{readOnly: true}}
                 />
             </div>
-            <Workspace />
+            <Workspace/>
         </div>
     )
 }
@@ -36,18 +34,21 @@ function TaskSelection() {
     const [key, setKey] = useState('1');
 
 
-    useEffect(async () => {
-        await axios.get("/api/tasks").then((res) => {
-            console.log(res.data);
-        });
-    })
+    useEffect( () => {
+        async function fetchData () {
+            await axios.get("/api/tasks").then((res) => {
+                console.log(res.data);
+            });
+        }
+        fetchData();
+    }, [])
 
     return (
         <Container style={{paddingTop: "2rem"}}>
             <Tabs
                 activeKey={key}
                 onSelect={(selectedKey) => {
-                    if (selectedKey == key) {
+                    if (selectedKey === key) {
                         setKey(null);
                     } else {
                         setKey(selectedKey);

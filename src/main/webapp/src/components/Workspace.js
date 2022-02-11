@@ -1,5 +1,4 @@
 import Editor from "@monaco-editor/react";
-import {Button} from "react-bootstrap";
 import SubmitButton from "./SubmitButton";
 
 const b64string = "aW1wb3J0IG9yZy5qdW5pdC5UZXN0OwoKaW1wb3J0IHN0YXRpYyBvcmcuanVuaXQuQXNzZXJ0Lio7CgpwdWJsaWMgY2xhc3MgSW5zZXJ0aW9uU29ydFRlc3QgewoKICAgIEBUZXN0CiAgICBwdWJsaWMgdm9pZCBzb3J0KCkgewogICAgfQp9";
