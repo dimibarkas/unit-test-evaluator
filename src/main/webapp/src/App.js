@@ -5,10 +5,10 @@ import TaskSelection from "./components/TaskSelection";
 
 function App() {
     return (
-        <div>
+        <>
             <CustomNavbar/>
             <TaskSelection/>
-        </div>
+        </>
     );
 }
 
