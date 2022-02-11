@@ -14,14 +14,14 @@ public class TaskResponseTO {
 
     private String targetDescription;
 
-    private String pathToFile;
+    private String encodedFile;
 
     public static TaskResponseTO fromTask(Task task) {
         return new TaskResponseTO(
                 task.getId(),
                 task.getDescription(),
                 task.getTargetDescription(),
-                task.getPathToFile()
+                task.getEncodedFile()
         );
     }
 }

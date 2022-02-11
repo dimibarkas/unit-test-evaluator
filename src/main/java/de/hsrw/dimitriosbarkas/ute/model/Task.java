@@ -2,8 +2,6 @@ package de.hsrw.dimitriosbarkas.ute.model;
 
 import lombok.Data;
 
-import java.nio.file.Path;
-
 @Data
 public class Task {
 
@@ -16,4 +14,6 @@ public class Task {
     private String targetDescription;
 
     private String pathToFile;
+
+    private String encodedFile;
 }

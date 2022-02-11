@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 
 
 @Service
@@ -19,6 +22,20 @@ import java.nio.charset.StandardCharsets;
 public class ConfigServiceImpl implements ConfigService {
 
     private final String TASKS_DEFINITION_FILE = "tasks.yaml";
+
+    public String loadResourceByUrl( URL u, String resource) throws IOException {
+        log.info("attempting input resource", resource);
+        if(u != null) {
+            String path = u.getPath();
+            log.info(" absolute resource path found: " + path);
+            String s = new String(Files.readAllBytes(Paths.get(path)));
+//            log.info(" file content: \n"+s);
+            return s;
+        } else {
+            log.info(" no resource found: " + resource);
+            return null;
+        }
+    }
 
     @Override
     public TaskConfig getTaskConfig() throws CannotLoadConfigException {
@@ -30,6 +47,21 @@ public class ConfigServiceImpl implements ConfigService {
             YamlReader reader = new YamlReader(br);
 
             TaskConfig taskConfig = reader.read(TaskConfig.class);
+
+            taskConfig.getTasks().stream().forEach(task -> {
+                String pathToFile = task.getPathToFile();
+                URL u = getClass().getClassLoader().getResource(pathToFile);
+                try {
+                    String fileContent = loadResourceByUrl(u, pathToFile);
+                    if(fileContent != null) {
+                        String encodedString = Base64.getEncoder().encodeToString(fileContent.getBytes(StandardCharsets.UTF_8));
+                        task.setEncodedFile(encodedString);
+                    }
+                } catch (IOException e) {
+                    log.error(e);
+                }
+
+            });
 
             reader.close();
 
