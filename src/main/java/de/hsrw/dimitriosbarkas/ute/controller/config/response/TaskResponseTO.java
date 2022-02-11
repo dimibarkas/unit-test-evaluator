@@ -16,12 +16,15 @@ public class TaskResponseTO {
 
     private String encodedFile;
 
+    private String encodedTestTemplate;
+
     public static TaskResponseTO fromTask(Task task) {
         return new TaskResponseTO(
                 task.getId(),
                 task.getDescription(),
                 task.getTargetDescription(),
-                task.getEncodedFile()
+                task.getEncodedFile(),
+                task.getEncodedTestTemplate()
         );
     }
 }

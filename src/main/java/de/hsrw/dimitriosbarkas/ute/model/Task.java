@@ -16,4 +16,8 @@ public class Task {
     private String pathToFile;
 
     private String encodedFile;
+
+    private String pathToTestTemplate;
+
+    private String encodedTestTemplate;
 }

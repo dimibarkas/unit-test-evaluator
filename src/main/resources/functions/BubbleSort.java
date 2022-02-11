@@ -1,5 +1,3 @@
-package de.hsrw.dimitriosbarkas.ute.testfunctions;
-
 public class BubbleSort {
 
     void bubbleSort(int[] arr)

@@ -23,9 +23,9 @@ public class ConfigServiceImpl implements ConfigService {
 
     private final String TASKS_DEFINITION_FILE = "tasks.yaml";
 
-    public String loadResourceByUrl( URL u, String resource) throws IOException {
+    public String loadResourceByUrl(URL u, String resource) throws IOException {
         log.info("attempting input resource", resource);
-        if(u != null) {
+        if (u != null) {
             String path = u.getPath();
             log.info(" absolute resource path found: " + path);
             String s = new String(Files.readAllBytes(Paths.get(path)));
@@ -42,7 +42,7 @@ public class ConfigServiceImpl implements ConfigService {
         log.info("Loading task configuration file from " + TASKS_DEFINITION_FILE + ".");
 
         URL url = getClass().getClassLoader().getResource(TASKS_DEFINITION_FILE);
-        try(BufferedReader br = new BufferedReader(
+        try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
             YamlReader reader = new YamlReader(br);
 
@@ -50,17 +50,23 @@ public class ConfigServiceImpl implements ConfigService {
 
             taskConfig.getTasks().stream().forEach(task -> {
                 String pathToFile = task.getPathToFile();
-                URL u = getClass().getClassLoader().getResource(pathToFile);
+                URL fileURL = getClass().getClassLoader().getResource(pathToFile);
+                String pathToTemplate = task.getPathToTestTemplate();
+                URL templateURL = getClass().getClassLoader().getResource(pathToTemplate);
                 try {
-                    String fileContent = loadResourceByUrl(u, pathToFile);
-                    if(fileContent != null) {
-                        String encodedString = Base64.getEncoder().encodeToString(fileContent.getBytes(StandardCharsets.UTF_8));
-                        task.setEncodedFile(encodedString);
+                    String fileContent = loadResourceByUrl(fileURL, pathToFile);
+                    if (fileContent != null) {
+                        String encodedFile = Base64.getEncoder().encodeToString(fileContent.getBytes(StandardCharsets.UTF_8));
+                        task.setEncodedFile(encodedFile);
+                    }
+                    String templateContent = loadResourceByUrl(templateURL, pathToTemplate);
+                    if (templateContent != null) {
+                        String encodedTemplate = Base64.getEncoder().encodeToString(templateContent.getBytes(StandardCharsets.UTF_8));
+                        task.setEncodedTestTemplate(encodedTemplate);
                     }
                 } catch (IOException e) {
                     log.error(e);
                 }
-
             });
 
             reader.close();

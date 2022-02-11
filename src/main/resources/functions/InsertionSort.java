@@ -1,5 +1,3 @@
-package de.hsrw.dimitriosbarkas.ute.testfunctions;
-
 public class InsertionSort {
 
     void sort(int[] arr) throws ArrayIsEmptyException {
