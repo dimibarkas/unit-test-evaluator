@@ -1,9 +1,7 @@
 public class InsertionSort {
 
-    void sort(int[] arr) throws ArrayIsEmptyException {
-        int n = arr.length;
-        if(n == 0) throw new ArrayIsEmptyException("empty array provided");
-        for (int i = 1; i < n; ++i) {
+    void sort(int[] arr) {
+        for (int i = 1; i < arr.length; ++i) {
             int key = arr[i];
             int j = i - 1;
 
