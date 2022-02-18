@@ -12,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -26,7 +27,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     private SafeExecuteTestService safeExecuteTestService;
 
     @Override
-    public void evaluateTest(String taskId, String encodedTestContent) throws CannotLoadConfigException, TaskNotFoundException, CannotConvertToFileException, IOException {
+    public void evaluateTest(String taskId, String encodedTestContent) throws CannotLoadConfigException, TaskNotFoundException, CannotConvertToFileException, IOException, XMLStreamException, InterruptedException {
         log.info("Evaluating test for task" + taskId + "...");
 
         // Get configuration for this task
@@ -35,6 +36,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         Path path = safeExecuteTestService.extractFilesToTemplateProject(task, encodedTestContent);
         safeExecuteTestService.safelyExecuteTestInTempProject(path);
         safeExecuteTestService.generateCoverageReport(path);
+        safeExecuteTestService.readCoverageReport(path);
     }
 
     private Task getTaskConfig(String taskId) throws CannotLoadConfigException, TaskNotFoundException {

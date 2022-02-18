@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.Base64;
 
@@ -24,7 +25,7 @@ public class EvaluatorController {
     private EvaluatorService evaluatorService;
 
     @PostMapping(value = "/api/evaluate")
-    public ResponseEntity<?> evaluateTest(@RequestBody EvaluatorRequestTo evaluatorRequestTo) throws CannotConvertToFileException, TaskNotFoundException, CannotLoadConfigException, IOException {
+    public ResponseEntity<?> evaluateTest(@RequestBody EvaluatorRequestTo evaluatorRequestTo) throws CannotConvertToFileException, TaskNotFoundException, CannotLoadConfigException, IOException, XMLStreamException, InterruptedException {
         //TODO: Implement
 //        byte[] decodedBytes = Base64.getDecoder().decode(evaluatorRequestTo.getEncodedTestContent());
 //        log.info(new String(decodedBytes));
