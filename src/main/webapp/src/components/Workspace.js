@@ -13,7 +13,7 @@ function Workspace() {
         editorRef.current = editor;
     }
 
-    async function simulateNetworkRequest() {
+    async function sendTestContent() {
         await axios.post("/api/evaluate", {taskId: 1, encodedTestContent: btoa(editorRef.current.getValue())})
             .then((response) => {
                 console.log(response)
@@ -24,7 +24,7 @@ function Workspace() {
 
     useEffect(() => {
         if (isLoading) {
-            simulateNetworkRequest().then(() => {
+            sendTestContent().then(() => {
                 setLoading(false);
             });
         }
