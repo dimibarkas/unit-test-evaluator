@@ -13,6 +13,7 @@ public class _Class {
     @JacksonXmlElementWrapper(useWrapping = false)
     public List<Method> method;
 
+    @JacksonXmlElementWrapper(useWrapping = false)
     public List<Counter> counter;
 
     public String name;

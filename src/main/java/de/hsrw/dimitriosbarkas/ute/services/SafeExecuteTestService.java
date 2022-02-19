@@ -15,6 +15,6 @@ public interface SafeExecuteTestService {
 
     void generateCoverageReport(Path path) throws IOException, InterruptedException;
 
-    void readCoverageReport(Path path) throws IOException, XMLStreamException;
+    void parseCoverageReport(Path path) throws IOException, XMLStreamException;
 
 }

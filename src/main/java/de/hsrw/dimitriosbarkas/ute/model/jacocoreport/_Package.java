@@ -1,6 +1,5 @@
 package de.hsrw.dimitriosbarkas.ute.model.jacocoreport;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.Data;
@@ -17,6 +16,7 @@ public class _Package {
     @JacksonXmlElementWrapper(useWrapping = false)
     public List<Sourcefile> sourcefile;
 
+    @JacksonXmlElementWrapper(useWrapping = false)
     public List<Counter> counter;
 
     public String name;

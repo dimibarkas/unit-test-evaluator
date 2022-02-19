@@ -36,7 +36,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         Path path = safeExecuteTestService.extractFilesToTemplateProject(task, encodedTestContent);
         safeExecuteTestService.safelyExecuteTestInTempProject(path);
         safeExecuteTestService.generateCoverageReport(path);
-        safeExecuteTestService.readCoverageReport(path);
+        safeExecuteTestService.parseCoverageReport(path);
     }
 
     private Task getTaskConfig(String taskId) throws CannotLoadConfigException, TaskNotFoundException {
