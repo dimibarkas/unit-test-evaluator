@@ -1,6 +1,5 @@
 package de.hsrw.dimitriosbarkas.ute.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.CouldNotSetupTestEnvironmentException;
@@ -14,8 +13,10 @@ public interface SafeExecuteTestService {
 
     Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
 
+    //return the exit value of this process
     void safelyExecuteTestInTempProject(Path path) throws ErrorWhileExecutingTestException, IOException;
-
+    
+    //return the exit value of this process
     void generateCoverageReport(Path path) throws IOException, InterruptedException;
 
     Report parseCoverageReport(Path path) throws IOException, JacocoReportXmlFileNotFoundException;

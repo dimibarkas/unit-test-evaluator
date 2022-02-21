@@ -34,15 +34,12 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             // Create temporary folder
             Path path = Files.createTempDirectory("temp");
 
-
-            log.info(lines);
-            log.info("Temp path: " + path.toAbsolutePath());
-            log.info(lines);
+            log.info("Creating test environment in temp path...");
+            log.info(path.toAbsolutePath());
 
             // Execute bash script
             String[] command = {"bash", "src/main/resources/create-mvn-project-script.sh", "-p", path.toAbsolutePath().toString()};
             p = Runtime.getRuntime().exec(command);
-
             p.waitFor();
             if(p.exitValue() == 0) {
                 log.info(lines);
@@ -50,6 +47,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 log.info(lines);
             }
 
+            // write files
             File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getPathToFile());
             File testFile = new File(path.toAbsolutePath() + "/testapp/src/test/java/com/test/app/" + task.getPathToTestTemplate());
             writeFile(taskFile, taskData);
@@ -86,6 +84,8 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         log.info(dir);
     }
 
+
+
     @Override
     public void generateCoverageReport(Path path) throws IOException, InterruptedException {
         String[] command = {"mvn", "jacoco:report"};
@@ -100,10 +100,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     public Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, IOException {
         String pathToReport = path.toAbsolutePath() + "/testapp/target/site/jacoco/jacoco.xml";
         File file = new File(pathToReport);
-
-        if(!file.exists()) {
-            throw new JacocoReportXmlFileNotFoundException();
-        }
 
         Report report;
         try {
@@ -124,6 +120,12 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         }
     }
 
+    /**
+     * helper method for xml-mapping
+     * @param is InputStream
+     * @return String from InputStream
+     * @throws IOException if an I/O Error occurs
+     */
     private String inputStreamToString(InputStream is) throws IOException {
         StringBuilder sb = new StringBuilder();
         String line;
@@ -135,14 +137,13 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         return sb.toString();
     }
 
-
     private void writeFile(File file, byte[] data) {
         try (FileOutputStream fos = new FileOutputStream(file, true)) {
             String str = "package com.test.app; \n\n";
             byte[] strToBytes = str.getBytes();
             fos.write(strToBytes);
             fos.write(data);
-            log.info(file.getAbsolutePath() + " saved.");
+            //log.info(file.getAbsolutePath() + " saved.");
         } catch (Exception e) {
             e.printStackTrace();
         }

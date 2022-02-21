@@ -24,15 +24,15 @@ public class ConfigServiceImpl implements ConfigService {
     private final String TASKS_DEFINITION_FILE = "tasks.yaml";
 
     public String loadResourceByUrl(URL u, String resource) throws IOException {
-        log.info("attempting input resource", resource);
+        //log.info("attempting input resource", resource);
         if (u != null) {
             String path = u.getPath();
-            log.info(" absolute resource path found: " + path);
+            //log.info(" absolute resource path found: " + path);
             String s = new String(Files.readAllBytes(Paths.get(path)));
 //            log.info(" file content: \n"+s);
             return s;
         } else {
-            log.info(" no resource found: " + resource);
+            //log.info(" no resource found: " + resource);
             return null;
         }
     }
@@ -42,13 +42,13 @@ public class ConfigServiceImpl implements ConfigService {
         log.info("Loading task configuration file from " + TASKS_DEFINITION_FILE + ".");
 
         URL url = getClass().getClassLoader().getResource(TASKS_DEFINITION_FILE);
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
+        if(url == null) throw new CannotLoadConfigException();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
             YamlReader reader = new YamlReader(br);
 
             TaskConfig taskConfig = reader.read(TaskConfig.class);
 
-            taskConfig.getTasks().stream().forEach(task -> {
+            taskConfig.getTasks().forEach(task -> {
                 String pathToFile = task.getPathToFile();
                 URL fileURL = getClass().getClassLoader().getResource(pathToFile);
                 String pathToTemplate = task.getPathToTestTemplate();
