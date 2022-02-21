@@ -18,6 +18,9 @@ function Workspace() {
             .then((response) => {
                 console.log(response)
             })
+            .catch((reason) => {
+                console.log(reason);
+            })
     }
 
     const [isLoading, setLoading] = useState(false);
