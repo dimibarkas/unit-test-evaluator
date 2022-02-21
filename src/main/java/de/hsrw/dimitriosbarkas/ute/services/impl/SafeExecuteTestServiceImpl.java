@@ -1,28 +1,24 @@
 package de.hsrw.dimitriosbarkas.ute.services.impl;
 
-import com.ctc.wstx.stax.WstxInputFactory;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import de.hsrw.dimitriosbarkas.ute.model.CoverageResult;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.CannotConvertToFileException;
+import de.hsrw.dimitriosbarkas.ute.services.exceptions.CompliationErrorException;
+import de.hsrw.dimitriosbarkas.ute.services.exceptions.JacocoReportXmlFileNotFoundException;
 import lombok.extern.log4j.Log4j2;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.springframework.stereotype.Service;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +42,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             String[] command = {"bash", "src/main/resources/create-mvn-project-script.sh", "-p", path.toAbsolutePath().toString()};
             p = Runtime.getRuntime().exec(command);
 
+
             // Read output from script
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
@@ -55,6 +52,8 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
             reader.close();
 
+            p.waitFor();
+
             File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getPathToFile());
             File testFile = new File(path.toAbsolutePath() + "/testapp/src/test/java/com/test/app/" + task.getPathToTestTemplate());
             writeFile(taskFile, taskData);
@@ -63,18 +62,25 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             //path.toFile().deleteOnExit();
 
             return path;
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new CannotConvertToFileException(e);
         }
     }
 
     @Override
-    public void safelyExecuteTestInTempProject(Path path) throws IOException {
+    public void safelyExecuteTestInTempProject(Path path) throws CompliationErrorException, IOException {
+        //test if file is empty
         String[] command = {"mvn", "test"};
         String[] env = {};
         String pathToTempProject = path.toAbsolutePath() + "/testapp";
         File dir = new File(pathToTempProject);
-        Process p = Runtime.getRuntime().exec(command, env, dir);
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(command, env, dir);
+        } catch (IOException e) {
+            throw new CompliationErrorException(e);
+        }
+
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line;
@@ -96,25 +102,27 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
     @Override
-    public void parseCoverageReport(Path path) throws IOException, XMLStreamException {
+    public Report parseCoverageReport(Path path) throws FileNotFoundException, XMLStreamException, JsonProcessingException, JacocoReportXmlFileNotFoundException {
         String pathToReport = path.toAbsolutePath() + "/testapp/target/site/jacoco/jacoco.xml";
         File file = new File(pathToReport);
 
         Report report;
-        if (file.exists()) {
+        try {
             XmlMapper mapper = new XmlMapper();
             String xml = inputStreamToString(new FileInputStream(file));
             report = mapper.readValue(xml, Report.class);
-//            System.out.println(report);
             List<Sourcefile> sourcefileList = report.get_package().getSourcefile();
             List<Line> lineList = sourcefileList
                     .stream()
 //                    .filter(s -> s.getName().equals("InsertionSort.java"))
                     .flatMap(s -> s.getLine().stream())
+                    .sorted(Comparator.comparingInt(Line::getNr))
                     .collect(Collectors.toList());
             lineList.forEach(System.out::println);
+            return report;
+        } catch (IOException e) {
+            throw new JacocoReportXmlFileNotFoundException(e);
         }
-
     }
 
     private String inputStreamToString(InputStream is) throws IOException {
