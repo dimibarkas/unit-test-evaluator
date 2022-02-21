@@ -1,19 +1,15 @@
 package de.hsrw.dimitriosbarkas.ute.services.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
-import de.hsrw.dimitriosbarkas.ute.services.exceptions.CannotConvertToFileException;
-import de.hsrw.dimitriosbarkas.ute.services.exceptions.CompliationErrorException;
-import de.hsrw.dimitriosbarkas.ute.services.exceptions.JacocoReportXmlFileNotFoundException;
+import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,8 +22,10 @@ import java.util.stream.Collectors;
 @Service
 public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
+    private static final String lines = "------------------------------------------------------------------------";
+
     @Override
-    public Path extractFilesToTemplateProject(Task task, String encodedTest) throws CannotConvertToFileException {
+    public Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException {
         byte[] testData = Base64.getDecoder().decode(encodedTest);
         byte[] taskData = Base64.getDecoder().decode(task.getEncodedFile());
 
@@ -36,39 +34,35 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             // Create temporary folder
             Path path = Files.createTempDirectory("temp");
 
-            log.info("Extracting file content to path " + path.toAbsolutePath());
+
+            log.info(lines);
+            log.info("Temp path: " + path.toAbsolutePath());
+            log.info(lines);
 
             // Execute bash script
             String[] command = {"bash", "src/main/resources/create-mvn-project-script.sh", "-p", path.toAbsolutePath().toString()};
             p = Runtime.getRuntime().exec(command);
 
-
-            // Read output from script
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                log.info("Script output: " + line);
-            }
-
-            reader.close();
-
             p.waitFor();
+            if(p.exitValue() == 0) {
+                log.info(lines);
+                log.info("Test environment successfully setup.");
+                log.info(lines);
+            }
 
             File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getPathToFile());
             File testFile = new File(path.toAbsolutePath() + "/testapp/src/test/java/com/test/app/" + task.getPathToTestTemplate());
             writeFile(taskFile, taskData);
             writeFile(testFile, testData);
 
-            //path.toFile().deleteOnExit();
-
             return path;
         } catch (IOException | InterruptedException e) {
-            throw new CannotConvertToFileException(e);
+            throw new CouldNotSetupTestEnvironmentException(e);
         }
     }
 
     @Override
-    public void safelyExecuteTestInTempProject(Path path) throws CompliationErrorException, IOException {
+    public void safelyExecuteTestInTempProject(Path path) throws ErrorWhileExecutingTestException, IOException {
         //test if file is empty
         String[] command = {"mvn", "test"};
         String[] env = {};
@@ -77,17 +71,18 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         Process p;
         try {
             p = Runtime.getRuntime().exec(command, env, dir);
-        } catch (IOException e) {
-            throw new CompliationErrorException(e);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                log.info("Script output: " + line);
+            }
+            p.waitFor();
+            if (p.exitValue() != 0) {
+                throw new ErrorWhileExecutingTestException("BUILD FAILED.");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            log.info("Script output: " + line);
-        }
-
         log.info(dir);
     }
 
@@ -102,9 +97,13 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
     @Override
-    public Report parseCoverageReport(Path path) throws FileNotFoundException, XMLStreamException, JsonProcessingException, JacocoReportXmlFileNotFoundException {
+    public Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, IOException {
         String pathToReport = path.toAbsolutePath() + "/testapp/target/site/jacoco/jacoco.xml";
         File file = new File(pathToReport);
+
+        if(!file.exists()) {
+            throw new JacocoReportXmlFileNotFoundException();
+        }
 
         Report report;
         try {
@@ -121,7 +120,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             lineList.forEach(System.out::println);
             return report;
         } catch (IOException e) {
-            throw new JacocoReportXmlFileNotFoundException(e);
+            throw new IOException(e);
         }
     }
 

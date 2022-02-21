@@ -2,7 +2,6 @@ package de.hsrw.dimitriosbarkas.ute.services.impl;
 
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
-import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
@@ -26,19 +25,23 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     private SafeExecuteTestService safeExecuteTestService;
 
     @Override
-    public void evaluateTest(String taskId, String encodedTestContent) throws CannotLoadConfigException, TaskNotFoundException, CannotConvertToFileException, IOException, XMLStreamException, InterruptedException, JacocoReportXmlFileNotFoundException, CompliationErrorException {
+    public String evaluateTest(String taskId, String encodedTestContent) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
         log.info("Evaluating test for task" + taskId + "...");
 
         // Get configuration for this task
         Task task = getTaskConfig(taskId);
 
-
-
-        // TODO: surround with try catch -> if exception is thrown, then throw an eval custom exception (EvaluationException)
-        Path path = safeExecuteTestService.extractFilesToTemplateProject(task, encodedTestContent);
-        safeExecuteTestService.safelyExecuteTestInTempProject(path);
-        safeExecuteTestService.generateCoverageReport(path);
-        safeExecuteTestService.parseCoverageReport(path);
+        Path path;
+        try {
+            path = safeExecuteTestService.setupTestEnvironment(task, encodedTestContent);
+            safeExecuteTestService.safelyExecuteTestInTempProject(path);
+            safeExecuteTestService.generateCoverageReport(path);
+            safeExecuteTestService.parseCoverageReport(path);
+        } catch (CouldNotSetupTestEnvironmentException |  ErrorWhileExecutingTestException | IOException | InterruptedException  | JacocoReportXmlFileNotFoundException e) {
+            log.error(e);
+            throw new CompilationErrorException(e);
+        }
+        return "Test successfully executed.";
     }
 
     private Task getTaskConfig(String taskId) throws CannotLoadConfigException, TaskNotFoundException {
