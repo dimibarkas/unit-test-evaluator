@@ -2,6 +2,7 @@ package de.hsrw.dimitriosbarkas.ute.services.impl;
 
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
+import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
@@ -26,17 +27,19 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     @Override
     public String evaluateTest(String taskId, String encodedTestContent) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
-        log.info("Evaluating test for task" + taskId + "...");
+        log.info("Evaluating test for task " + taskId + " ...");
 
         // Get configuration for this task
         Task task = getTaskConfig(taskId);
 
         Path path;
+        Report report;
         try {
             path = safeExecuteTestService.setupTestEnvironment(task, encodedTestContent);
             safeExecuteTestService.safelyExecuteTestInTempProject(path);
             safeExecuteTestService.generateCoverageReport(path);
-            safeExecuteTestService.parseCoverageReport(path);
+            report = safeExecuteTestService.parseCoverageReport(path);
+            log.info(report);
         } catch (CouldNotSetupTestEnvironmentException |  ErrorWhileExecutingTestException | IOException | InterruptedException  | JacocoReportXmlFileNotFoundException e) {
             log.error(e);
             throw new CompilationErrorException(e);

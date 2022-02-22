@@ -75,6 +75,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 log.info("Script output: " + line);
             }
             p.waitFor();
+            //TODO: if a directory /surefire-reports does not exist, then build failed if if exists then try to read the TEST-mutation.<filename>.xml file to get information about the failed tests
             if (p.exitValue() != 0) {
                 throw new ErrorWhileExecutingTestException("BUILD FAILED.");
             }
