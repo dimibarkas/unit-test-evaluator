@@ -2,6 +2,7 @@ package de.hsrw.dimitriosbarkas.ute.services.impl;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
+import de.hsrw.dimitriosbarkas.ute.model.TestResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
@@ -41,7 +42,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             String[] command = {"bash", "src/main/resources/create-mvn-project-script.sh", "-p", path.toAbsolutePath().toString()};
             p = Runtime.getRuntime().exec(command);
             p.waitFor();
-            if(p.exitValue() == 0) {
+            if (p.exitValue() == 0) {
                 log.info(lines);
                 log.info("Test environment successfully setup.");
                 log.info(lines);
@@ -60,31 +61,36 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
     @Override
-    public void safelyExecuteTestInTempProject(Path path) throws ErrorWhileExecutingTestException, IOException {
-        //test if file is empty
+    public TestResult executeTestInTempDirectory(Path path) throws ErrorWhileExecutingTestException {
+
+        //prepare command and choose right directory
         String[] command = {"mvn", "test"};
         String[] env = {};
         String pathToTempProject = path.toAbsolutePath() + "/testapp";
         File dir = new File(pathToTempProject);
+
+        //execute test in different thread
         Process p;
         try {
-            p = Runtime.getRuntime().exec(command, env, dir);
+            p  = Runtime.getRuntime().exec(command, env, dir);
+            p.waitFor();
+            StringBuilder sb = new StringBuilder();
+            // TODO: if possible, just read the error messages.. maybe with ErrorStream?
+            // like this:
+            // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[12,23] '}' expected
+            // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[13,9] invalid method declaration; return type required
+            // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[15,1] class, interface, or enum expected
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                log.info("Script output: " + line);
+                sb.append(line);
+                sb.append("\n");
             }
-            p.waitFor();
-            //TODO: if a directory /surefire-reports does not exist, then build failed if if exists then try to read the TEST-mutation.<filename>.xml file to get information about the failed tests
-            if (p.exitValue() != 0) {
-                throw new ErrorWhileExecutingTestException("BUILD FAILED.");
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            return new TestResult(sb.toString(), p.exitValue(), null);
+        } catch(IOException | InterruptedException e) {
+            throw new ErrorWhileExecutingTestException(e);
         }
-        log.info(dir);
     }
-
 
 
     @Override
@@ -123,6 +129,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
     /**
      * helper method for xml-mapping
+     *
      * @param is InputStream
      * @return String from InputStream
      * @throws IOException if an I/O Error occurs

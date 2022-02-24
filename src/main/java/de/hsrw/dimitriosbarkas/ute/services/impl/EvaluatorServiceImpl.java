@@ -2,6 +2,7 @@ package de.hsrw.dimitriosbarkas.ute.services.impl;
 
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
+import de.hsrw.dimitriosbarkas.ute.model.TestResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -36,15 +38,39 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         Report report;
         try {
             path = safeExecuteTestService.setupTestEnvironment(task, encodedTestContent);
-            safeExecuteTestService.safelyExecuteTestInTempProject(path);
-            safeExecuteTestService.generateCoverageReport(path);
-            report = safeExecuteTestService.parseCoverageReport(path);
-            log.info(report);
+            TestResult result = safeExecuteTestService.executeTestInTempDirectory(path);
+
+            //check if there are errors
+            if(result.getProcessExitValue() == 0) {
+                safeExecuteTestService.generateCoverageReport(path);
+                report = safeExecuteTestService.parseCoverageReport(path);
+                result.setReport(report);
+                //log.info(result);
+            } else {
+                if(!checkPath(path)) {
+                    log.info("build failed");
+                    //log.info(result.getProcessOutput());
+                    //throw new ErrorWhileBuildingTestException();
+                } else {
+                    log.info("there are test failures");
+                }
+            }
+            return result.getProcessOutput();
         } catch (CouldNotSetupTestEnvironmentException |  ErrorWhileExecutingTestException | IOException | InterruptedException  | JacocoReportXmlFileNotFoundException e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }
-        return "Test successfully executed.";
+    }
+
+
+    /**
+     * This method checks if a directory exists in a given path.
+     * @param path specified path
+     * @return boolean value if directory exists
+     */
+    private boolean checkPath(Path path) {
+        File dir = new File(path.toAbsolutePath() + "/testapp/target/surefire-reports");
+        return dir.exists();
     }
 
     private Task getTaskConfig(String taskId) throws CannotLoadConfigException, TaskNotFoundException {
