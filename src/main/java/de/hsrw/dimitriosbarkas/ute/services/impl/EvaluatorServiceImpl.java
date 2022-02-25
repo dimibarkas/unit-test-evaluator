@@ -21,11 +21,17 @@ import java.nio.file.Path;
 @Log4j2
 public class EvaluatorServiceImpl implements EvaluatorService {
 
-    @Autowired
-    private ConfigService configService;
+    private final ConfigService configService;
 
-    @Autowired
-    private SafeExecuteTestService safeExecuteTestService;
+    private final SafeExecuteTestService safeExecuteTestService;
+
+    public EvaluatorServiceImpl(
+            ConfigService configService,
+            SafeExecuteTestService safeExecuteTestService
+    ) {
+        this.configService = configService;
+        this.safeExecuteTestService = safeExecuteTestService;
+    }
 
     @Override
     public TestResult evaluateTest(String taskId, String encodedTestContent) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
