@@ -13,10 +13,14 @@ function Workspace() {
         editorRef.current = editor;
     }
 
+
     async function sendTestContent() {
         await axios.post("/api/evaluate", {taskId: 1, encodedTestContent: btoa(editorRef.current.getValue())})
             .then((response) => {
                 console.log(response)
+            })
+            .catch((reason) => {
+                console.log(reason);
             })
     }
 
@@ -33,9 +37,15 @@ function Workspace() {
     const handleClick = () => setLoading(true);
 
 
+    //TODO: The submit button should be blue if the user can submit.
+    // If a user submits his code, the button turns grey while the test are executing.
+    // If the build failed, the button should turn red and stay red until the user makes changes in his code.
+    // if the tests are incorrect, the button should turn yellow until the user makes changes in his code.
+
     return (
         <>
             <div style={{display: "flex", flexDirection: "row-reverse", marginRight: "1rem", marginBottom: "1rem"}}>
+
                 <Button
                     variant="primary"
                     disabled={isLoading}
