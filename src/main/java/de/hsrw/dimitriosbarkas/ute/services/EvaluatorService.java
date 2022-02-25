@@ -1,5 +1,6 @@
 package de.hsrw.dimitriosbarkas.ute.services;
 
+import de.hsrw.dimitriosbarkas.ute.model.TestResult;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 
 public interface EvaluatorService {
@@ -13,7 +14,7 @@ public interface EvaluatorService {
      * @throws TaskNotFoundException if the specified task cannot be found
      * @throws CompilationErrorException if an error occurred during the compilation
      */
-    String evaluateTest(String taskId, String encodedTestContent)
+    TestResult evaluateTest(String taskId, String encodedTestContent)
             throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException;
 
 }

@@ -75,7 +75,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             p  = Runtime.getRuntime().exec(command, env, dir);
             p.waitFor();
             StringBuilder sb = new StringBuilder();
-            // TODO: if possible, just read the error messages.. maybe with ErrorStream?
+            // TODO: if possible, just read the error messages.. maybe with ErrorStream or with a filter inside a stream
             // like this:
             // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[12,23] '}' expected
             // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[13,9] invalid method declaration; return type required
@@ -86,7 +86,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 sb.append(line);
                 sb.append("\n");
             }
-            return new TestResult(sb.toString(), p.exitValue(), null);
+            return new TestResult(sb.toString(), p.exitValue(), null, null);
         } catch(IOException | InterruptedException e) {
             throw new ErrorWhileExecutingTestException(e);
         }
@@ -94,13 +94,18 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
 
     @Override
-    public void generateCoverageReport(Path path) throws IOException, InterruptedException {
-        String[] command = {"mvn", "jacoco:report"};
-        String[] env = {};
-        String pathToTempProject = path.toAbsolutePath() + "/testapp";
-        File dir = new File(pathToTempProject);
-        Process p = Runtime.getRuntime().exec(command, env, dir);
-        p.waitFor();
+    public void generateCoverageReport(Path path) throws ErrorWhileGeneratingCoverageReport {
+        try {
+            String[] command = {"mvn", "jacoco:report"};
+            String[] env = {};
+            String pathToTempProject = path.toAbsolutePath() + "/testapp";
+            File dir = new File(pathToTempProject);
+            Process p = Runtime.getRuntime().exec(command, env, dir);
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
+            throw new ErrorWhileGeneratingCoverageReport(e);
+        }
+
     }
 
     @Override
@@ -152,7 +157,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             fos.write(strToBytes);
             fos.write(data);
             //log.info(file.getAbsolutePath() + " saved.");
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

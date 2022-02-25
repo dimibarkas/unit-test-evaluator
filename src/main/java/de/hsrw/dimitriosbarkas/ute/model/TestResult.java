@@ -13,4 +13,6 @@ public class TestResult {
     private int processExitValue;
 
     private Report report;
+
+    private BuildSummary conclusion;
 }
