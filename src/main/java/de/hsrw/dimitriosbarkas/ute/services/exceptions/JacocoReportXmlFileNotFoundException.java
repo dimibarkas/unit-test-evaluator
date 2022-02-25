@@ -13,10 +13,10 @@ public class JacocoReportXmlFileNotFoundException extends Exception {
 
     /**
      * Constructor setting cause.
-     * @param cause cause of exception.
+     * @param message description of why the exception was thrown.
      */
-    public JacocoReportXmlFileNotFoundException(Throwable cause) {
-        super(cause);
+    public JacocoReportXmlFileNotFoundException(String message) {
+        super(message);
     }
 
 

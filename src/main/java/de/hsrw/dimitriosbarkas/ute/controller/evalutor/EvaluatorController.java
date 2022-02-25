@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class EvaluatorController {
 
-    @Autowired
-    private EvaluatorService evaluatorService;
+    private final EvaluatorService evaluatorService;
+
+    public EvaluatorController(EvaluatorService evaluatorService) {
+        this.evaluatorService = evaluatorService;
+    }
 
     @PostMapping(value = "/api/evaluate")
     public ResponseEntity<?> evaluateTest(@RequestBody EvaluatorRequestTo evaluatorRequestTo) {

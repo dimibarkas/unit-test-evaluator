@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TaskController {
 
-    @Autowired
-    private ConfigService configService;
+    private final ConfigService configService;
+
+    public TaskController(ConfigService configService) {
+        this.configService = configService;
+    }
 
     @GetMapping(value = "/api/tasks")
     public ResponseEntity<?> getConfig() {

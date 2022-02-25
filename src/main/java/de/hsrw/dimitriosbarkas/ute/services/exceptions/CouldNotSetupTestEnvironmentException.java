@@ -15,6 +15,10 @@ public class CouldNotSetupTestEnvironmentException extends Exception {
         super(cause);
     }
 
+    public CouldNotSetupTestEnvironmentException(String message) {
+        super(message);
+    }
+
 
 
 }

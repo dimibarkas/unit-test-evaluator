@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 @Service
 public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
-    private static final String lines = "------------------------------------------------------------------------";
-
     @Override
     public Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException {
         byte[] testData = Base64.getDecoder().decode(encodedTest);
@@ -35,24 +33,27 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             // Create temporary folder
             Path path = Files.createTempDirectory("temp");
 
-            log.info("Creating test environment in temp path...");
+            log.info("Creating test environment in temp path ...");
             log.info(path.toAbsolutePath());
 
             // Execute bash script
             String[] command = {"bash", "src/main/resources/create-mvn-project-script.sh", "-p", path.toAbsolutePath().toString()};
             p = Runtime.getRuntime().exec(command);
             p.waitFor();
-            if (p.exitValue() == 0) {
-                log.info(lines);
-                log.info("Test environment successfully setup.");
-                log.info(lines);
+
+            if (p.exitValue() != 0) {
+                throw new CouldNotSetupTestEnvironmentException("Error while creating test environment");
             }
+
+            log.info("Test environment successfully setup.");
 
             // write files
             File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getPathToFile());
             File testFile = new File(path.toAbsolutePath() + "/testapp/src/test/java/com/test/app/" + task.getPathToTestTemplate());
             writeFile(taskFile, taskData);
             writeFile(testFile, testData);
+
+            log.info("Write files to test environment.");
 
             return path;
         } catch (IOException | InterruptedException e) {
@@ -113,6 +114,11 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         String pathToReport = path.toAbsolutePath() + "/testapp/target/site/jacoco/jacoco.xml";
         File file = new File(pathToReport);
 
+        if(!file.exists()) {
+            String errorMessage = "The file jacoco.xml could not be found in path " + path;
+            throw new JacocoReportXmlFileNotFoundException(errorMessage);
+        }
+
         Report report;
         try {
             XmlMapper mapper = new XmlMapper();
@@ -125,7 +131,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                     .flatMap(s -> s.getLine().stream())
                     .sorted(Comparator.comparingInt(Line::getNr))
                     .collect(Collectors.toList());
-            lineList.forEach(System.out::println);
+//            lineList.forEach(System.out::println);
             return report;
         } catch (IOException e) {
             throw new IOException(e);
