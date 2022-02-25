@@ -50,7 +50,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             //check if build was successful by exit value
             if(result.getProcessExitValue() == 0) {
                 log.info("build successful");
-                result.setConclusion(BuildSummary.BUILD_SUCCESSFUL);
+                result.setSummary(BuildSummary.BUILD_SUCCESSFUL);
                 safeExecuteTestService.generateCoverageReport(path);
                 report = safeExecuteTestService.parseCoverageReport(path);
                 result.setReport(report);
@@ -58,11 +58,11 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             } else {
                 if(!checkPath(path)) {
                     log.info("build failed");
-                    result.setConclusion(BuildSummary.BUILD_FAILED);
+                    result.setSummary(BuildSummary.BUILD_FAILED);
                     //throw new ErrorWhileBuildingTestException();
                 } else {
                     log.info("build successful - but there are test failures");
-                    result.setConclusion(BuildSummary.TESTS_FAILED);
+                    result.setSummary(BuildSummary.TESTS_FAILED);
                 }
             }
             return result;

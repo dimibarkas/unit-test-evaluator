@@ -36,6 +36,13 @@ public interface SafeExecuteTestService {
      */
     void generateCoverageReport(Path path) throws ErrorWhileGeneratingCoverageReport;
 
-    Report parseCoverageReport(Path path) throws IOException, JacocoReportXmlFileNotFoundException;
+    /**
+     * This function tries to parse a report created by jacoco into a Report object.
+     * @param path the path to the jacoco directory.
+     * @return the parsed Report object
+     * @throws JacocoReportXmlFileNotFoundException if the xml file could not be found
+     * @throws IOException if an error occurs during the parse
+     */
+    Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, IOException;
 
 }

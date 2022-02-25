@@ -14,5 +14,5 @@ public class TestResult {
 
     private Report report;
 
-    private BuildSummary conclusion;
+    private BuildSummary summary;
 }
