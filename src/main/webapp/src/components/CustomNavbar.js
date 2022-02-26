@@ -11,7 +11,7 @@ function CustomNavbar() {
                     </svg>
                     {' '}
                     <div style={{paddingLeft: ".4rem"}}>
-                        Unit Test Evaluator
+                        Unit-Test Evaluator
                     </div>
                 </Navbar.Brand>
             </Container>
