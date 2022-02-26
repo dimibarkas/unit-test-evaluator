@@ -6,6 +6,8 @@ public class ErrorWhileGeneratingCoverageReport extends Exception{
      */
     public ErrorWhileGeneratingCoverageReport() {}
 
-    public ErrorWhileGeneratingCoverageReport(Throwable cause) {}
+    public ErrorWhileGeneratingCoverageReport(Throwable cause) {
+        super(cause);
+    }
 
 }

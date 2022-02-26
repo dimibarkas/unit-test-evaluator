@@ -65,17 +65,19 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     public TestResult executeTestInTempDirectory(Path path) throws ErrorWhileExecutingTestException {
 
         //prepare command and choose right directory
-        String[] command = {"mvn", "test"};
+        String[] command = {"mvn", "clean", "test"};
         String[] env = {};
         String pathToTempProject = path.toAbsolutePath() + "/testapp";
         File dir = new File(pathToTempProject);
 
         //execute test in different thread
         Process p;
+        StringBuilder sb;
         try {
-            p  = Runtime.getRuntime().exec(command, env, dir);
+            p = Runtime.getRuntime().exec(command, env, dir);
             p.waitFor();
-            StringBuilder sb = new StringBuilder();
+
+            sb = new StringBuilder();
             // TODO: if possible, just read the error messages.. maybe with ErrorStream or with a filter inside a stream
             // like this:
             // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[12,23] '}' expected
@@ -88,7 +90,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 sb.append("\n");
             }
             return new TestResult(sb.toString(), p.exitValue(), null, null);
-        } catch(IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new ErrorWhileExecutingTestException(e);
         }
     }
@@ -110,11 +112,11 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
     @Override
-    public Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, IOException {
+    public Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
         String pathToReport = path.toAbsolutePath() + "/testapp/target/site/jacoco/jacoco.xml";
         File file = new File(pathToReport);
 
-        if(!file.exists()) {
+        if (!file.exists()) {
             String errorMessage = "The file jacoco.xml could not be found in path " + path;
             throw new JacocoReportXmlFileNotFoundException(errorMessage);
         }
@@ -125,16 +127,13 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             String xml = inputStreamToString(new FileInputStream(file));
             report = mapper.readValue(xml, Report.class);
             List<Sourcefile> sourcefileList = report.get_package().getSourcefile();
-            List<Line> lineList = sourcefileList
-                    .stream()
+            List<Line> lineList = sourcefileList.stream()
 //                    .filter(s -> s.getName().equals("InsertionSort.java"))
-                    .flatMap(s -> s.getLine().stream())
-                    .sorted(Comparator.comparingInt(Line::getNr))
-                    .collect(Collectors.toList());
+                    .flatMap(s -> s.getLine().stream()).sorted(Comparator.comparingInt(Line::getNr)).collect(Collectors.toList());
 //            lineList.forEach(System.out::println);
             return report;
         } catch (IOException e) {
-            throw new IOException(e);
+            throw new ErrorWhileParsingReportException(e);
         }
     }
 

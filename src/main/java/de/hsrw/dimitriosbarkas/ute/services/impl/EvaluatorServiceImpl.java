@@ -25,10 +25,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     private final SafeExecuteTestService safeExecuteTestService;
 
-    public EvaluatorServiceImpl(
-            ConfigService configService,
-            SafeExecuteTestService safeExecuteTestService
-    ) {
+    public EvaluatorServiceImpl(ConfigService configService, SafeExecuteTestService safeExecuteTestService) {
         this.configService = configService;
         this.safeExecuteTestService = safeExecuteTestService;
     }
@@ -48,25 +45,30 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             result = safeExecuteTestService.executeTestInTempDirectory(path);
 
             //check if build was successful by exit value
-            if(result.getProcessExitValue() == 0) {
+            if (result.getProcessExitValue() == 0) {
                 log.info("build successful");
                 result.setSummary(BuildSummary.BUILD_SUCCESSFUL);
                 safeExecuteTestService.generateCoverageReport(path);
                 report = safeExecuteTestService.parseCoverageReport(path);
                 result.setReport(report);
+                log.info(result);
                 //log.info(result);
             } else {
-                if(!checkPath(path)) {
-                    log.info("build failed");
+                if (!checkPath(path)) {
+                    log.warn("build failed");
                     result.setSummary(BuildSummary.BUILD_FAILED);
+                    String errorMessages = result.getProcessOutput();
+                    log.info(errorMessages);
                     //throw new ErrorWhileBuildingTestException();
                 } else {
-                    log.info("build successful - but there are test failures");
+                    log.warn("build successful - but there are test failures");
                     result.setSummary(BuildSummary.TESTS_FAILED);
+                    log.info(result);
+
                 }
             }
             return result;
-        } catch (CouldNotSetupTestEnvironmentException |  ErrorWhileExecutingTestException | ErrorWhileGeneratingCoverageReport  | JacocoReportXmlFileNotFoundException | IOException  e) {
+        } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException | ErrorWhileGeneratingCoverageReport | JacocoReportXmlFileNotFoundException | ErrorWhileParsingReportException e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }
@@ -74,6 +76,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     /**
      * This method checks if a directory exists in a given path.
+     *
      * @param path specified path
      * @return boolean value if directory exists
      */
@@ -84,16 +87,16 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     /**
      * This function helps to get a Task by its id.
+     *
      * @param taskId the specified id
      * @return Task
      * @throws CannotLoadConfigException if config could not be load
-     * @throws TaskNotFoundException if the task with the specified can not be found
+     * @throws TaskNotFoundException     if the task with the specified can not be found
      */
     private Task getTaskConfig(String taskId) throws CannotLoadConfigException, TaskNotFoundException {
         TaskConfig config = configService.getTaskConfig();
 
         //Find task
-        return config.getTasks().stream().filter(t -> taskId.equals(t.getId()))
-                .findFirst().orElseThrow(TaskNotFoundException::new);
+        return config.getTasks().stream().filter(t -> taskId.equals(t.getId())).findFirst().orElseThrow(TaskNotFoundException::new);
     }
 }
