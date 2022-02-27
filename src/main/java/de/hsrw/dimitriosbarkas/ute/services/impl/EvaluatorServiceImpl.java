@@ -1,20 +1,16 @@
 package de.hsrw.dimitriosbarkas.ute.services.impl;
 
-import de.hsrw.dimitriosbarkas.ute.model.BuildSummary;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
 import de.hsrw.dimitriosbarkas.ute.model.TestResult;
-import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 @Service
@@ -37,38 +33,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         // Get configuration for this task
         Task task = getTaskConfig(taskId);
 
-        Path path;
-        Report report;
         TestResult result;
         try {
-            path = safeExecuteTestService.setupTestEnvironment(task, encodedTestContent);
-            result = safeExecuteTestService.executeTestInTempDirectory(path);
+            safeExecuteTestService.setupTestEnvironment(task, encodedTestContent);
+            result = safeExecuteTestService.buildAndRunTests();
 
-            //check if build was successful by exit value
-            if (result.getProcessExitValue() == 0) {
-                log.info("build successful");
-                result.setSummary(BuildSummary.BUILD_SUCCESSFUL);
-                safeExecuteTestService.generateCoverageReport(path);
-                report = safeExecuteTestService.parseCoverageReport(path);
-                result.setReport(report);
-                log.info(result);
-                //log.info(result);
-            } else {
-                if (!checkPath(path)) {
-                    log.warn("build failed");
-                    result.setSummary(BuildSummary.BUILD_FAILED);
-                    String errorMessages = result.getProcessOutput();
-                    log.info(errorMessages);
-                    //throw new ErrorWhileBuildingTestException();
-                } else {
-                    log.warn("build successful - but there are test failures");
-                    result.setSummary(BuildSummary.TESTS_FAILED);
-                    log.info(result);
-
-                }
-            }
             return result;
-        } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException | ErrorWhileGeneratingCoverageReport | JacocoReportXmlFileNotFoundException | ErrorWhileParsingReportException e) {
+        } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException  e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }

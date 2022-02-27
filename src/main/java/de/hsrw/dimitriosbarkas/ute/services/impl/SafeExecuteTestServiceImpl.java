@@ -1,6 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.services.impl;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import de.hsrw.dimitriosbarkas.ute.model.BuildSummary;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TestResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
@@ -8,6 +9,7 @@ import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +23,22 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Service
+@Data
 public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
+    private Path path;
+    private Task task;
+
     @Override
-    public Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException {
+    public void setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException {
+        setTask(task);
         byte[] testData = Base64.getDecoder().decode(encodedTest);
         byte[] taskData = Base64.getDecoder().decode(task.getEncodedFile());
 
         Process p;
         try {
             // Create temporary folder
-            Path path = Files.createTempDirectory("temp");
+            setPath(Files.createTempDirectory("temp"));
 
             log.info("Creating test environment in temp path ...");
             log.info(path.toAbsolutePath());
@@ -53,16 +60,15 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             writeFile(taskFile, taskData);
             writeFile(testFile, testData);
 
-            log.info("Write files to test environment.");
+            log.info("Tests successfully written.");
 
-            return path;
         } catch (IOException | InterruptedException e) {
             throw new CouldNotSetupTestEnvironmentException(e);
         }
     }
 
     @Override
-    public TestResult executeTestInTempDirectory(Path path) throws ErrorWhileExecutingTestException {
+    public TestResult buildAndRunTests() throws ErrorWhileExecutingTestException {
 
         //prepare command and choose right directory
         String[] command = {"mvn", "clean", "test"};
@@ -71,28 +77,75 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         File dir = new File(pathToTempProject);
 
         //execute test in different thread
-        Process p;
+        Process process;
         StringBuilder sb;
         try {
-            p = Runtime.getRuntime().exec(command, env, dir);
-            p.waitFor();
+            process = Runtime.getRuntime().exec(command, env, dir);
+            process.waitFor();
 
-            sb = new StringBuilder();
-            // TODO: if possible, just read the error messages.. maybe with ErrorStream or with a filter inside a stream
-            // like this:
-            // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[12,23] '}' expected
-            // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[13,9] invalid method declaration; return type required
-            // [ERROR] /private/var/folders/yq/xv6h8nj97tzcqs9dnp8zgknr0000gn/T/temp15456590090410174899/testapp/src/test/java/com/test/app/InsertionSortTest.java:[15,1] class, interface, or enum expected
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append("\n");
-            }
-            return new TestResult(sb.toString(), p.exitValue(), null, null);
-        } catch (IOException | InterruptedException e) {
+            // check if build was successful
+            if (process.exitValue() == 0) return getSuccessfulTestResult(path);
+            return getBuildOrTestErrors(process, path);
+
+        } catch (IOException | InterruptedException | ErrorWhileGeneratingCoverageReport | JacocoReportXmlFileNotFoundException | ErrorWhileParsingReportException e) {
             throw new ErrorWhileExecutingTestException(e);
         }
+    }
+
+    // TODO: Refactor to utils
+    private String readFromFile(File file) {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    private TestResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
+        log.info("build successful");
+        String filename = task.getPathToTestTemplate().replace(".java", ".txt");
+        String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
+        File file = new File(pathToFile);
+        String output = readFromFile(file);
+        generateCoverageReport(path);
+        Report report = parseCoverageReport(path);
+        return new TestResult(output, report, BuildSummary.BUILD_SUCCESSFUL);
+    }
+
+
+    private TestResult getBuildOrTestErrors(Process process, Path path) throws IOException, InterruptedException {
+        String pathToDir = path.toAbsolutePath() + "/testapp/target/surefire-reports/";
+        boolean buildSucceed = new File(pathToDir).exists();
+        if(buildSucceed) {
+            log.warn("build successful - but there are test failures");
+            String filename = task.getPathToTestTemplate().replace(".java", ".txt");
+            String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
+            File file = new File(pathToFile);
+            String output = readFromFile(file);
+            return new TestResult(output, null, BuildSummary.TESTS_FAILED);
+        }
+
+        log.error("build failed");
+        // return error logs
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try(BufferedReader reader = new BufferedReader((new InputStreamReader(process.getInputStream())))) {
+            while((line = reader.readLine()) != null) {
+                if(line.startsWith("[ERROR]")) {
+                    sb.append(line);
+                    sb.append("\n");
+                }
+            }
+        }
+        return new TestResult(sb.toString(), null, BuildSummary.BUILD_FAILED);
     }
 
 
@@ -137,6 +190,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         }
     }
 
+    // TODO: Refactor to utils
     /**
      * helper method for xml-mapping
      *
@@ -155,6 +209,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         return sb.toString();
     }
 
+    // TODO: Refactor to utils
     private void writeFile(File file, byte[] data) {
         try (FileOutputStream fos = new FileOutputStream(file, true)) {
             String str = "package com.test.app; \n\n";

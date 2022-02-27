@@ -20,15 +20,14 @@ public interface SafeExecuteTestService {
      * @return path to the newly created temporary directory
      * @throws CouldNotSetupTestEnvironmentException if an error occurs while setting up the test environment
      */
-    Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
+    void setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
 
     /**
      * This function actually calls the command to compile the provided tests.
-     * @param path the path to the temporary directory
      * @return the exit value of the process
      * @throws ErrorWhileExecutingTestException if an error occurs while executing tests (compile oder test errors)
      */
-    TestResult executeTestInTempDirectory(Path path) throws ErrorWhileExecutingTestException;
+    TestResult buildAndRunTests() throws ErrorWhileExecutingTestException;
 
     /**
      * This function calls the command to generate a coverage-report.xml file out of the jacoco.exe file.
