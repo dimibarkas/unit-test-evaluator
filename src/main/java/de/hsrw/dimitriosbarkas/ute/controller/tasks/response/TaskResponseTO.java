@@ -10,6 +10,8 @@ public class TaskResponseTO {
 
     private String id;
 
+    private String name;
+
     private String description;
 
     private String targetDescription;
@@ -21,6 +23,7 @@ public class TaskResponseTO {
     public static TaskResponseTO fromTask(Task task) {
         return new TaskResponseTO(
                 task.getId(),
+                task.getName(),
                 task.getDescription(),
                 task.getTargetDescription(),
                 task.getEncodedFile(),
