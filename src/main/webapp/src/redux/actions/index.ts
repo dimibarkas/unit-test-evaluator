@@ -2,7 +2,7 @@ import {getAllTasks} from "../../services/tasks";
 import {Task} from "../../types/Task";
 
 export const REQUEST_TASKLIST = 'REQUEST_TASKLIST';
-export const RECIEVE_TASKLIST = 'RECIEVE_TASKLIST';
+export const RECEIVE_TASKLIST = 'RECEIVE_TASKLIST';
 export const SELECT_TASK = 'SELECT_TASK';
 export const INVALIDATE_TASK = 'INVALIDATE_TASK';
 
@@ -20,14 +20,14 @@ export const requestTasks = () => ({
     type: REQUEST_TASKLIST
 })
 
-export const recievePosts = (tasks: Task[]) => ({
-    type: RECIEVE_TASKLIST,
+export const receivePosts = (tasks: Task[]) => ({
+    type: RECEIVE_TASKLIST,
     tasks: tasks
 })
 
 const fetchTasks = () => dispatch => {
     dispatch(requestTasks())
-    return getAllTasks().then((tasks) => dispatch(recievePosts(tasks)))
+    return getAllTasks().then((tasks) => dispatch(receivePosts(tasks)))
 }
 
 const shouldFetchTasks = (state) => {
