@@ -1,7 +1,6 @@
 import {Container, ListGroup, Nav, Navbar, Offcanvas, Spinner} from "react-bootstrap";
 import {useEffect, useState} from "react";
-// @ts-ignore
-import {getAllTasks} from "../services/tasks.ts";
+import {getAllTasks} from "../services/tasks";
 import {Task} from "../types/Task";
 import {MdDashboard} from "react-icons/md"
 import React from "react";

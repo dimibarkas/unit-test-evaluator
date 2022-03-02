@@ -7,7 +7,7 @@ export const getAllTasks = async (): Promise<Task[]> => {
         // console.log(taskList);
         taskList = res.data.tasks;
     }).catch((error) => {
-        console.log("tasks could not be loaded", error);
+        console.error("tasks could not be loaded", error);
     });
     return taskList;
 }
