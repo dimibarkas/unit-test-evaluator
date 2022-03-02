@@ -1,44 +1,38 @@
 import {getAllTasks} from "../../services/tasks";
 import {Task} from "../../types/Task";
 
-export const REQUEST_TASKLIST = 'REQUEST_TASKLIST';
-export const RECEIVE_TASKLIST = 'RECEIVE_TASKLIST';
-export const SELECT_TASK = 'SELECT_TASK';
-export const INVALIDATE_TASK = 'INVALIDATE_TASK';
+export enum ActionType {
+    REQUEST_TASKS = 'REQUEST_TASKS',
+    RECEIVE_TASKS = 'RECEIVE_TASKS'
+}
 
-export const selectTask = task => ({
-    type: SELECT_TASK,
-    task
+interface RequestTasksAction {
+    type: ActionType.REQUEST_TASKS,
+}
+
+interface ReceiveTasksAction {
+    type: ActionType.RECEIVE_TASKS,
+    payload: Task[]
+}
+
+export type Action = RequestTasksAction | ReceiveTasksAction;
+
+export const requestTasks = (): Action => ({
+    type: ActionType.REQUEST_TASKS
 })
 
-export const invalidateTask = task => ({
-    type: INVALIDATE_TASK,
-    task
-})
-
-export const requestTasks = () => ({
-    type: REQUEST_TASKLIST
-})
-
-export const receivePosts = (tasks: Task[]) => ({
-    type: RECEIVE_TASKLIST,
-    tasks: tasks
+export const receiveTasks = (tasks: Task[]) => ({
+    type: ActionType.RECEIVE_TASKS,
+    payload: tasks
 })
 
 const fetchTasks = () => dispatch => {
     dispatch(requestTasks())
-    return getAllTasks().then((tasks) => dispatch(receivePosts(tasks)))
+    return getAllTasks().then((tasks) => dispatch(receiveTasks(tasks)))
 }
 
-const shouldFetchTasks = (state) => {
-    const tasks = state.taskList
-    if (tasks.length === 0) {
-        return true
-    }
-    if (tasks.isFetching) {
-        return false
-    }
-    return tasks.didInvalidate
+const shouldFetchTasks = (state): boolean => {
+    return state.tasks.taskList.length === 0;
 }
 
 export const fetchTasksIfNeeded = () => (dispatch, getState) => {

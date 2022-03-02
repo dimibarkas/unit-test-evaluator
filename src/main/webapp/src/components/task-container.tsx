@@ -1,7 +1,6 @@
 import {Alert, Col, Container, Row} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
 import Workspace from "./workspace";
-import React from "react";
 
 function TaskContainer() {
 

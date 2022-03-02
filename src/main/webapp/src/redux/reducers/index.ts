@@ -1,58 +1,39 @@
-import {AnyAction, combineReducers} from "redux";
-import {INVALIDATE_TASK, RECEIVE_TASKLIST, REQUEST_TASKLIST, SELECT_TASK} from "../actions";
+import {combineReducers} from "redux";
+import {Action, ActionType} from "../actions";
 import {Task} from "../../types/Task";
 
-const selectedTask = (state: Task = null, action) => {
-    switch (action.type) {
-        case SELECT_TASK:
-            return action.task
-        default:
-            return state
-    }
+const initialTaskListState = {
+    isLoading: false,
+    taskList:  new Array<Task>()
 }
 
-// interface ITaskListState {
-//     isFetching: boolean;
-//     didInvalidate: false;
-//     tasks: Task[];
-// }
-//
-// const initialTaskListState: ITaskListState = {
-//     isFetching: false,
-//     didInvalidate: false,
-//     tasks: [],
-// }
+interface ITaskListState  {
+    isLoading: boolean,
+    taskList: Task[]
+}
 
-//TODO: typing
-const taskList = (state = [], action: AnyAction) => {
-    console.log(action.payload)
+const tasks = (state:ITaskListState = initialTaskListState, action: Action) => {
     switch (action.type) {
-        case INVALIDATE_TASK:
+        case ActionType.REQUEST_TASKS:
             return {
                 ...state,
-                didInvalidate: true
+                isLoading: true,
             }
-        case REQUEST_TASKLIST:
+        case ActionType.RECEIVE_TASKS:
             return {
                 ...state,
-                isFetching: true,
-                didInvalidate: false
-            }
-        case RECEIVE_TASKLIST:
-            return {
-                ...state,
-                isFetching: false,
-                didInvalidate: false,
-                tasks: action.tasks,
+                isLoading: false,
+                taskList: action.payload
             }
         default:
-            return state
+            return {
+                ...state
+            }
     }
 }
 
 const rootReducer = combineReducers({
-    selectedTask,
-    taskList
+    tasks,
 })
 
 export default rootReducer
