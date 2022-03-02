@@ -1,22 +1,13 @@
-import React, {useEffect, useState} from "react";
-import {Task} from "../types/Task";
-import {getAllTasks} from "../services/tasks";
+import React from "react";
+import {Task} from "../model/types";
 import {ListGroup, Spinner} from "react-bootstrap";
+import {useSelector} from "react-redux";
+import {State} from "../redux/reducers";
 
 function TaskList() {
-    const [tasks, setTasks] = useState<Task[] | undefined>(undefined);
-    const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        getAllTasks().then((returnedTasks) => {
-            setTasks(returnedTasks);
-            setLoading(false);
-        }).catch((error) => {
-            console.log(error);
-        })
-    }, [])
+    const tasks = useSelector((state: State) => state.tasks)
 
-
-    if(loading) return (
+    if(tasks.isLoading) return (
         <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
         </Spinner>
@@ -24,7 +15,7 @@ function TaskList() {
 
     return (
         <ListGroup as={"ol"} numbered>
-            {tasks.map((task: Task) => (
+            {tasks.taskList.map((task: Task) => (
                 <ListGroup.Item key={task.id} action as={"li"} className={"d-flex justify-content-between align-items-start"}>
                     <div className="ms-2 me-auto">
                         <div className="fw-bold">{task.name}</div>

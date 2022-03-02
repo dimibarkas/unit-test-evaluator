@@ -1,5 +1,5 @@
 import {getAllTasks} from "../../services/tasks";
-import {Task} from "../../types/Task";
+import {Task} from "../../model/types";
 
 export enum ActionType {
     REQUEST_TASKS = 'REQUEST_TASKS',

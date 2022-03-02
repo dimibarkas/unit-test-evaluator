@@ -57,10 +57,10 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     }
 
     /**
-     * This function helps to get a Task by its id.
+     * This function helps to get a Types by its id.
      *
      * @param taskId the specified id
-     * @return Task
+     * @return Types
      * @throws CannotLoadConfigException if config could not be load
      * @throws TaskNotFoundException     if the task with the specified can not be found
      */

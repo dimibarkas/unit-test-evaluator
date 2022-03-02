@@ -1,5 +1,5 @@
 import axios from "axios";
-import {Task} from "../types/Task";
+import {Task} from "../model/types";
 
 export const getAllTasks = async (): Promise<Task[]> => {
     let taskList: Task[];

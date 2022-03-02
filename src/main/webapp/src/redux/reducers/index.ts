@@ -1,6 +1,6 @@
 import {combineReducers} from "redux";
 import {Action, ActionType} from "../actions";
-import {Task} from "../../types/Task";
+import {Task} from "../../model/types";
 
 const initialTaskListState = {
     isLoading: false,
@@ -37,3 +37,5 @@ const rootReducer = combineReducers({
 })
 
 export default rootReducer
+
+export type State = ReturnType<typeof rootReducer>

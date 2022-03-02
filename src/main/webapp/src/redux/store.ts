@@ -1,11 +1,12 @@
 import thunk from "redux-thunk";
-import {createLogger} from 'redux-logger';
+//import {createLogger} from 'redux-logger';
 import {applyMiddleware, createStore, compose} from "redux";
 import reducers from "./reducers";
 
 const middleware = [thunk]
 if (process.env.NODE_ENV !== 'production') {
-    middleware.push(createLogger())
+    //To help you debug in redux uncomment the following line
+    // middleware.push(createLogger())
 }
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
