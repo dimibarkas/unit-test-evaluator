@@ -1,4 +1,4 @@
-import {Alert, Button, Col, Container, Row} from "react-bootstrap";
+import {Alert, Button, Container} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
 import {useSelector} from "react-redux";
 import {State} from "../redux/reducers";
@@ -7,6 +7,7 @@ import TaskList from "./task-list";
 import {EvaluationRequest, TestResult} from "../model/types";
 import {submitCode} from "../services/tasks";
 import useAlert from "../hooks/use-alert";
+import Split from "react-split";
 
 
 function TaskContainer() {
@@ -29,7 +30,7 @@ function TaskContainer() {
                 taskId: selectedTask.task.id,
                 encodedTestContent: btoa(editorRef.current.getValue())
             }
-            submitCode(request).then((receivedTest:TestResult) => {
+            submitCode(request).then((receivedTest: TestResult) => {
                 showCustomAlert(receivedTest)
                 setLoading(false);
             }).catch((error) => {
@@ -56,52 +57,59 @@ function TaskContainer() {
 
     return (
         <>
-            <Container fluid>
-                <Container className="text-light">
-                    <h1 className="display-6 my-4">{selectedTask.task.name}</h1>
-                    <h5>{selectedTask.task.description}</h5>
-                    <p><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
-                </Container>
-                <Row>
-                    <Col xs={6} xl={6}>
-                        <Editor
-                            height={"45vh"}
-                            defaultLanguage={"java"}
-                            theme={"vs-dark"}
-                            options={{readOnly: true}}
-                            value={atob(selectedTask.task.encodedFile)}
-                        />
-                    </Col>
-                    <Col xs={6} xl={6}>
-                        <Editor
-                            height={"45vh"}
-                            defaultLanguage={"java"}
-                            theme={"vs-dark"}
-                            onMount={handleEditorDidMount}
-                            value={atob(selectedTask.task.encodedTestTemplate)}
-                        />
-                    </Col>
-                </Row>
-                <Container className="my-4">
+            <Container className="text-light">
+                <h1 className="display-5 my-4">{selectedTask.task.name}</h1>
+                <p className="lead my-2">{selectedTask.task.description}</p>
+                <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
+                <div className="d-flex flex-row-reverse mb-3">
+                    <Button
+                        variant="primary"
+                        disabled={isLoading}
+                        onClick={!isLoading ? handleClick : null}
+                    >
+                        {isLoading ? 'Verarbeitung läuft…' : 'Ausführen'}
+                    </Button>
+                </div>
+                <Split
+                    className="split"
+                    style={{height: "100%"}}
+                    sizes={[50, 50]}
+                    minSize={100}
+                    expandToMin={false}
+                    gutterSize={10}
+                    gutterAlign="center"
+                    snapOffset={30}
+                    dragInterval={1}
+                    direction="horizontal"
+                    cursor="col-resize"
+                >
+                    <Editor
+                        height={"45vh"}
+                        width={"100%"}
+                        defaultLanguage={"java"}
+                        theme={"vs-dark"}
+                        options={{readOnly: true}}
+                        value={atob(selectedTask.task.encodedFile)}
+                    />
+                    <Editor
+                        height={"45vh"}
+                        width={"100%"}
+                        defaultLanguage={"java"}
+                        theme={"vs-dark"}
+                        onMount={handleEditorDidMount}
+                        value={atob(selectedTask.task.encodedTestTemplate)}
+                    />
+                </Split>
+                <div className="my-4">
                     <Alert show={showAlert} variant={variant} onClose={() => setShowAlert(false)} dismissible>
                         <Alert.Heading>{header}</Alert.Heading>
                         <p>
-                            Change this and that and try again. Duis mollis, est non commodo
-                            luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
-                            Cras mattis consectetur purus sit amet fermentum.
+                            Kurzbeschreibung des Fehlers und die Möglichkeit ein Video abzuspielen.
                         </p>
                     </Alert>
-                </Container>
+                </div>
             </Container>
-            <Container className="d-flex flex-row-reverse mt-3">
-                <Button
-                    variant="primary"
-                    disabled={isLoading}
-                    onClick={!isLoading ? handleClick : null}
-                >
-                    {isLoading ? 'Verarbeitung läuft…' : 'Ausführen'}
-                </Button>
-            </Container>
+
         </>
     )
 }
