@@ -1,5 +1,5 @@
 import axios from "axios";
-import {Task} from "../model/types";
+import {EvaluationRequest, Task, TestResult} from "../model/types";
 
 export const getAllTasks = async (): Promise<Task[]> => {
     let taskList: Task[];
@@ -10,4 +10,15 @@ export const getAllTasks = async (): Promise<Task[]> => {
         console.error("tasks could not be loaded", error);
     });
     return taskList;
+}
+
+export const submitCode = async (request: EvaluationRequest): Promise<TestResult> => {
+    let result: TestResult;
+    await axios.post<TestResult>("/api/evaluate", request)
+        .then((response) => {
+            result = response.data;
+        }).catch(() => {
+            throw new Error("an error occurred during code submission");
+        })
+    return result;
 }
