@@ -3,14 +3,15 @@ package de.hsrw.dimitriosbarkas.ute.services;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TestResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
-import de.hsrw.dimitriosbarkas.ute.services.exceptions.CouldNotSetupTestEnvironmentException;
-import de.hsrw.dimitriosbarkas.ute.services.exceptions.ErrorWhileExecutingTestException;
-import de.hsrw.dimitriosbarkas.ute.services.exceptions.ErrorWhileGeneratingCoverageReport;
-import de.hsrw.dimitriosbarkas.ute.services.exceptions.JacocoReportXmlFileNotFoundException;
+import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * This interface provides methods for the base functionality of this project like
+ * setting up a test environment or executing tests in this environment.
+ */
 public interface SafeExecuteTestService {
     /**
      * This function creates a maven project in a temporary directory where unit tests can be executed in.
@@ -19,15 +20,14 @@ public interface SafeExecuteTestService {
      * @return path to the newly created temporary directory
      * @throws CouldNotSetupTestEnvironmentException if an error occurs while setting up the test environment
      */
-    Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
+    void setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
 
     /**
      * This function actually calls the command to compile the provided tests.
-     * @param path the path to the temporary directory
      * @return the exit value of the process
      * @throws ErrorWhileExecutingTestException if an error occurs while executing tests (compile oder test errors)
      */
-    TestResult executeTestInTempDirectory(Path path) throws ErrorWhileExecutingTestException;
+    TestResult buildAndRunTests() throws ErrorWhileExecutingTestException;
 
     /**
      * This function calls the command to generate a coverage-report.xml file out of the jacoco.exe file.
@@ -43,6 +43,6 @@ public interface SafeExecuteTestService {
      * @throws JacocoReportXmlFileNotFoundException if the xml file could not be found
      * @throws IOException if an error occurs during the parse
      */
-    Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, IOException;
+    Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException;
 
 }

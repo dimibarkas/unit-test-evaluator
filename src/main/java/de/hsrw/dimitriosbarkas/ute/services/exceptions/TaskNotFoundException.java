@@ -1,7 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.services.exceptions;
 
 /**
- * Excpetion that is thrown if Task could not be found in config.
+ * Excpetion that is thrown if Types could not be found in config.
  */
 public class TaskNotFoundException extends Exception {
     /**
