@@ -8,6 +8,7 @@ import {EvaluationRequest, TestResult} from "../model/types";
 import {submitCode} from "../services/tasks";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
+import {BsPlayFill} from "react-icons/bs";
 
 
 function TaskContainer() {
@@ -18,6 +19,14 @@ function TaskContainer() {
     const [isLoading, setLoading] = useState(false);
     const editorRef = useRef(null);
 
+    function submitButton() {
+        return (
+            <div className="d-flex align-items-center">
+                <BsPlayFill/>
+                <div className="mx-2">Ausführen</div>
+            </div>
+        )
+    }
 
     function handleEditorDidMount(editor) {
         editorRef.current = editor;
@@ -63,11 +72,11 @@ function TaskContainer() {
                 <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
                 <div className="d-flex flex-row-reverse mb-3">
                     <Button
-                        variant="primary"
+                        variant={isLoading ? "secondary": "success"}
                         disabled={isLoading}
                         onClick={!isLoading ? handleClick : null}
                     >
-                        {isLoading ? 'Verarbeitung läuft…' : 'Ausführen'}
+                        {isLoading ? 'Verarbeitung läuft…' : submitButton()}
                     </Button>
                 </div>
                 <Split
