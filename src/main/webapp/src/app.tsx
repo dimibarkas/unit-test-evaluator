@@ -1,7 +1,8 @@
 import NavigationBar from "./components/navigation-bar";
 import React, {useEffect} from "react";
-import {fetchTasksIfNeeded} from "./redux/actions";
 import {useDispatch} from "react-redux";
+import TaskContainer from "./components/task-container";
+import {fetchTasksIfNeeded} from "./redux/actions/tasks";
 
 function App() {
 
@@ -12,7 +13,10 @@ function App() {
     }, [dispatch])
 
     return (
-        <NavigationBar/>
+        <>
+            <NavigationBar/>
+            <TaskContainer/>
+        </>
     );
 }
 
