@@ -5,18 +5,23 @@ import {BiMenuAltRight} from "react-icons/bi"
 import TaskList from "./task-list";
 import {store} from "../redux/store";
 import {State} from "../redux/reducers";
-import {Task} from "../model/types";
-
 
 function NavigationBar() {
     const [show, setShow] = useState(false);
 
+
+    /**
+     * helper method
+     * @param state
+     */
     function select(state:State) {
         return state.selectedTask?.task?.id
     }
-
-    // state subscriber
     let currentValue
+
+    /**
+     * subscriber method
+     */
     function handleChange() {
         let previousValue = currentValue
         currentValue = select(store.getState())
@@ -35,13 +40,13 @@ function NavigationBar() {
         <>
             <Navbar style={{backgroundColor: "#39393a"}}>
                 <Container>
-                    <Navbar.Brand style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    <Navbar.Brand className="d-flex flex-row align-items-center">
                         <svg width={20} height={20}>
                             <polygon points={"10,20  10,0 20,10"}
                                      style={{fill: "white"}}/>
                         </svg>
                         {' '}
-                        <div style={{paddingLeft: ".4rem", color: "white"}}>
+                        <div className="text-light mx-2" >
                             Unit-Test Evaluator
                         </div>
                     </Navbar.Brand>
