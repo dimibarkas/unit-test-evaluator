@@ -6,6 +6,7 @@ export default function useAlert() {
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [header, setHeader] = useState("");
     const [variant, setVariant] = useState("");
+    const [output, setOutput] = useState("");
 
     const showCustomAlert = (testResult: TestResult) => {
         let headerString = "";
@@ -29,10 +30,11 @@ export default function useAlert() {
         }
         setHeader(headerString);
         setVariant(variant);
+        setOutput(testResult.output);
         setShowAlert(true);
     }
 
     return {
-        showAlert, setShowAlert, showCustomAlert, header, variant
+        showAlert, setShowAlert, showCustomAlert, header, variant, output
     }
 }
