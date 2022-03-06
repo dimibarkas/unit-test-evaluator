@@ -1,12 +1,32 @@
 import {Container, Nav, Navbar, Offcanvas} from "react-bootstrap";
-import {useState} from "react";
-import {MdDashboard} from "react-icons/md"
+import {useEffect, useState} from "react";
 import React from "react";
+import {BiMenuAltRight} from "react-icons/bi"
 import TaskList from "./task-list";
+import {store} from "../redux/store";
+import {State} from "../redux/reducers";
+import {Task} from "../model/types";
 
 
 function NavigationBar() {
     const [show, setShow] = useState(false);
+
+    function select(state:State) {
+        return state.selectedTask?.task?.id
+    }
+
+    // state subscriber
+    let currentValue
+    function handleChange() {
+        let previousValue = currentValue
+        currentValue = select(store.getState())
+        if (previousValue !== currentValue) handleClose()
+    }
+
+    useEffect(() => {
+        store.subscribe(handleChange)
+        // eslint-disable-next-line
+    }, [])
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -26,11 +46,11 @@ function NavigationBar() {
                         </div>
                     </Navbar.Brand>
                     <Nav>
-                        <div style={{color: "white", cursor: "pointer"}} onClick={handleShow} >
+                        <button className="text-light btn" onClick={handleShow}>
                             <h3>
-                                <MdDashboard />
+                                <BiMenuAltRight />
                             </h3>
-                        </div>
+                        </button>
                     </Nav>
                 </Container>
             </Navbar>
@@ -39,16 +59,15 @@ function NavigationBar() {
                     <Offcanvas.Title>Menü</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <p>
+                    <p className="lead">
                         Alle Aufgaben
                     </p>
-                    <TaskList />
+                    <TaskList/>
                 </Offcanvas.Body>
             </Offcanvas>
         </>
     )
 }
-
 
 
 export default NavigationBar;

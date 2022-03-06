@@ -59,7 +59,7 @@ function TaskContainer() {
         return (
             <>
                 <Container>
-                    <h1 className="text-light display-6 my-4">Bitte Aufgabe wählen.</h1>
+                    <p className="lead text-light my-4">Bitte Aufgabe wählen.</p>
                     <TaskList/>
                 </Container>
             </>
