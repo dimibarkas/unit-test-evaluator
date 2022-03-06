@@ -19,3 +19,13 @@ $body-bg: #2a2a2b;
 
 // Import Bootstrap and its default variables
 @import '~bootstrap/scss/bootstrap.scss';
+
+.nav-tabs {
+  .nav-link {
+    border: none;
+
+  }
+  .nav-link.active {
+    background-color: white;
+  }
+}
