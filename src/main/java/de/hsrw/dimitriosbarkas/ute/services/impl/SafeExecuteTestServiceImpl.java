@@ -21,6 +21,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static de.hsrw.dimitriosbarkas.ute.utils.Utilities.*;
+
 @Log4j2
 @Service
 @Data
@@ -92,22 +94,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         }
     }
 
-    // TODO: Refactor to utils
-    private String readFromFile(File file) {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line = br.readLine();
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
 
     private TestResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
         log.info("build successful");
@@ -190,35 +176,4 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         }
     }
 
-    // TODO: Refactor to utils
-    /**
-     * helper method for xml-mapping
-     *
-     * @param is InputStream
-     * @return String from InputStream
-     * @throws IOException if an I/O Error occurs
-     */
-    private String inputStreamToString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-        br.close();
-        return sb.toString();
-    }
-
-    // TODO: Refactor to utils
-    private void writeFile(File file, byte[] data) {
-        try (FileOutputStream fos = new FileOutputStream(file, true)) {
-//            String str = "package com.test.app; \n\n";
-//            byte[] strToBytes = str.getBytes();
-//            fos.write(strToBytes);
-            fos.write(data);
-            //log.info(file.getAbsolutePath() + " saved.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
