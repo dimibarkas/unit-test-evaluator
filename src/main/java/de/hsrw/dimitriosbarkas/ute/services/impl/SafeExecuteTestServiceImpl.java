@@ -212,9 +212,9 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     // TODO: Refactor to utils
     private void writeFile(File file, byte[] data) {
         try (FileOutputStream fos = new FileOutputStream(file, true)) {
-            String str = "package com.test.app; \n\n";
-            byte[] strToBytes = str.getBytes();
-            fos.write(strToBytes);
+//            String str = "package com.test.app; \n\n";
+//            byte[] strToBytes = str.getBytes();
+//            fos.write(strToBytes);
             fos.write(data);
             //log.info(file.getAbsolutePath() + " saved.");
         } catch (IOException e) {

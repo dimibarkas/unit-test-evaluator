@@ -2,6 +2,9 @@ package de.hsrw.dimitriosbarkas.ute.model;
 
 import lombok.Data;
 
+/**
+ * This class represents a task for a user to work on.
+ */
 @Data
 public class Task {
 
