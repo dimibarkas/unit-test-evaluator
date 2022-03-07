@@ -4,7 +4,7 @@ import {useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
-import {EvaluationRequest, TestResult} from "../model/types";
+import {Submission, TestResult} from "../model/types";
 import {submitCode} from "../services/tasks";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
@@ -36,7 +36,7 @@ function TaskContainer() {
     useEffect(() => {
         if (isLoading) {
             setShowAlert(false);
-            const request: EvaluationRequest = {
+            const request: Submission = {
                 taskId: selectedTask.task.id,
                 encodedTestContent: btoa(editorRef.current.getValue())
             }

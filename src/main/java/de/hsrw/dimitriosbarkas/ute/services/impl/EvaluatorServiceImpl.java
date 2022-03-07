@@ -1,5 +1,6 @@
 package de.hsrw.dimitriosbarkas.ute.services.impl;
 
+import de.hsrw.dimitriosbarkas.ute.controller.evalutor.request.Submission;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
 import de.hsrw.dimitriosbarkas.ute.model.TestResult;
@@ -9,9 +10,6 @@ import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
-import java.nio.file.Path;
 
 @Service
 @Log4j2
@@ -27,15 +25,15 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     }
 
     @Override
-    public TestResult evaluateTest(String taskId, String encodedTestContent) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
-        log.info("Evaluating test for task " + taskId + " ...");
+    public TestResult evaluateTest(Submission submission) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
+        log.info("Evaluating test for task " + submission.getTaskId() + " ...");
 
         // Get configuration for this task
-        Task task = getTaskConfig(taskId);
+        Task task = getTaskConfig(submission.getTaskId());
 
         TestResult result;
         try {
-            safeExecuteTestService.setupTestEnvironment(task, encodedTestContent);
+            safeExecuteTestService.setupTestEnvironment(task, submission.getEncodedTestContent());
             result = safeExecuteTestService.buildAndRunTests();
 
             return result;
@@ -43,17 +41,6 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             log.error(e);
             throw new CompilationErrorException(e);
         }
-    }
-
-    /**
-     * This method checks if a directory exists in a given path.
-     *
-     * @param path specified path
-     * @return boolean value if directory exists
-     */
-    private boolean checkPath(Path path) {
-        File dir = new File(path.toAbsolutePath() + "/testapp/target/surefire-reports");
-        return dir.exists();
     }
 
     /**

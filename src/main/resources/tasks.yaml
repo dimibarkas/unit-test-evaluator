@@ -2,7 +2,7 @@ tasks:
   - id: '1'
     name: 'Sortieralgorithmus I: InsertionSort'
     description: 'Der Sortieralgorithmus InsertionSort in Java implementiert.'
-    targetDescription: 'Erreichen Sie eine Test-Coverage von 100%.'
+    targetDescription: 'Erreichen Sie eine Line-Coverage von 100% für die gesamte Klasse.'
     pathToFile: 'InsertionSort.java'
     pathToTestTemplate : 'InsertionSortTest.java'
   - id: '2'
