@@ -1,3 +1,5 @@
+package com.test.app;
+
 public class BubbleSort {
 
     void bubbleSort(int[] arr)

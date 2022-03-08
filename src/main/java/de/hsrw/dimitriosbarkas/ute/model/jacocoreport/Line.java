@@ -10,6 +10,8 @@ import lombok.Data;
  *  - When mb and cb are 0 the line is a statement.
  *  - cb / (mb+cb) is 2/4 partial hit.
  *  - When not a branch and mi == 0 the line is hit (green)
+ *
+ *   more information: https://www.eclemma.org/jacoco/trunk/doc/counters.html
  */
 @Data
 public class Line {

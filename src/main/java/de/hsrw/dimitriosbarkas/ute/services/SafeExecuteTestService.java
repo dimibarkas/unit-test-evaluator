@@ -1,11 +1,10 @@
 package de.hsrw.dimitriosbarkas.ute.services;
 
 import de.hsrw.dimitriosbarkas.ute.model.Task;
-import de.hsrw.dimitriosbarkas.ute.model.TestResult;
+import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -17,7 +16,6 @@ public interface SafeExecuteTestService {
      * This function creates a maven project in a temporary directory where unit tests can be executed in.
      * @param task the specified task which needs to be setup
      * @param encodedTest the base 64 encoded test
-     * @return path to the newly created temporary directory
      * @throws CouldNotSetupTestEnvironmentException if an error occurs while setting up the test environment
      */
     void setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
@@ -27,7 +25,7 @@ public interface SafeExecuteTestService {
      * @return the exit value of the process
      * @throws ErrorWhileExecutingTestException if an error occurs while executing tests (compile oder test errors)
      */
-    TestResult buildAndRunTests() throws ErrorWhileExecutingTestException;
+    SubmissionResult buildAndRunTests() throws ErrorWhileExecutingTestException;
 
     /**
      * This function calls the command to generate a coverage-report.xml file out of the jacoco.exe file.
@@ -41,7 +39,6 @@ public interface SafeExecuteTestService {
      * @param path the path to the jacoco directory.
      * @return the parsed Report object
      * @throws JacocoReportXmlFileNotFoundException if the xml file could not be found
-     * @throws IOException if an error occurs during the parse
      */
     Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException;
 

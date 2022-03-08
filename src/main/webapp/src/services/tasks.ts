@@ -1,5 +1,5 @@
 import axios from "axios";
-import {EvaluationRequest, Task, TestResult} from "../model/types";
+import {Submission, Task, TestResult} from "../model/types";
 
 export const getAllTasks = async (): Promise<Task[]> => {
     let taskList: Task[];
@@ -12,9 +12,9 @@ export const getAllTasks = async (): Promise<Task[]> => {
     return taskList;
 }
 
-export const submitCode = async (request: EvaluationRequest): Promise<TestResult> => {
+export const submitCode = async (submission: Submission): Promise<TestResult> => {
     let result: TestResult;
-    await axios.post<TestResult>("/api/evaluate", request)
+    await axios.post<TestResult>("/api/evaluate", submission)
         .then((response) => {
             result = response.data;
         }).catch(() => {

@@ -1,12 +1,37 @@
 import {Container, Nav, Navbar, Offcanvas} from "react-bootstrap";
-import {useState} from "react";
-import {MdDashboard} from "react-icons/md"
+import {useEffect, useState} from "react";
 import React from "react";
+import {BiMenuAltRight} from "react-icons/bi"
 import TaskList from "./task-list";
-
+import {store} from "../redux/store";
+import {State} from "../redux/reducers";
 
 function NavigationBar() {
     const [show, setShow] = useState(false);
+
+
+    /**
+     * helper method
+     * @param state
+     */
+    function select(state:State) {
+        return state.selectedTask?.task?.id
+    }
+    let currentValue
+
+    /**
+     * subscriber method
+     */
+    function handleChange() {
+        let previousValue = currentValue
+        currentValue = select(store.getState())
+        if (previousValue !== currentValue) handleClose()
+    }
+
+    useEffect(() => {
+        store.subscribe(handleChange)
+        // eslint-disable-next-line
+    }, [])
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -15,22 +40,22 @@ function NavigationBar() {
         <>
             <Navbar style={{backgroundColor: "#39393a"}}>
                 <Container>
-                    <Navbar.Brand style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    <Navbar.Brand className="d-flex flex-row align-items-center">
                         <svg width={20} height={20}>
                             <polygon points={"10,20  10,0 20,10"}
                                      style={{fill: "white"}}/>
                         </svg>
                         {' '}
-                        <div style={{paddingLeft: ".4rem", color: "white"}}>
+                        <div className="text-light mx-2" >
                             Unit-Test Evaluator
                         </div>
                     </Navbar.Brand>
                     <Nav>
-                        <div style={{color: "white", cursor: "pointer"}} onClick={handleShow} >
+                        <button className="text-light btn" onClick={handleShow}>
                             <h3>
-                                <MdDashboard />
+                                <BiMenuAltRight />
                             </h3>
-                        </div>
+                        </button>
                     </Nav>
                 </Container>
             </Navbar>
@@ -39,16 +64,15 @@ function NavigationBar() {
                     <Offcanvas.Title>Menü</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <p>
+                    <p className="lead">
                         Alle Aufgaben
                     </p>
-                    <TaskList />
+                    <TaskList/>
                 </Offcanvas.Body>
             </Offcanvas>
         </>
     )
 }
-
 
 
 export default NavigationBar;

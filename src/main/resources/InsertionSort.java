@@ -1,3 +1,5 @@
+package com.test.app;
+
 public class InsertionSort {
 
     void sort(int[] arr) {

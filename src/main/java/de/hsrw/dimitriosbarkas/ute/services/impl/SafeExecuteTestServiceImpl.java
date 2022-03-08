@@ -3,7 +3,7 @@ package de.hsrw.dimitriosbarkas.ute.services.impl;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.hsrw.dimitriosbarkas.ute.model.BuildSummary;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
-import de.hsrw.dimitriosbarkas.ute.model.TestResult;
+import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
@@ -20,6 +20,8 @@ import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static de.hsrw.dimitriosbarkas.ute.utils.Utilities.*;
 
 @Log4j2
 @Service
@@ -68,7 +70,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
     @Override
-    public TestResult buildAndRunTests() throws ErrorWhileExecutingTestException {
+    public SubmissionResult buildAndRunTests() throws ErrorWhileExecutingTestException {
 
         //prepare command and choose right directory
         String[] command = {"mvn", "clean", "test"};
@@ -92,24 +94,8 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         }
     }
 
-    // TODO: Refactor to utils
-    private String readFromFile(File file) {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line = br.readLine();
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
 
-    private TestResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
+    private SubmissionResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
         log.info("build successful");
         String filename = task.getPathToTestTemplate().replace(".java", ".txt");
         String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
@@ -117,11 +103,11 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         String output = readFromFile(file);
         generateCoverageReport(path);
         Report report = parseCoverageReport(path);
-        return new TestResult(output, report, BuildSummary.BUILD_SUCCESSFUL);
+        return new SubmissionResult(output, report, BuildSummary.BUILD_SUCCESSFUL);
     }
 
 
-    private TestResult getBuildOrTestErrors(Process process, Path path) throws IOException, InterruptedException {
+    private SubmissionResult getBuildOrTestErrors(Process process, Path path) throws IOException, InterruptedException {
         String pathToDir = path.toAbsolutePath() + "/testapp/target/surefire-reports/";
         boolean buildSucceed = new File(pathToDir).exists();
         if(buildSucceed) {
@@ -130,7 +116,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
             File file = new File(pathToFile);
             String output = readFromFile(file);
-            return new TestResult(output, null, BuildSummary.TESTS_FAILED);
+            return new SubmissionResult(output, null, BuildSummary.TESTS_FAILED);
         }
 
         log.error("build failed");
@@ -145,7 +131,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 }
             }
         }
-        return new TestResult(sb.toString(), null, BuildSummary.BUILD_FAILED);
+        return new SubmissionResult(sb.toString(), null, BuildSummary.BUILD_FAILED);
     }
 
 
@@ -190,35 +176,4 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         }
     }
 
-    // TODO: Refactor to utils
-    /**
-     * helper method for xml-mapping
-     *
-     * @param is InputStream
-     * @return String from InputStream
-     * @throws IOException if an I/O Error occurs
-     */
-    private String inputStreamToString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-        br.close();
-        return sb.toString();
-    }
-
-    // TODO: Refactor to utils
-    private void writeFile(File file, byte[] data) {
-        try (FileOutputStream fos = new FileOutputStream(file, true)) {
-            String str = "package com.test.app; \n\n";
-            byte[] strToBytes = str.getBytes();
-            fos.write(strToBytes);
-            fos.write(data);
-            //log.info(file.getAbsolutePath() + " saved.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

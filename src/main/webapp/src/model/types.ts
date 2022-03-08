@@ -28,7 +28,7 @@ export type TestResult = {
     summary: BuildSummary
 }
 
-export type EvaluationRequest = {
+export type Submission = {
     taskId: number,
     encodedTestContent: string,
 }
