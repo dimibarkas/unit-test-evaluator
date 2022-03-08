@@ -3,7 +3,7 @@ package de.hsrw.dimitriosbarkas.ute.services.impl;
 import de.hsrw.dimitriosbarkas.ute.controller.evalutor.request.Submission;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
-import de.hsrw.dimitriosbarkas.ute.model.TestResult;
+import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
@@ -25,13 +25,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     }
 
     @Override
-    public TestResult evaluateTest(Submission submission) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
+    public SubmissionResult evaluateTest(Submission submission) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
         log.info("Evaluating test for task " + submission.getTaskId() + " ...");
 
         // Get configuration for this task
         Task task = getTaskConfig(submission.getTaskId());
 
-        TestResult result;
+        SubmissionResult result;
         try {
             safeExecuteTestService.setupTestEnvironment(task, submission.getEncodedTestContent());
             result = safeExecuteTestService.buildAndRunTests();

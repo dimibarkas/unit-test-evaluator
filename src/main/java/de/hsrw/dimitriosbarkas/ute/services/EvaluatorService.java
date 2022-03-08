@@ -1,7 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.services;
 
 import de.hsrw.dimitriosbarkas.ute.controller.evalutor.request.Submission;
-import de.hsrw.dimitriosbarkas.ute.model.TestResult;
+import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 
 /**
@@ -18,6 +18,6 @@ public interface EvaluatorService {
      * @throws TaskNotFoundException     if the specified task cannot be found
      * @throws CompilationErrorException if an error occurred during the compilation
      */
-    TestResult evaluateTest(Submission submission) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException;
+    SubmissionResult evaluateTest(Submission submission) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException;
 
 }

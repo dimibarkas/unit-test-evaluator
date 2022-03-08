@@ -3,7 +3,7 @@ package de.hsrw.dimitriosbarkas.ute.services.impl;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.hsrw.dimitriosbarkas.ute.model.BuildSummary;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
-import de.hsrw.dimitriosbarkas.ute.model.TestResult;
+import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
@@ -70,7 +70,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
     @Override
-    public TestResult buildAndRunTests() throws ErrorWhileExecutingTestException {
+    public SubmissionResult buildAndRunTests() throws ErrorWhileExecutingTestException {
 
         //prepare command and choose right directory
         String[] command = {"mvn", "clean", "test"};
@@ -95,7 +95,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
 
-    private TestResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
+    private SubmissionResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
         log.info("build successful");
         String filename = task.getPathToTestTemplate().replace(".java", ".txt");
         String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
@@ -103,11 +103,11 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         String output = readFromFile(file);
         generateCoverageReport(path);
         Report report = parseCoverageReport(path);
-        return new TestResult(output, report, BuildSummary.BUILD_SUCCESSFUL);
+        return new SubmissionResult(output, report, BuildSummary.BUILD_SUCCESSFUL);
     }
 
 
-    private TestResult getBuildOrTestErrors(Process process, Path path) throws IOException, InterruptedException {
+    private SubmissionResult getBuildOrTestErrors(Process process, Path path) throws IOException, InterruptedException {
         String pathToDir = path.toAbsolutePath() + "/testapp/target/surefire-reports/";
         boolean buildSucceed = new File(pathToDir).exists();
         if(buildSucceed) {
@@ -116,7 +116,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
             File file = new File(pathToFile);
             String output = readFromFile(file);
-            return new TestResult(output, null, BuildSummary.TESTS_FAILED);
+            return new SubmissionResult(output, null, BuildSummary.TESTS_FAILED);
         }
 
         log.error("build failed");
@@ -131,7 +131,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 }
             }
         }
-        return new TestResult(sb.toString(), null, BuildSummary.BUILD_FAILED);
+        return new SubmissionResult(sb.toString(), null, BuildSummary.BUILD_FAILED);
     }
 
 

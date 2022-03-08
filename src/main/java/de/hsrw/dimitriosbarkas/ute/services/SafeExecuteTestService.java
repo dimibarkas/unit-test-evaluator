@@ -1,7 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.services;
 
 import de.hsrw.dimitriosbarkas.ute.model.Task;
-import de.hsrw.dimitriosbarkas.ute.model.TestResult;
+import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 
@@ -25,7 +25,7 @@ public interface SafeExecuteTestService {
      * @return the exit value of the process
      * @throws ErrorWhileExecutingTestException if an error occurs while executing tests (compile oder test errors)
      */
-    TestResult buildAndRunTests() throws ErrorWhileExecutingTestException;
+    SubmissionResult buildAndRunTests() throws ErrorWhileExecutingTestException;
 
     /**
      * This function calls the command to generate a coverage-report.xml file out of the jacoco.exe file.
