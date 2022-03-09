@@ -20,10 +20,11 @@ public class UserController {
     @PostMapping(value = "/api/user")
     public ResponseEntity<?> createUser() {
         try {
-            return new ResponseEntity<>(userService.createUser(), HttpStatus.OK);
+            return new ResponseEntity<>(new UserResponseTO(userService.createUser()), HttpStatus.OK);
         } catch (Error e) {
             log.error(e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
+

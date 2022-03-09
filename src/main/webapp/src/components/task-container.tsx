@@ -5,7 +5,7 @@ import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
 import {Submission, TestResult} from "../model/types";
-import {submitCode} from "../services/tasks";
+import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";

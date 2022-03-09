@@ -1,13 +1,13 @@
 import axios from "axios";
-import {Submission, Task, TestResult} from "../model/types";
+import {Submission, Task, TestResult, User} from "../model/types";
+
 
 export const getAllTasks = async (): Promise<Task[]> => {
     let taskList: Task[];
     await axios.get("/api/tasks").then((res) => {
-        // console.log(taskList);
         taskList = res.data.tasks;
-    }).catch((error) => {
-        console.error("tasks could not be loaded", error);
+    }).catch(() => {
+        throw new Error("tasks could not be loaded");
     });
     return taskList;
 }
@@ -21,4 +21,16 @@ export const submitCode = async (submission: Submission): Promise<TestResult> =>
             throw new Error("an error occurred during code submission");
         })
     return result;
+}
+
+export const fetchNewUser = async (): Promise<User> => {
+    let user: User;
+    await axios.post("/api/user")
+        .then((response) => {
+            console.log(response.data)
+            user = {id: response.data.id, createdAt: response.data.createdAt};
+        }).catch(() => {
+            throw new Error("an error occurred during code submission");
+        })
+    return user;
 }

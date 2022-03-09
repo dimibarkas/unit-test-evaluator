@@ -8,7 +8,7 @@ public interface UserService {
      * This method saves a user in the database.
      * @return the generated id
      */
-    UUID createUser();
+    User createUser();
 
     /**
      * This method saves a new submission related to the user.

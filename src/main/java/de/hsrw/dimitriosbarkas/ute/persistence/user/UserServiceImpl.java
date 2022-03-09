@@ -21,10 +21,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UUID createUser() {
+    public User createUser() {
         User user = new User();
         userRepository.save(user);
-        return user.getId();
+        log.debug(user);
+        return user;
     }
 
     @Override

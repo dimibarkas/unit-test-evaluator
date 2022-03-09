@@ -2,10 +2,14 @@ package de.hsrw.dimitriosbarkas.ute.persistence.user;
 
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.Submission;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +36,10 @@ public class User {
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private List<Submission> submissionList = new ArrayList<>();
+
+    @Column(name = "created_at", updatable = false, nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     public void addSubmission(Submission submission) {
         this.submissionList.add(submission);

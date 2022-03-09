@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Task} from "../model/types";
 import {ListGroup, Spinner} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
@@ -14,11 +14,14 @@ function TaskList() {
         dispatch(selectTask(task))
     }
 
-    if (tasks.isLoading) return (
-        <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-        </Spinner>
-    )
+    if (tasks.isLoading) {
+        return (
+            <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        )
+    }
+
 
     return (
         <ListGroup as={"ol"} numbered>
