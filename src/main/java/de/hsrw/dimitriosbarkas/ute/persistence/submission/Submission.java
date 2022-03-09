@@ -1,14 +1,16 @@
 package de.hsrw.dimitriosbarkas.ute.persistence.submission;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * This class represents the progress in a specific task of a user.
+ * This class represents a submission which can be saved in the database.
  * <p>
- * It needs to save the submission results in order to keep track of the progress and the number of tries he needs.
+ * We need to save the submission results in order to keep track of the progress and the number of tries he needs.
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,9 +27,16 @@ public class Submission {
 
     private String taskId;
 
-    private int percentage;
-
-    @Column(name= "user_id")
+    @Column(name = "user_id")
     private UUID userid;
 
+    @Column(name = "submitted_at", updatable = false, nullable = false)
+    @CreationTimestamp
+    private LocalDateTime submittedAt;
+
+    @Column(name = "covered_instructions")
+    private int coveredInstructions;
+
+    @Column(name = "covered_branches")
+    private int coveredBranches;
 }

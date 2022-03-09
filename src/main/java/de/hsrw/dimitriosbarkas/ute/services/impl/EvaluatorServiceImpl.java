@@ -1,9 +1,10 @@
 package de.hsrw.dimitriosbarkas.ute.services.impl;
 
 import de.hsrw.dimitriosbarkas.ute.controller.evalutor.request.SubmissionTO;
-import de.hsrw.dimitriosbarkas.ute.model.Task;
-import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
-import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
+import de.hsrw.dimitriosbarkas.ute.model.*;
+import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Counter;
+import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
+import de.hsrw.dimitriosbarkas.ute.model.jacocoreport._Class;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.UserService;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
@@ -40,13 +41,67 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             safeExecuteTestService.setupTestEnvironment(task, submissionTO.getEncodedTestContent());
             result = safeExecuteTestService.buildAndRunTests();
 
-//            userService.addSubmission();
+            if (result.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
+                CoverageResult coverageResult = getCoverageResult(result.getReport(), task);
+                userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), coverageResult.getCoveredInstructions(), coverageResult.getCoveredBranches());
+            }
 
             return result;
         } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }
+    }
+
+    @Override
+    public CoverageResult getCoverageResult(Report report, Task task) {
+        //TODO: make function throw a custom exception
+        _Class _class = null;
+        try {
+            _class = report._package._class.stream().filter(aClass -> aClass.sourcefilename.equals(task.getPathToFile())).findFirst().orElseThrow(Exception::new);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return new CoverageResult(calculateCoveredInstructionsPercent(_class), calculateCoveredBranchesPercent(_class));
+    }
+
+    public int calculateCoveredInstructionsPercent(_Class _class) {
+        //TODO: make function throw a custom exception
+        if (_class == null) return 0;
+        int percentage = 0;
+        try {
+            Counter counter = _class.counter.stream().filter(c -> c.type.equals("INSTRUCTION")).findFirst().orElseThrow(Exception::new);
+            //log.info(counter.covered);
+            //log.info(counter.missed);
+            if (counter.missed == 0) return 100;
+            if (counter.covered == 0) return 0;
+            int total = counter.missed + counter.covered;
+            percentage = (int) Math.floor(((double) counter.covered / (double) total) * 100);
+            //percentage = (int) (((double) counter.covered / (double) counter.missed) * 100);
+            //log.info(percentage);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return percentage;
+    }
+
+    public int calculateCoveredBranchesPercent(_Class _class) {
+        //TODO: make function throw a custom exception
+        if (_class == null) return 0;
+        int percentage = 0;
+        try {
+            Counter counter = _class.counter.stream().filter(c -> c.type.equals("BRANCH")).findFirst().orElseThrow(Exception::new);
+            //log.info(counter.covered);
+            //log.info(counter.missed);
+            if (counter.missed == 0) return 100;
+            if (counter.covered == 0) return 0;
+            int total = counter.missed + counter.covered;
+            percentage = (int) Math.floor(((double) counter.covered / (double) total) * 100);
+            //log.info(percentage);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return percentage;
     }
 
     /**
@@ -59,8 +114,6 @@ public class EvaluatorServiceImpl implements EvaluatorService {
      */
     private Task getTaskConfig(String taskId) throws CannotLoadConfigException, TaskNotFoundException {
         TaskConfig config = configService.getTaskConfig();
-
-        //Find task
         return config.getTasks().stream().filter(t -> taskId.equals(t.getId())).findFirst().orElseThrow(TaskNotFoundException::new);
     }
 }

@@ -24,18 +24,19 @@ public class UserServiceImpl implements UserService{
     public User createUser() {
         User user = new User();
         userRepository.save(user);
-        log.debug(user);
+        //log.debug(user);
         return user;
     }
 
     @Override
-    public void addSubmission(UUID userId, String taskId, int coveragePercentage) {
+    public void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches) {
         User user = userRepository.getById(userId);
-        log.info(user);
+        //log.debug(user);
         Submission submission = new Submission();
         submission.setTaskId(taskId);
         submission.setUserid(user.getId());
-        submission.setPercentage(coveragePercentage);
+        submission.setCoveredInstructions(coveredInstructions);
+        submission.setCoveredBranches(coveredBranches);
         Submission savedSubmission = submissionRepository.save(submission);
         user.addSubmission(savedSubmission);
         userRepository.save(user);

@@ -9,12 +9,11 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * This class represents a user who is using the application.
+ * This class represents a user using the application.
  */
 @NoArgsConstructor
 @AllArgsConstructor

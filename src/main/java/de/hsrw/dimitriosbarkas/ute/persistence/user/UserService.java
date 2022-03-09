@@ -14,5 +14,5 @@ public interface UserService {
      * This method saves a new submission related to the user.
      * @param userId the id of the specified user.
      */
-    void addSubmission(UUID userId, String taskId, int coveragePercentage);
+    void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches);
 }

@@ -31,6 +31,7 @@ export type TestResult = {
 export type Submission = {
     taskId: number,
     encodedTestContent: string,
+    userId: string;
 }
 
 /**
