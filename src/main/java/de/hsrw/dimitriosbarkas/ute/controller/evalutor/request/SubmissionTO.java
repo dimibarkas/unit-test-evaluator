@@ -6,7 +6,7 @@ import lombok.Data;
  * This class represents a submission on a task specified by the id.
  */
 @Data
-public class Submission {
+public class SubmissionTO {
     /**
      * The id for the specified task
      */
