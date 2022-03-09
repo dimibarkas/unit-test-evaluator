@@ -19,7 +19,6 @@ export const user = (state: IUser = initialUserState, action: Action): IUser => 
                 isFetching: true
             }
         case ActionType.RECEIVE_USER:
-            console.log(action)
             return {
                 ...state,
                 isFetching: false,

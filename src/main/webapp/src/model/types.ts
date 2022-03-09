@@ -38,5 +38,5 @@ export type Submission = {
  */
 export type User = {
     id: string;
-    createdAt: Date
+    createdAt: string;
 }

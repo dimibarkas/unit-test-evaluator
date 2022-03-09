@@ -29,7 +29,6 @@ export const receiveUser = (user: User): ReceiveUserAction => ({
 const fetchUser = () => dispatch => {
     dispatch(requestUser())
     return fetchNewUser().then((user) => {
-        console.log(user)
         dispatch(receiveUser(user))
     })
 }

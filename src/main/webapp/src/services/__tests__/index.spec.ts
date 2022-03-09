@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {fetchNewUser, getAllTasks, submitCode} from "../index";
-import {BuildSummary, Submission, TestResult} from "../../model/types";
+import {BuildSummary, Submission, TestResult, User} from "../../model/types";
 
 jest.mock('axios')
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -37,7 +37,10 @@ const testSubmission: Submission = {
     encodedTestContent: "encodedTest"
 }
 
-const testUserId = "02ae07b6-f8fa-49ba-b338-545cff81512a"
+const testUser: User = {
+    id: "02ae07b6-f8fa-49ba-b338-545cff81512a",
+    createdAt: "2022-03-09:14:10:0000"
+}
 
 beforeEach(() => {
     jest.clearAllMocks();
@@ -61,11 +64,10 @@ describe('Service', () => {
         expect(mockedAxios.post).toHaveBeenCalledWith("/api/evaluate", testSubmission);
     })
     it('fetch a user id from backend', async () => {
-        mockedAxios.post.mockImplementationOnce(() => Promise.resolve(testUserId));
-        let result:string = await fetchNewUser();
-        // console.log(result)
+
+        mockedAxios.post.mockImplementationOnce(() => Promise.resolve(testUser));
+        await fetchNewUser();
         expect(mockedAxios.post).toHaveBeenCalled();
         expect(mockedAxios.post).toHaveBeenCalledWith("/api/user");
-        expect(result).toMatch(testUserId);
     })
 })
