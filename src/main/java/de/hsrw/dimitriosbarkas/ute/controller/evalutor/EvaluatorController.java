@@ -1,7 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.controller.evalutor;
 
 import de.hsrw.dimitriosbarkas.ute.common.ErrorResultTO;
-import de.hsrw.dimitriosbarkas.ute.controller.evalutor.request.Submission;
+import de.hsrw.dimitriosbarkas.ute.controller.evalutor.request.SubmissionTO;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
@@ -22,10 +22,10 @@ public class EvaluatorController {
     }
 
     @PostMapping(value = "/api/evaluate")
-    public ResponseEntity<?> evaluateTest(@RequestBody Submission submission) {
+    public ResponseEntity<?> evaluateTest(@RequestBody SubmissionTO submissionTO) {
         try {
             return new ResponseEntity<>(
-                    evaluatorService.evaluateTest(submission),
+                    evaluatorService.evaluateTest(submissionTO),
                     HttpStatus.OK);
         } catch (TaskNotFoundException | CompilationErrorException | CannotLoadConfigException e) {
             log.error(e);

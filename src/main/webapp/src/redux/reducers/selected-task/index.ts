@@ -9,7 +9,11 @@ const initialSelectedTaskState: ISelectedTaskState = {
     task: null,
 }
 
-
+/**
+ * Reducer function for a selected task.
+ * @param state current state
+ * @param action dispatched action
+ */
 export const selectedTask = (state: ISelectedTaskState = initialSelectedTaskState, action: Action): ISelectedTaskState => {
     switch (action.type) {
         case ActionType.SELECT_TASK:
