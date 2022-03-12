@@ -5,7 +5,7 @@ import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
 import {Submission, TestResult} from "../model/types";
-import {submitCode} from "../services/tasks";
+import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";
@@ -14,6 +14,7 @@ import {BsPlayFill} from "react-icons/bs";
 function TaskContainer() {
 
     const selectedTask = useSelector((state: State) => state.selectedTask);
+    const user = useSelector((state: State) => state.user);
     const {showAlert, setShowAlert, showCustomAlert, header, variant, output} = useAlert();
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
@@ -38,7 +39,8 @@ function TaskContainer() {
             setShowAlert(false);
             const request: Submission = {
                 taskId: selectedTask.task.id,
-                encodedTestContent: btoa(editorRef.current.getValue())
+                encodedTestContent: btoa(editorRef.current.getValue()),
+                userId: user.user.id
             }
             submitCode(request).then((receivedTest: TestResult) => {
                 showCustomAlert(receivedTest)

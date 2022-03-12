@@ -31,4 +31,13 @@ export type TestResult = {
 export type Submission = {
     taskId: number,
     encodedTestContent: string,
+    userId: string;
+}
+
+/**
+ * This type represents a simple appuser.
+ */
+export type User = {
+    id: string;
+    createdAt: string;
 }
