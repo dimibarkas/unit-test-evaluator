@@ -43,7 +43,20 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
             if (result.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
                 CoverageResult coverageResult = getCoverageResult(result.getReport(), task);
-                userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), coverageResult.getCoveredInstructions(), coverageResult.getCoveredBranches());
+                userService.addSubmission(
+                        submissionTO.getUserId(),
+                        submissionTO.getTaskId(),
+                        coverageResult.getCoveredInstructions(),
+                        coverageResult.getCoveredBranches(),
+                        result.getSummary());
+            } else {
+                userService.addSubmission(
+                        submissionTO.getUserId(),
+                        submissionTO.getTaskId(),
+                        0,
+                        0,
+                        result.getSummary()
+                );
             }
 
             return result;
@@ -58,7 +71,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         //TODO: make function throw a custom exception
         _Class _class = null;
         try {
-            _class = report._package._class.stream().filter(aClass -> aClass.sourcefilename.equals(task.getPathToFile())).findFirst().orElseThrow(Exception::new);
+            _class = report._package._class.stream().filter(aClass -> aClass.sourcefilename.equals(task.getSourcefilename())).findFirst().orElseThrow(Exception::new);
         } catch (Exception e) {
             log.error(e);
         }

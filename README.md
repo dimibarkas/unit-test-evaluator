@@ -9,5 +9,5 @@ Um die Anwendung lokal auszuführen wird eine Postgres-Instanz benötigt diese k
 Docker gestartet werden.
 
 ```shell
-docker-compose up
+docker-compose up -d
 ```

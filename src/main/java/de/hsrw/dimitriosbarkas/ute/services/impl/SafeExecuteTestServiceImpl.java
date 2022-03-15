@@ -14,12 +14,15 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static de.hsrw.dimitriosbarkas.ute.utils.Utilities.*;
 
@@ -28,12 +31,19 @@ import static de.hsrw.dimitriosbarkas.ute.utils.Utilities.*;
 @Data
 public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
+    /**
+     * the temporary path where the tests are being executed
+     */
     private Path path;
+
     private Task task;
 
     @Override
     public void setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException {
+
         setTask(task);
+        //TODO: bevor der Test überhaupt in die Testumgebung geschrieben wird, soll geprüft werden ob das Template verändert wurde...
+        // wenn ja, dann soll ebenfalls eine Custom-Exception geworden werden. TestTemplateCorruptedException
         byte[] testData = Base64.getDecoder().decode(encodedTest);
         byte[] taskData = Base64.getDecoder().decode(task.getEncodedFile());
 
@@ -46,7 +56,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             log.info(path.toAbsolutePath());
 
             // Execute bash script
-            String[] command = {"bash", "src/main/resources/create-mvn-project-script.sh", "-p", path.toAbsolutePath().toString()};
+            String[] command = {"bash", "src/main/resources/scripts/create-mvn-project-script.sh", "-p", path.toAbsolutePath().toString()};
             p = Runtime.getRuntime().exec(command);
             p.waitFor();
 
@@ -56,17 +66,47 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
             log.info("Test environment successfully setup.");
 
-            // write files
-            File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getPathToFile());
-            File testFile = new File(path.toAbsolutePath() + "/testapp/src/test/java/com/test/app/" + task.getPathToTestTemplate());
-            writeFile(taskFile, taskData);
+            // write files to test environment
+            loadSourceFiles();
+
+//            File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getSourcefilename());
+//            writeFile(taskFile, taskData);
+
+            log.info("Sourcefiles successfully written.");
+
+            File testFile = new File(path.toAbsolutePath() + "/testapp/src/test/java/com/test/app/" + task.getTesttemplatefilename());
             writeFile(testFile, testData);
 
-            log.info("Tests successfully written.");
+            log.info("Testfile successfully written.");
 
         } catch (IOException | InterruptedException e) {
             throw new CouldNotSetupTestEnvironmentException(e);
         }
+    }
+
+
+    private void writeSourceFiles(List<File> sourceFiles) throws IOException {
+        for (File file : sourceFiles) {
+            File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + file.getName());
+            writeFile(taskFile, Files.readAllBytes(file.toPath()));
+        }
+    }
+
+    private void loadSourceFiles() throws IOException {
+        URL dirURL = getClass().getClassLoader().getResource(task.getPathToDir());
+        if (dirURL != null) {
+
+            try (Stream<Path> paths = Files.walk(Paths.get(dirURL.getPath()))) {
+                List<File> sourceFiles = paths.filter(Files::isRegularFile).filter(path -> !path.getFileName().toString().endsWith("Test.java")).map(Path::toFile).collect(Collectors.toList());
+                writeSourceFiles(sourceFiles);
+            }
+
+        }
+    }
+
+    private boolean checkIfTestsWereCorrupted(String encodedTestTemplate) {
+        //TODO: Implement
+        return true;
     }
 
     @Override
@@ -97,7 +137,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
     private SubmissionResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
         log.info("build successful");
-        String filename = task.getPathToTestTemplate().replace(".java", ".txt");
+        String filename = task.getTesttemplatefilename().replace(".java", ".txt");
         String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
         File file = new File(pathToFile);
         String output = readFromFile(file);
@@ -110,9 +150,9 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     private SubmissionResult getBuildOrTestErrors(Process process, Path path) throws IOException, InterruptedException {
         String pathToDir = path.toAbsolutePath() + "/testapp/target/surefire-reports/";
         boolean buildSucceed = new File(pathToDir).exists();
-        if(buildSucceed) {
+        if (buildSucceed) {
             log.warn("build successful - but there are test failures");
-            String filename = task.getPathToTestTemplate().replace(".java", ".txt");
+            String filename = task.getTesttemplatefilename().replace(".java", ".txt");
             String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
             File file = new File(pathToFile);
             String output = readFromFile(file);
@@ -123,9 +163,9 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         // return error logs
         StringBuilder sb = new StringBuilder();
         String line;
-        try(BufferedReader reader = new BufferedReader((new InputStreamReader(process.getInputStream())))) {
-            while((line = reader.readLine()) != null) {
-                if(line.startsWith("[ERROR]")) {
+        try (BufferedReader reader = new BufferedReader((new InputStreamReader(process.getInputStream())))) {
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("[ERROR]")) {
                     sb.append(line);
                     sb.append("\n");
                 }
