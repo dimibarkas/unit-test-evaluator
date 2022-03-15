@@ -1,5 +1,6 @@
 package de.hsrw.dimitriosbarkas.ute.persistence.user;
 
+import de.hsrw.dimitriosbarkas.ute.model.BuildSummary;
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.Submission;
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.SubmissionRepository;
 import lombok.extern.log4j.Log4j2;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches) {
+    public void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches, BuildSummary summary) {
         User user = userRepository.getById(userId);
         //log.debug(user);
         Submission submission = new Submission();
@@ -37,6 +38,7 @@ public class UserServiceImpl implements UserService{
         submission.setUserid(user.getId());
         submission.setCoveredInstructions(coveredInstructions);
         submission.setCoveredBranches(coveredBranches);
+        submission.setSummary(summary);
         Submission savedSubmission = submissionRepository.save(submission);
         user.addSubmission(savedSubmission);
         userRepository.save(user);

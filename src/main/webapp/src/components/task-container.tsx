@@ -72,7 +72,7 @@ function TaskContainer() {
         <>
             <Container className="text-light">
                 <h1 className="display-5 my-4">{selectedTask.task.name}</h1>
-                <p className="lead my-2">{selectedTask.task.description}</p>
+                <p className="lead my-2">{selectedTask.task.shortDescription}</p>
                 <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
                 <div className="d-flex flex-row-reverse mb-3">
                     <Button

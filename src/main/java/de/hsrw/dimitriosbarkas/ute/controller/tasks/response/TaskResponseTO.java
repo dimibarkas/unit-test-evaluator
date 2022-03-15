@@ -14,6 +14,8 @@ public class TaskResponseTO {
 
     private String description;
 
+    private String shortDescription;
+
     private String targetDescription;
 
     private String encodedFile;
@@ -25,6 +27,7 @@ public class TaskResponseTO {
                 task.getId(),
                 task.getName(),
                 task.getDescription(),
+                task.getShortDescription(),
                 task.getTargetDescription(),
                 task.getEncodedFile(),
                 task.getEncodedTestTemplate()

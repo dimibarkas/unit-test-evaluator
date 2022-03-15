@@ -21,45 +21,35 @@ import java.util.Base64;
 @Log4j2
 public class ConfigServiceImpl implements ConfigService {
 
-    private final String TASKS_DEFINITION_FILE = "tasks.yaml";
-
-    public String loadResourceByUrl(URL u, String resource) throws IOException {
-        //log.info("attempting input resource", resource);
-        if (u != null) {
-            String path = u.getPath();
-            //log.info(" absolute resource path found: " + path);
-            String s = new String(Files.readAllBytes(Paths.get(path)));
-//            log.info(" file content: \n"+s);
-            return s;
-        } else {
-            //log.info(" no resource found: " + resource);
-            return null;
-        }
+    public String loadResourceByUrl(URL u) throws IOException {
+        if (u == null) return null;
+        return new String(Files.readAllBytes(Paths.get(u.getPath())));
     }
 
     @Override
     public TaskConfig getTaskConfig() throws CannotLoadConfigException {
+        String TASKS_DEFINITION_FILE = "tasks.yaml";
         log.info("Loading task configuration file from " + TASKS_DEFINITION_FILE + ".");
 
         URL url = getClass().getClassLoader().getResource(TASKS_DEFINITION_FILE);
-        if(url == null) throw new CannotLoadConfigException();
+        if (url == null) throw new CannotLoadConfigException();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
             YamlReader reader = new YamlReader(br);
 
             TaskConfig taskConfig = reader.read(TaskConfig.class);
 
             taskConfig.getTasks().forEach(task -> {
-                String pathToFile = task.getPathToFile();
+                String pathToFile = task.getPathToDir() + task.getSourcefilename();
+                String pathToTemplate = task.getPathToDir() + task.getTesttemplatefilename();
                 URL fileURL = getClass().getClassLoader().getResource(pathToFile);
-                String pathToTemplate = task.getPathToTestTemplate();
                 URL templateURL = getClass().getClassLoader().getResource(pathToTemplate);
                 try {
-                    String fileContent = loadResourceByUrl(fileURL, pathToFile);
+                    String fileContent = loadResourceByUrl(fileURL);
                     if (fileContent != null) {
                         String encodedFile = Base64.getEncoder().encodeToString(fileContent.getBytes(StandardCharsets.UTF_8));
                         task.setEncodedFile(encodedFile);
                     }
-                    String templateContent = loadResourceByUrl(templateURL, pathToTemplate);
+                    String templateContent = loadResourceByUrl(templateURL);
                     if (templateContent != null) {
                         String encodedTemplate = Base64.getEncoder().encodeToString(templateContent.getBytes(StandardCharsets.UTF_8));
                         task.setEncodedTestTemplate(encodedTemplate);
