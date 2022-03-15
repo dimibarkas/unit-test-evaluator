@@ -1,5 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.persistence.user;
 
+import de.hsrw.dimitriosbarkas.ute.model.BuildSummary;
+
 import java.util.UUID;
 
 public interface UserService {
@@ -14,5 +16,5 @@ public interface UserService {
      * This method saves a new submission related to the user.
      * @param userId the id of the specified user.
      */
-    void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches);
+    void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches, BuildSummary summary);
 }

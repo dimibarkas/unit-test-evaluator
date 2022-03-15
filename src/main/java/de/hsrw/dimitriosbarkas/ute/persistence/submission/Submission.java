@@ -1,5 +1,6 @@
 package de.hsrw.dimitriosbarkas.ute.persistence.submission;
 
+import de.hsrw.dimitriosbarkas.ute.model.BuildSummary;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -39,4 +40,8 @@ public class Submission {
 
     @Column(name = "covered_branches")
     private int coveredBranches;
+
+    @Enumerated(EnumType.STRING)
+    private BuildSummary summary;
+
 }
