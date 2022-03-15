@@ -4,9 +4,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class StringUtilTest {
+import java.io.*;
+
+public class StatisticUtilTest {
 
     @Test
-    public void sort() {
+    public void test() {
     }
 }
