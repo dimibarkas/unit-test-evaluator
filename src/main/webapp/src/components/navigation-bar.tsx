@@ -5,18 +5,21 @@ import {BiMenuAltRight} from "react-icons/bi"
 import TaskList from "./task-list";
 import {store} from "../redux/store";
 import {State} from "../redux/reducers";
+import {useSelector} from "react-redux";
 
 function NavigationBar() {
     const [show, setShow] = useState(false);
 
+    const selectedTask = useSelector((state: State) => state.selectedTask);
 
     /**
      * helper method
      * @param state
      */
-    function select(state:State) {
+    function select(state: State) {
         return state.selectedTask?.task?.id
     }
+
     let currentValue
 
     /**
@@ -46,14 +49,14 @@ function NavigationBar() {
                                      style={{fill: "white"}}/>
                         </svg>
                         {' '}
-                        <div className="text-light mx-2" >
+                        <div className="text-light mx-2">
                             Unit-Test Evaluator
                         </div>
                     </Navbar.Brand>
-                    <Nav>
+                    <Nav style={{display: selectedTask.task == null ? "none" : "inherit"}}>
                         <button className="text-light btn" onClick={handleShow}>
                             <h3>
-                                <BiMenuAltRight />
+                                <BiMenuAltRight/>
                             </h3>
                         </button>
                     </Nav>
