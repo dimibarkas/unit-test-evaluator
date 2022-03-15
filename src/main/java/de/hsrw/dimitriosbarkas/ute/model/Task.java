@@ -23,6 +23,10 @@ public class Task {
      */
     private String description;
     /**
+     * The short description of the task which should be displayed in the selection.
+     */
+    private String shortDescription;
+    /**
      * The description of the target.
      */
     private String targetDescription;

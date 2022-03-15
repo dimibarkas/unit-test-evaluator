@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Task} from "../model/types";
 import {ListGroup, Spinner} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
@@ -30,7 +30,7 @@ function TaskList() {
                                 className={"d-flex justify-content-between align-items-start"}>
                     <div className="ms-2 me-auto">
                         <div className="fw-bold">{task.name}</div>
-                        {task.targetDescription}
+                        {task.shortDescription}
                     </div>
                 </ListGroup.Item>
             ))}

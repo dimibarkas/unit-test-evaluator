@@ -5,6 +5,7 @@ export type Task = {
     id: number;
     name: string;
     description: string;
+    shortDescription: string;
     targetDescription: string;
     encodedFile: string;
     encodedTestTemplate: string;

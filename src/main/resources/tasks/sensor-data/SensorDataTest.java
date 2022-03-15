@@ -9,6 +9,6 @@ import java.io.*;
 public class SensorDataTest {
 
     @Test
-    public void getAverageAge() {
+    public void test() {
     }
 }
