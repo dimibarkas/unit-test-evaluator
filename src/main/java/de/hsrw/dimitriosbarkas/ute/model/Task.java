@@ -2,6 +2,8 @@ package de.hsrw.dimitriosbarkas.ute.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * This class represents a task for a user to work on.
  */
@@ -25,9 +27,13 @@ public class Task {
      */
     private String targetDescription;
     /**
-     * The path to the file.
+     * The path to the directory with the files needed for the source files.
      */
-    private String pathToFile;
+    private String pathToDir;
+    /**
+     * The name of the file which should get tested.
+     */
+    private String sourcefilename;
     /**
      * The file content base-64 encoded.
      */
@@ -35,9 +41,13 @@ public class Task {
     /**
      * The path to the file with the test-template.
      */
-    private String pathToTestTemplate;
+    private String testtemplatefilename;
     /**
      * The test template file content base-64 encoded.
      */
     private String encodedTestTemplate;
+    /**
+     * A list of possible hints.
+     */
+    private List<Hint> hintList;
 }
