@@ -23,6 +23,14 @@ tasks:
     pathToDir: 'tasks/string-util/'
     sourcefilename: 'StringUtil.java'
     testtemplatefilename: 'StringUtilTest.java'
+    hintList:
+      - nr: 3
+        isMissedInstruction:
+          - "Du hast vergessen, die Klasse zu instanziieren."
+      - nr: 12
+        isMissedBranch:
+          - "Prüfe mal den Randfall dass null als Parameter übergeben wurde."
+          - "Prüfe ob eine Exception der Klasse IllegalArgumentException geworfen wurde."
   - id: '4'
     name: 'Statistik'
     description: 'Die Methode StatisticUtil.getAverageAge erhält einen InputStream von einer CSV-Datei. Diese Datei speichert Personen mit Vornamen, Nachnamen und Alter und gibt das Durchschnittsalter zurück. Spalten werden durch Semikolon getrennt.'
