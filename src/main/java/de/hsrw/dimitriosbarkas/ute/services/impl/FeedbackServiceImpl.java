@@ -5,7 +5,6 @@ import de.hsrw.dimitriosbarkas.ute.model.Hint;
 import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
-import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.Submission;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
 import de.hsrw.dimitriosbarkas.ute.services.FeedbackService;
@@ -13,7 +12,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,26 +23,32 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public String provideFeedback(User user, Task task, SubmissionResult submissionResult) {
 
-        // check the submission done by this user.
+        // check the submissions done by this user.
         List<Submission> submissionList = user.getSubmissionList().stream().sorted().collect(Collectors.toList());
 
         // if the current build was not successful, provide more general feedback
         if (submissionResult.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
-            return "ich gebe dir einen generellen Tipp, wie versuch doch erstmal eine Instanz der Klasse zu bilden";
+            return "Ein allgemeiner Tipp.";
+        }
+
+        //first try 100% lines and branches covered
+        if(submissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL
+                && submissionList.get(0).getCoveredBranches() == 100
+                && submissionList.get(0).getCoveredInstructions() == 100
+        ) {
+            return "Beim ersten versucht hast du sofort eine Line-Coverage von 100% erreicht? WOW!!!!";
         }
 
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
         List<Line> lineList = submissionResult.getReport()._package.sourcefile.stream().filter(sourcefile -> Objects.equals(sourcefile.getName(), task.getSourcefilename())).collect(Collectors.toList()).stream().findFirst().orElseThrow(NullPointerException::new).getLine();
 
-        log.info(getFeedback(task, lineList));
+//        submissionList.forEach(System.out::println);
+//        lineList.forEach(System.out::println);
 
-        submissionList.forEach(System.out::println);
-        lineList.forEach(System.out::println);
-
-        return null;
+        return getFeedbackByLineCoverage(task, lineList);
     }
 
-    String getFeedback(Task task, List<Line> lineList) {
+    String getFeedbackByLineCoverage(Task task, List<Line> lineList) {
         List<Hint> hintList = task.getHintList();
         for (Line line : lineList) {
             Optional<Hint> optionalHint = hintList.stream().filter(_hint -> _hint.getNr() == line.nr).findFirst();

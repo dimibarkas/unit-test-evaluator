@@ -48,18 +48,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
             if (result.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
                 CoverageResult coverageResult = getCoverageResult(result.getReport(), task);
-                userService.addSubmission(
-                        submissionTO.getUserId(),
-                        submissionTO.getTaskId(),
-                        coverageResult.getCoveredInstructions(),
-                        coverageResult.getCoveredBranches(),
-                        result.getSummary());
+                userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), coverageResult.getCoveredInstructions(), coverageResult.getCoveredBranches(), result.getSummary());
             } else {
                 userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), 0, 0, result.getSummary());
             }
 
             User user = userService.getUserById(submissionTO.getUserId());
-            feedbackService.provideFeedback(user, task, result);
+            log.info(feedbackService.provideFeedback(user, task, result));
 
             return result;
         } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException | NullPointerException e) {
