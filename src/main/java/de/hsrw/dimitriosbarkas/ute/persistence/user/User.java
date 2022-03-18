@@ -1,16 +1,17 @@
 package de.hsrw.dimitriosbarkas.ute.persistence.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.Submission;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class represents a user using the application.
@@ -34,7 +35,8 @@ public class User {
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "user_id")
-    private List<Submission> submissionList = new ArrayList<>();
+    @JsonIgnore
+    private Set<Submission> submissionList = new HashSet<>();
 
     @Column(name = "created_at", updatable = false, nullable = false)
     @CreationTimestamp

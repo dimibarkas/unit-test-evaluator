@@ -8,7 +8,7 @@ import java.util.List;
 public class Hint {
     private int nr;
 
-    private List<String> isMissedInstruction;
+    private List<String> isMissedInstruction = null;
 
-    private List<String> isMissedBranch;
+    private List<String> isMissedBranch = null;
 }

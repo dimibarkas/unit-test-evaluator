@@ -25,14 +25,12 @@ public class UserServiceImpl implements UserService{
     public User createUser() {
         User user = new User();
         userRepository.save(user);
-        //log.debug(user);
         return user;
     }
 
     @Override
     public void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches, BuildSummary summary) {
         User user = userRepository.getById(userId);
-        //log.debug(user);
         Submission submission = new Submission();
         submission.setTaskId(taskId);
         submission.setUserid(user.getId());
@@ -42,5 +40,10 @@ public class UserServiceImpl implements UserService{
         Submission savedSubmission = submissionRepository.save(submission);
         user.addSubmission(savedSubmission);
         userRepository.save(user);
+    }
+
+    @Override
+    public User getUserById(UUID id) {
+        return userRepository.getById(id);
     }
 }

@@ -5,9 +5,11 @@ import de.hsrw.dimitriosbarkas.ute.model.*;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Counter;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport._Class;
+import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.UserService;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
+import de.hsrw.dimitriosbarkas.ute.services.FeedbackService;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
@@ -23,10 +25,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     private final UserService userService;
 
-    public EvaluatorServiceImpl(ConfigService configService, SafeExecuteTestService safeExecuteTestService, UserService userService) {
+    private final FeedbackService feedbackService;
+
+    public EvaluatorServiceImpl(ConfigService configService, SafeExecuteTestService safeExecuteTestService, UserService userService, FeedbackService feedbackService) {
         this.configService = configService;
         this.safeExecuteTestService = safeExecuteTestService;
         this.userService = userService;
+        this.feedbackService = feedbackService;
     }
 
     @Override
@@ -43,24 +48,16 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
             if (result.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
                 CoverageResult coverageResult = getCoverageResult(result.getReport(), task);
-                userService.addSubmission(
-                        submissionTO.getUserId(),
-                        submissionTO.getTaskId(),
-                        coverageResult.getCoveredInstructions(),
-                        coverageResult.getCoveredBranches(),
-                        result.getSummary());
+                userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), coverageResult.getCoveredInstructions(), coverageResult.getCoveredBranches(), result.getSummary());
             } else {
-                userService.addSubmission(
-                        submissionTO.getUserId(),
-                        submissionTO.getTaskId(),
-                        0,
-                        0,
-                        result.getSummary()
-                );
+                userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), 0, 0, result.getSummary());
             }
 
+            User user = userService.getUserById(submissionTO.getUserId());
+            log.info(feedbackService.provideFeedback(user, task, result));
+
             return result;
-        } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException e) {
+        } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException | NullPointerException e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }

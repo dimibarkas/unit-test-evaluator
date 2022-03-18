@@ -18,7 +18,8 @@ public interface EvaluatorService {
      * @return TestResult assumption of execution
      * @throws CannotLoadConfigException if config file cannot be found
      * @throws TaskNotFoundException     if the specified task cannot be found
-     * @throws CompilationErrorException if an error occurred during the compilation
+     * @throws CompilationErrorException if
+     * an error occurred during the compilation
      */
     SubmissionResult evaluateTest(SubmissionTO submissionTO) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException;
 

@@ -62,6 +62,7 @@ public class ConfigServiceImpl implements ConfigService {
             reader.close();
 
             log.info("Done.");
+
             return taskConfig;
         } catch (IOException e) {
             throw new CannotLoadConfigException(e);
