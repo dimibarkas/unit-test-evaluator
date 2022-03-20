@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {BuildSummary, TestResult} from "../model/types";
+import {useEffect, useState} from "react";
+import {BuildSummary, SubmissionResult} from "../model/types";
 
 export default function useAlert() {
 
@@ -7,11 +7,17 @@ export default function useAlert() {
     const [header, setHeader] = useState("");
     const [variant, setVariant] = useState("");
     const [output, setOutput] = useState("");
+    const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+    const [videoTitle, setVideoTitle] = useState("");
 
-    const showCustomAlert = (testResult: TestResult) => {
+    useEffect(() => {
+        console.log(showVideoPlayer);
+    }, [showVideoPlayer])
+
+    const showCustomAlert = (submissionResult: SubmissionResult) => {
         let headerString = "";
         let variant = "";
-        switch (testResult.summary) {
+        switch (submissionResult.summary) {
             case BuildSummary.BUILD_FAILED:
                 headerString = "Build fehlgeschlagen!"
                 variant = "danger";
@@ -28,13 +34,20 @@ export default function useAlert() {
                 break
 
         }
+        if(submissionResult.feedback !== null) {
+            setVideoTitle(submissionResult.feedback);
+            setShowVideoPlayer(true);
+        } else {
+            setVideoTitle("");
+            setShowVideoPlayer(false);
+        }
         setHeader(headerString);
         setVariant(variant);
-        setOutput(testResult.output);
+        setOutput(submissionResult.output);
         setShowAlert(true);
     }
 
     return {
-        showAlert, setShowAlert, showCustomAlert, header, variant, output
+        showAlert, setShowAlert, showCustomAlert, header, variant, output, showVideoPlayer, videoTitle
     }
 }

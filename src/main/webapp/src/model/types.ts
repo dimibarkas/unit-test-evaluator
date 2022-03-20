@@ -23,10 +23,11 @@ export enum BuildSummary {
 /**
  * This type represents the type of object wich is returned when a task is submitted.
  */
-export type TestResult = {
+export type SubmissionResult = {
     output: string,
     report: any,
     summary: BuildSummary
+    feedback: string;
 }
 
 export type Submission = {

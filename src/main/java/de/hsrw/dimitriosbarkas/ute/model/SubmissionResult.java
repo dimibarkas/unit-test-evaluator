@@ -24,4 +24,9 @@ public class SubmissionResult {
      * A build summary which determines if the last build was successfully, failed or if the build was successfully but the tests failed.
      */
     private BuildSummary summary;
+
+    /**
+     * The title of the videofeedback.
+     */
+    private String feedback;
 }

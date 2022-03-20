@@ -53,11 +53,15 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), 0, 0, result.getSummary());
             }
 
-            User user = userService.getUserById(submissionTO.getUserId());
-            log.info(feedbackService.provideFeedback(user, task, result));
+            try {
+                User user = userService.getUserById(submissionTO.getUserId());
+                result.setFeedback(feedbackService.provideFeedback(user, task, result));
+            } catch (NullPointerException e) {
+                log.warn("no hint provided for specific line");
+            }
 
             return result;
-        } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException | NullPointerException e) {
+        } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }
