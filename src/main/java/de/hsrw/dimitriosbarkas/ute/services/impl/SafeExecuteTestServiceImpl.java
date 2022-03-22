@@ -45,7 +45,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         //TODO: bevor der Test überhaupt in die Testumgebung geschrieben wird, soll geprüft werden ob das Template verändert wurde...
         // wenn ja, dann soll ebenfalls eine Custom-Exception geworden werden. TestTemplateCorruptedException
         byte[] testData = Base64.getDecoder().decode(encodedTest);
-        byte[] taskData = Base64.getDecoder().decode(task.getEncodedFile());
 
         Process p;
         try {
@@ -143,7 +142,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         String output = readFromFile(file);
         generateCoverageReport(path);
         Report report = parseCoverageReport(path);
-        return new SubmissionResult(output, report, BuildSummary.BUILD_SUCCESSFUL);
+        return new SubmissionResult(output, report, BuildSummary.BUILD_SUCCESSFUL, null);
     }
 
 
@@ -156,7 +155,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
             File file = new File(pathToFile);
             String output = readFromFile(file);
-            return new SubmissionResult(output, null, BuildSummary.TESTS_FAILED);
+            return new SubmissionResult(output, null, BuildSummary.TESTS_FAILED, null);
         }
 
         log.error("build failed");
@@ -171,7 +170,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 }
             }
         }
-        return new SubmissionResult(sb.toString(), null, BuildSummary.BUILD_FAILED);
+        return new SubmissionResult(sb.toString(), null, BuildSummary.BUILD_FAILED, null);
     }
 
 

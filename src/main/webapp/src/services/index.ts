@@ -1,5 +1,5 @@
 import axios from "axios";
-import {Submission, Task, TestResult, User} from "../model/types";
+import {Submission, Task, SubmissionResult, User} from "../model/types";
 
 
 
@@ -15,8 +15,8 @@ export const getAllTasks = async (): Promise<Task[]> => {
 
 }
 
-export const submitCode = async (submission: Submission): Promise<TestResult> => {
-    let result: TestResult;
+export const submitCode = async (submission: Submission): Promise<SubmissionResult> => {
+    let result: SubmissionResult;
     await axios.post("/api/evaluate", submission)
         .then((response) => {
             result = response.data;

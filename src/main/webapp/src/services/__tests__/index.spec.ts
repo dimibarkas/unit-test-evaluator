@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {fetchNewUser, getAllTasks, submitCode} from "../index";
-import {BuildSummary, Submission, TestResult, User} from "../../model/types";
+import {BuildSummary, Submission, SubmissionResult, User} from "../../model/types";
 
 jest.mock('axios')
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -26,7 +26,7 @@ const data = {
     ]
 };
 
-const testResult: TestResult = {
+const testResult: SubmissionResult = {
     output: "testtest",
     report: "report",
     summary: BuildSummary.BUILD_SUCCESSFUL

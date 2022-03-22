@@ -4,7 +4,7 @@ import {useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
-import {Submission, TestResult} from "../model/types";
+import {Submission, SubmissionResult} from "../model/types";
 import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
@@ -15,7 +15,7 @@ function TaskContainer() {
 
     const selectedTask = useSelector((state: State) => state.selectedTask);
     const user = useSelector((state: State) => state.user);
-    const {showAlert, setShowAlert, showCustomAlert, header, variant, output} = useAlert();
+    const {showAlert, setShowAlert, showCustomAlert, header, variant, output, showVideoPlayer, videoTitle} = useAlert();
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
     const editorRef = useRef(null);
@@ -42,10 +42,11 @@ function TaskContainer() {
                 encodedTestContent: btoa(editorRef.current.getValue()),
                 userId: user.user.id
             }
-            submitCode(request).then((receivedTest: TestResult) => {
+            submitCode(request).then((receivedTest: SubmissionResult) => {
                 showCustomAlert(receivedTest)
                 setLoading(false);
             }).catch((error) => {
+                setLoading(false);
                 console.log(error)
             });
         }
@@ -117,18 +118,24 @@ function TaskContainer() {
                     <Alert show={showAlert} variant={variant} onClose={() => setShowAlert(false)} dismissible>
                         <Alert.Heading>{header}</Alert.Heading>
                         <hr/>
-                        <p>
-                            Kurzbeschreibung des Fehlers und die Möglichkeit ein Video abzuspielen.
-                        </p>
+                        <div
+                            style={{
+                                display: showVideoPlayer ? "flex" : "none",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "100%"
+                            }}>
+                            <video src={`/api/video/${videoTitle}`} width="80%" height="80%" controls
+                                   preload="none"/>
+                        </div>
                         <Tabs activeKey={key} onSelect={((k) => {
-                            if(k === key) {
+                            if (k === key) {
                                 setKey("")
-                            }
-                            else {
+                            } else {
                                 setKey(k);
                             }
                         })}>
-                            <Tab eventKey="console" title="Konsolenausgabe anzeigen" >
+                            <Tab eventKey="console" title="Konsolenausgabe anzeigen">
                                 <pre className="bg-white p-2">
                                 {output}
                                 </pre>
