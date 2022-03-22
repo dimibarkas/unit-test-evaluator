@@ -18,29 +18,33 @@ import java.util.stream.Collectors;
 @Log4j2
 public class FeedbackServiceImpl implements FeedbackService {
 
-
-    //TODO: Suche im Report nach der richtigen Datei und geben die Liste der Lines aus.
     @Override
-    public String provideFeedback(User user, Task task, SubmissionResult submissionResult) {
+    public String provideFeedback(User user, Task task, SubmissionResult currentSubmission) {
 
         // check the submissions done by this user.
         List<Submission> submissionList = user.getSubmissionList().stream().sorted().collect(Collectors.toList());
 
         // if the current build was not successful, provide more general feedback
-        if (submissionResult.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
-            return "Ein allgemeiner Tipp.";
+        if (currentSubmission.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
+            log.info("Ein allgemeiner Tipp.");
         }
 
         //first try 100% lines and branches covered
-        if(submissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL
+        if (currentSubmission.getSummary() == BuildSummary.BUILD_SUCCESSFUL
                 && submissionList.get(0).getCoveredBranches() == 100
                 && submissionList.get(0).getCoveredInstructions() == 100
         ) {
-            return "Beim ersten versucht hast du sofort eine Line-Coverage von 100% erreicht? WOW!!!!";
+            log.info("Beim ersten versucht hast du sofort eine Line-Coverage von 100% erreicht? WOW!!!!");
         }
 
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
-        List<Line> lineList = submissionResult.getReport()._package.sourcefile.stream().filter(sourcefile -> Objects.equals(sourcefile.getName(), task.getSourcefilename())).collect(Collectors.toList()).stream().findFirst().orElseThrow(NullPointerException::new).getLine();
+        List<Line> lineList = currentSubmission
+                .getReport()
+                ._package
+                .sourcefile
+                .stream()
+                .filter(sourcefile -> Objects.equals(sourcefile.getName(), task.getSourcefilename()))
+                .collect(Collectors.toList()).stream().findFirst().orElseThrow(() -> new NullPointerException("sourcefile not found: ")).getLine();
 
 //        submissionList.forEach(System.out::println);
 //        lineList.forEach(System.out::println);

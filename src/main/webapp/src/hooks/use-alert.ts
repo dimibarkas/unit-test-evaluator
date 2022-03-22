@@ -10,10 +10,6 @@ export default function useAlert() {
     const [showVideoPlayer, setShowVideoPlayer] = useState(false);
     const [videoTitle, setVideoTitle] = useState("");
 
-    useEffect(() => {
-        console.log(showVideoPlayer);
-    }, [showVideoPlayer])
-
     const showCustomAlert = (submissionResult: SubmissionResult) => {
         let headerString = "";
         let variant = "";

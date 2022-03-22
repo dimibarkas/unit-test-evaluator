@@ -9,15 +9,13 @@ import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
  */
 public interface FeedbackService {
 
-    //TODO: extend the following method to return a path to the video which should be streamed to the frontend
-
     /**
      * This function reads the coverage report in a submission, the progress of a user and the task he is currently working on and
      * decided which Feedback to provide.
      * @param user the user who gets the feedback
      * @param task the task the user is currently working on (providing the hints)
      * @param submissionResult the submission result keeps the coverage report which
-     * @return the feedback as a String
+     * @return the title of the feedback video
      *
      */
     String provideFeedback(User user, Task task, SubmissionResult submissionResult);

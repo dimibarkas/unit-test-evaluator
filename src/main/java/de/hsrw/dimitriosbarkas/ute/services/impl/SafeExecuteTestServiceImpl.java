@@ -45,7 +45,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         //TODO: bevor der Test überhaupt in die Testumgebung geschrieben wird, soll geprüft werden ob das Template verändert wurde...
         // wenn ja, dann soll ebenfalls eine Custom-Exception geworden werden. TestTemplateCorruptedException
         byte[] testData = Base64.getDecoder().decode(encodedTest);
-        byte[] taskData = Base64.getDecoder().decode(task.getEncodedFile());
 
         Process p;
         try {
