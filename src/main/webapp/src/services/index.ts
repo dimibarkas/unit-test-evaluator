@@ -1,6 +1,5 @@
 import axios from "axios";
-import {Submission, Task, SubmissionResult, User} from "../model/types";
-
+import {Submission, Task, SubmissionResult, User, Progress} from "../model/types";
 
 
 export const getAllTasks = async (): Promise<Task[]> => {
@@ -37,4 +36,17 @@ export const fetchNewUser = async (): Promise<User> => {
             throw new Error("an error occurred while fetching user");
         })
     return user;
+}
+
+export const getProgressList = async (userId: string): Promise<Progress[]> => {
+    let result: Progress[];
+    await axios.get("/api/progress", {
+        params: {userId: userId}
+    }).then((response) => {
+        result = response.data?.progressList;
+    }).catch((e) => {
+        console.log(e);
+        throw new Error("an error occurred while getting the progress list.");
+    })
+    return result;
 }

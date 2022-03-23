@@ -1,14 +1,15 @@
-import {Alert, Button, Container, Tab, Tabs} from "react-bootstrap";
+import {Alert, Button, Container, ProgressBar, Tab, Tabs} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
 import {useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
-import {Submission, SubmissionResult} from "../model/types";
-import {submitCode} from "../services";
+import {Progress, Submission, SubmissionResult} from "../model/types";
+import {getProgressList, submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";
+import {fetchProgressList} from "../redux/actions/progress";
 
 
 function TaskContainer() {
@@ -19,6 +20,8 @@ function TaskContainer() {
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
     const editorRef = useRef(null);
+    const [ciProgress, setCiProgress] = useState(0);
+    const [cbProgress, setCbProgress] = useState(0);
 
     function submitButton() {
         return (
@@ -29,10 +32,37 @@ function TaskContainer() {
         )
     }
 
+    function getProgressForSelectedTask(progressList: Progress[]): void {
+        progressList.filter((progress) => progress.id === selectedTask.task.id).forEach(progress => {
+            setCiProgress(progress.coveredInstructions);
+            setCbProgress(progress.coveredBranches);
+        })
+    }
+
+    function getVariant(progress: number): string {
+        if (progress <= 20) {
+            return "danger"
+        } else if (progress > 20 && progress < 80) {
+            return "warning"
+        } else if (progress >= 80 && progress < 99) {
+            return "info"
+        } else if (progress === 100) {
+            return "success"
+        }
+    }
+
     function handleEditorDidMount(editor) {
         editorRef.current = editor;
     }
 
+
+    useEffect(() => {
+        if (user?.user?.id) {
+            getProgressList(user?.user?.id).then((progressList) => {
+                getProgressForSelectedTask(progressList);
+            })
+        }
+    }, [selectedTask])
 
     useEffect(() => {
         if (isLoading) {
@@ -49,6 +79,12 @@ function TaskContainer() {
                 setLoading(false);
                 console.log(error)
             });
+        } else if (!isLoading) {
+            if (user?.user?.id) {
+                getProgressList(user.user.id).then((progressList) => {
+                    getProgressForSelectedTask(progressList);
+                })
+            }
         }
         // eslint-disable-next-line
     }, [isLoading]);
@@ -69,13 +105,14 @@ function TaskContainer() {
         )
     }
 
+
     return (
         <>
             <Container className="text-light">
-                <h1 className="display-5 my-4">{selectedTask.task.name}</h1>
-                <p className="lead my-2">{selectedTask.task.shortDescription}</p>
-                <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
-                <div className="d-flex flex-row-reverse mb-3">
+                <h1 className="display-5 mb-4 mt-1">{selectedTask.task.name}</h1>
+                <p className="lead my-1">{selectedTask.task.shortDescription}</p>
+                <p className="lead my-1"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
+                <div className="d-flex flex-row-reverse justify-content-between align-items-center mb-3">
                     <Button
                         variant={isLoading ? "secondary" : "success"}
                         disabled={isLoading}
@@ -83,6 +120,18 @@ function TaskContainer() {
                     >
                         {isLoading ? 'Verarbeitung läuft…' : submitButton()}
                     </Button>
+                    <div className="w-75 d-flex justify-content-between align-items-center flex-shrink-1">
+                        <div className="text-nowrap">
+                            covered instructions
+                        </div>
+                        <ProgressBar variant={getVariant(ciProgress)} now={ciProgress} label={`${ciProgress} %`}
+                                     className="w-100 m-2 text-black"/>
+                        <div className="text-nowrap">
+                            covered branches
+                        </div>
+                        <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
+                                     className="w-100 m-2 text-black"/>
+                    </div>
                 </div>
                 <Split
                     className="split"

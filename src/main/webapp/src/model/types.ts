@@ -43,3 +43,9 @@ export type User = {
     id: string;
     createdAt: string;
 }
+
+export type Progress = {
+    id: number;
+    coveredInstructions: number;
+    coveredBranches: number;
+}

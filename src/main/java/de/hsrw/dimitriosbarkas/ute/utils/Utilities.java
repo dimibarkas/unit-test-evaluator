@@ -7,6 +7,9 @@ import java.io.*;
  */
 public final class Utilities {
 
+    /**
+     * Default constructor is private.
+     */
     private Utilities () {}
 
     /**
