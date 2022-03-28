@@ -16,6 +16,14 @@ tasks:
 #    sourcefilename: 'BubbleSort.java'
 #    testtemplatefilename : 'BubbleSortTest.java'
   - id: '3'
+    name: 'Taschenrechner'
+    description: 'Die Klasse Calculator enthält Methoden für die Operationen: Addition, Subtraktion, Multiplikation und Division.'
+    shortDescription: 'Die Klass stellt Funktionen für einfache Rechenoperationen.'
+    targetDescription: 'Schreiben Sie Unit-Tests alle Methoden der Klasse Calculator. Testen Sie Standardfälle, Randfälle und die mögliche Exception.'
+    pathToDir: 'tasks/calculator/'
+    sourcefilename: 'Calculator.java'
+    testtemplatefilename: 'CalculatorTest.java'
+  - id: '4'
     name: 'Buchstaben duplizieren'
     description: 'Die Methode nimmt einen String entgegen und dupliziert jeden Buchstaben (aus "abc!" wird "aabbcc!!"). Wird null übergeben, wird eine IllegalArgumentException geworfen. '
     shortDescription: 'Die Methode dupliziert jeden Buchstaben in einem String.'
@@ -31,7 +39,7 @@ tasks:
         isMissedBranch:
           - "StringUtilHintLine12Mb1"
           - "StringUtilHintLine12Mb2"
-  - id: '4'
+  - id: '5'
     name: 'Statistik'
     description: 'Die Methode StatisticUtil.getAverageAge erhält einen InputStream von einer CSV-Datei. Diese Datei speichert Personen mit Vornamen, Nachnamen und Alter und gibt das Durchschnittsalter zurück. Spalten werden durch Semikolon getrennt.'
     shortDescription: 'Die Methode führt eine statistische Berechnung auf Basis von CSV-Daten aus.'
@@ -39,7 +47,7 @@ tasks:
     pathToDir: 'tasks/statistic-util/'
     sourcefilename: 'StatisticUtil.java'
     testtemplatefilename: 'StatisticUtilTest.java'
-  - id: '5'
+  - id: '6'
     name: 'Sensor Data'
     description: 'Die Klasse SensorData speichert eine Liste von Sensordaten (als Double). Die Klasse erlaubt es, Werte hinzuzufügen und auszulesen. Außerdem können statistische Werte, d.h. Minimum, Maximum und Durchschnitt ausgelesen werden.'
     shortDescription: 'Die Klasse bietet Hilfsmethoden zum Umgang mit Sensordaten.'
