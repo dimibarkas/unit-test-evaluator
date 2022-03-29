@@ -54,4 +54,12 @@ public class Task {
      * A list of possible hints.
      */
     private List<Hint> hintList;
+    /**
+     * The list of the mutators which should be used for mutations tests.
+     *
+     * detail: if any mutator is provided then the following are getting used:
+     *
+     * s
+     */
+    private List<String> mutators;
 }

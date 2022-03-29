@@ -1,8 +1,11 @@
-while getopts p: flag
+#!/bin/bash
+
+while getopts p:m: flag
 do
   # shellcheck disable=SC2220
   case "${flag}" in
     p)  path=${OPTARG};;
+    m)  mutators=${OPTARG};;
   esac
 done
 
@@ -25,3 +28,5 @@ rm pom.xml
 # create new pom.xml file from template
 echo "$value" > pom.xml
 
+#optional, put custom mutators in pom.xml file
+echo "$mutators"

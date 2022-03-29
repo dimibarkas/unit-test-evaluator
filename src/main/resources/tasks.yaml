@@ -25,6 +25,16 @@ tasks:
     pathToDir: 'tasks/bubble-sort/'
     sourcefilename: 'BubbleSort.java'
     testtemplatefilename : 'BubbleSortTest.java'
+    mutators:
+      - EMPTY_RETURNS
+      - FALSE_RETURNS
+      - INCREMENTS
+      - INVERT_NEGS
+      - NEGATE_CONDITIONALS
+      - NULL_RETURNS
+      - PRIMITIVE_RETURNS
+      - TRUE_RETURNS
+      - VOID_METHOD_CALLS
   - id: '3'
     name: 'Taschenrechner'
     description: 'Die Klasse Calculator enthält Methoden für die Operationen: Addition, Subtraktion, Multiplikation und Division.'

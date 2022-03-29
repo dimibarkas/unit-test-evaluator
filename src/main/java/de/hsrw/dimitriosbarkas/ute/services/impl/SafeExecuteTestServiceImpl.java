@@ -63,6 +63,19 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 throw new CouldNotSetupTestEnvironmentException("Error while creating test environment");
             }
 
+            log.info("checking for mutators...");
+
+            if(task.getMutators().isEmpty()) {
+                log.info("no custom mutators found, using default ones.");
+            } else {
+                //add custom mutators to pom file
+                log.info("using custom mutators: " + task.getMutators());
+                File pomFile = new File(path.toAbsolutePath() + "/testapp/pom.xml");
+                if(pomFile.exists()) {
+                    addMutators(pomFile, task.getMutators());
+                }
+            }
+
             log.info("Test environment successfully setup.");
 
             // write files to test environment
