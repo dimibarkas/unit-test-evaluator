@@ -40,11 +40,14 @@ public class FeedbackServiceImpl implements FeedbackService {
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
         List<Line> lineList = currentSubmission
                 .getReport()
-                ._package
-                .sourcefile
+                .get_package()
+                .getSourcefile()
                 .stream()
                 .filter(sourcefile -> Objects.equals(sourcefile.getName(), task.getSourcefilename()))
                 .collect(Collectors.toList()).stream().findFirst().orElseThrow(() -> new NullPointerException("sourcefile not found: ")).getLine();
+
+        log.info("Mutation-Result: ");
+        currentSubmission.getMutationReport().getMutations().stream().filter(mutation -> mutation.getSourceFile().equals(task.getSourcefilename())).forEach(System.out::println);
 
 //        submissionList.forEach(System.out::println);
 //        lineList.forEach(System.out::println);
@@ -55,16 +58,16 @@ public class FeedbackServiceImpl implements FeedbackService {
     String getFeedbackByLineCoverage(Task task, List<Line> lineList) {
         List<Hint> hintList = task.getHintList();
         for (Line line : lineList) {
-            Optional<Hint> optionalHint = hintList.stream().filter(_hint -> _hint.getNr() == line.nr).findFirst();
+            Optional<Hint> optionalHint = hintList.stream().filter(_hint -> _hint.getNr() == line.getNr()).findFirst();
             if (optionalHint.isEmpty()) {
                 return null;
             }
             Hint hint = optionalHint.get();
 //            log.info(String.format("found hint for line %d", hint.getNr()));
-            if (line.mi > 0 && hint.getIsMissedInstruction() != null) {
+            if (line.getMi() > 0 && hint.getIsMissedInstruction() != null) {
                 return getMissedInstructionHintForLine(hint.getIsMissedInstruction());
             }
-            if (line.mb > 0 && hint.getIsMissedBranch() != null) {
+            if (line.getMb() > 0 && hint.getIsMissedBranch() != null) {
                 return getMissedBranchHintForLine(hint.getIsMissedBranch());
             }
         }

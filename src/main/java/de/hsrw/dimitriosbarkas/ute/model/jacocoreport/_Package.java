@@ -2,6 +2,7 @@ package de.hsrw.dimitriosbarkas.ute.model.jacocoreport;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -9,15 +10,15 @@ import java.util.List;
 @Data
 public class _Package {
 
-    @JsonProperty("class")
+    @JacksonXmlProperty(localName = "class")
     @JacksonXmlElementWrapper(useWrapping = false)
-    public List<_Class> _class;
+    private List<_Class> _class;
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    public List<Sourcefile> sourcefile;
+    private List<Sourcefile> sourcefile;
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    public List<Counter> counter;
+    private List<Counter> counter;
 
-    public String name;
+    private String name;
 }

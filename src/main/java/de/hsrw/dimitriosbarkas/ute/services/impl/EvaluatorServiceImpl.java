@@ -72,7 +72,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         //TODO: make function throw a custom exception
         _Class _class = null;
         try {
-            _class = report._package._class.stream().filter(aClass -> aClass.sourcefilename.equals(task.getSourcefilename())).findFirst().orElseThrow(Exception::new);
+            _class = report.get_package().get_class().stream().filter(aClass -> aClass.getSourcefilename().equals(task.getSourcefilename())).findFirst().orElseThrow(Exception::new);
         } catch (Exception e) {
             log.error(e);
         }
@@ -84,13 +84,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         if (_class == null) return 0;
         int percentage = 0;
         try {
-            Counter counter = _class.counter.stream().filter(c -> c.type.equals("INSTRUCTION")).findFirst().orElseThrow(Exception::new);
+            Counter counter = _class.getCounter().stream().filter(c -> c.getType().equals("INSTRUCTION")).findFirst().orElseThrow(Exception::new);
             //log.info(counter.covered);
             //log.info(counter.missed);
-            if (counter.missed == 0) return 100;
-            if (counter.covered == 0) return 0;
-            int total = counter.missed + counter.covered;
-            percentage = (int) Math.floor(((double) counter.covered / (double) total) * 100);
+            if (counter.getMissed() == 0) return 100;
+            if (counter.getCovered() == 0) return 0;
+            int total = counter.getMissed() + counter.getMissed();
+            percentage = (int) Math.floor(((double) counter.getCovered() / (double) total) * 100);
             //percentage = (int) (((double) counter.covered / (double) counter.missed) * 100);
             //log.info(percentage);
         } catch (Exception e) {
@@ -104,13 +104,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         if (_class == null) return 0;
         int percentage = 0;
         try {
-            Counter counter = _class.counter.stream().filter(c -> c.type.equals("BRANCH")).findFirst().orElseThrow(Exception::new);
+            Counter counter = _class.getCounter().stream().filter(c -> c.getType().equals("BRANCH")).findFirst().orElseThrow(Exception::new);
             //log.info(counter.covered);
             //log.info(counter.missed);
-            if (counter.missed == 0) return 100;
-            if (counter.covered == 0) return 0;
-            int total = counter.missed + counter.covered;
-            percentage = (int) Math.floor(((double) counter.covered / (double) total) * 100);
+            if (counter.getMissed() == 0) return 100;
+            if (counter.getCovered() == 0) return 0;
+            int total = counter.getMissed() + counter.getCovered();
+            percentage = (int) Math.floor(((double) counter.getCovered() / (double) total) * 100);
             //log.info(percentage);
         } catch (Exception e) {
             log.error(e);

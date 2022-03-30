@@ -9,12 +9,12 @@ import java.util.List;
 public class _Class {
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    public List<Method> method;
+    private List<Method> method;
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    public List<Counter> counter;
+    private List<Counter> counter;
 
-    public String name;
+    private String name;
 
-    public String sourcefilename;
+    private String sourcefilename;
 }

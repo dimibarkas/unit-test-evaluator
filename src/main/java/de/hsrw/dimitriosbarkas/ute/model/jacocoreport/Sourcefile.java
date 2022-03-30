@@ -9,10 +9,10 @@ import java.util.List;
 public class Sourcefile {
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    public List<Line> line;
+    private List<Line> line;
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    public List<Counter> counter;
+    private List<Counter> counter;
 
-    public String name;
+    private String name;
 }
