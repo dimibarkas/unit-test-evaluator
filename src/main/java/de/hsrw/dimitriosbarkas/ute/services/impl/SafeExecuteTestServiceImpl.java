@@ -7,6 +7,7 @@ import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.Data;
@@ -18,9 +19,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,13 +62,11 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 throw new CouldNotSetupTestEnvironmentException("Error while creating test environment");
             }
 
-            log.info("checking for mutators...");
-
             if(task.getMutators().isEmpty()) {
                 log.info("no custom mutators found, using default ones.");
             } else {
                 //add custom mutators to pom file
-                log.info("using custom mutators: " + task.getMutators());
+                log.info("Using custom mutators: " + task.getMutators());
                 File pomFile = new File(path.toAbsolutePath() + "/testapp/pom.xml");
                 if(pomFile.exists()) {
                     addMutators(pomFile, task.getMutators());
@@ -148,14 +145,16 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
 
     private SubmissionResult getSuccessfulTestResult(Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
-        log.info("build successful");
+        log.info("Build successful");
         String filename = task.getTesttemplatefilename().replace(".java", ".txt");
         String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
         File file = new File(pathToFile);
         String output = readFromFile(file);
         generateCoverageReport(path);
+        generateMutationCoverageReport(path);
         Report report = parseCoverageReport(path);
-        return new SubmissionResult(output, report, BuildSummary.BUILD_SUCCESSFUL, null);
+        MutationReport mutationReport = parseMutationCoverageReport(path);
+        return new SubmissionResult(output, report, mutationReport,  BuildSummary.BUILD_SUCCESSFUL, null);
     }
 
 
@@ -163,15 +162,15 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         String pathToDir = path.toAbsolutePath() + "/testapp/target/surefire-reports/";
         boolean buildSucceed = new File(pathToDir).exists();
         if (buildSucceed) {
-            log.warn("build successful - but there are test failures");
+            log.warn("Build successful - but there are test failures");
             String filename = task.getTesttemplatefilename().replace(".java", ".txt");
             String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
             File file = new File(pathToFile);
             String output = readFromFile(file);
-            return new SubmissionResult(output, null, BuildSummary.TESTS_FAILED, null);
+            return new SubmissionResult(output, null, null, BuildSummary.TESTS_FAILED, null);
         }
 
-        log.error("build failed");
+        log.error("Build failed");
         // return error logs
         StringBuilder sb = new StringBuilder();
         String line;
@@ -183,7 +182,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 }
             }
         }
-        return new SubmissionResult(sb.toString(), null, BuildSummary.BUILD_FAILED, null);
+        return new SubmissionResult(sb.toString(), null, null, BuildSummary.BUILD_FAILED, null);
     }
 
 
@@ -199,7 +198,20 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         } catch (IOException | InterruptedException e) {
             throw new ErrorWhileGeneratingCoverageReport(e);
         }
+    }
 
+    @Override
+    public void generateMutationCoverageReport(Path path) {
+        try {
+            String[] command = {"mvn", "pitest:mutationCoverage"};
+            String[] env = {};
+            String pathToTempProject = path.toAbsolutePath() + "/testapp";
+            File dir = new File(pathToTempProject);
+            Process p = Runtime.getRuntime().exec(command, env, dir);
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
+            throw new Error(e);
+        }
     }
 
     @Override
@@ -227,5 +239,33 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             throw new ErrorWhileParsingReportException(e);
         }
     }
+
+    @Override
+    public MutationReport parseMutationCoverageReport(Path path) throws ErrorWhileParsingReportException {
+        String pathToReport = path.toAbsolutePath() + "/testapp/target/pit-reports";
+        File pitTestDirectory = new File(pathToReport);
+        if(!pitTestDirectory.exists()) {
+            //TODO: create custom exception
+            String errorMessage = "something went wrong " + path;
+            throw new Error(errorMessage);
+        }
+        Optional<File> fileContainingMutationCoverage = Arrays.stream(Objects.requireNonNull(pitTestDirectory.listFiles())).findFirst();
+
+        if(fileContainingMutationCoverage.isEmpty()) {
+            String errorMessage = "no mutation coverage report found" + path;
+            throw new Error(errorMessage);
+        }
+
+        MutationReport mutationReport;
+        try {
+            XmlMapper mapper = new XmlMapper();
+            String xml = inputStreamToString(new FileInputStream(fileContainingMutationCoverage.get() + "/mutations.xml"));
+            mutationReport = mapper.readValue(xml, MutationReport.class);
+            return mutationReport;
+        } catch (IOException e) {
+            throw new ErrorWhileParsingReportException(e);
+        }
+    }
+
 
 }
