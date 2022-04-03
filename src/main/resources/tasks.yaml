@@ -21,10 +21,12 @@ tasks:
       - nr: 3
         isMissedInstruction:
           - "InsertionSortHintLine3Mi"
-      - nr: 12
-        isMissedBranch:
+      - nr: 6
+        isMissedInstruction:
           - "InsertionSortHintLine3Mi"
           - "InsertionSortHintLine3Mi"
+    mutatorHintList:
+      - "InsertionSortMutatorHint1"
   - id: '2'
     name: 'Sortieren II'
     description: 'Die Methode BubbleSort.bubbleSort erhält ein Array aus integer Werten und sortiert dieses (in-place).'

@@ -25,7 +25,8 @@ public class FeedbackServiceImpl implements FeedbackService {
         // check the submissions done by this user.
         List<Submission> submissionList = user.getSubmissionList().stream().sorted().collect(Collectors.toList());
 
-        // if the current build was not successful, provide more general feedback
+
+        // if the current build was not successful, provide more general feedback (optional)
         if (currentSubmissionResult.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
             log.info("Ein allgemeiner Tipp.");
         }
@@ -56,18 +57,18 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .stream()
                 .filter(mutation ->
                         mutation.getSourceFile().equals(task.getSourcefilename())
-                        && !mutation.isDetected())
+                                && !mutation.isDetected())
                 .collect(Collectors.toList());
 
-        if (mutationList.isEmpty()) {
-            log.info("all mutations passed");
+        //if any mutation was detected but the coverage is 100 return a random message from the mutatorHintList
+        if (!mutationList.isEmpty()
+                && submissionList.get(submissionList.size() - 1).getCoveredBranches() == 100
+                && submissionList.get(submissionList.size() - 1).getCoveredInstructions() == 100
+        ) {
+            return getRandomHintMessage(task.getMutatorHintList());
         } else {
-            mutationList.forEach(System.out::println);
+            log.info("all mutations passed");
         }
-
-
-//        submissionList.forEach(System.out::println);
-//        lineList.forEach(System.out::println);
 
         return getFeedbackByLineCoverage(task, lineList);
     }

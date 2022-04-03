@@ -4,8 +4,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
-import {Progress, Submission, SubmissionResult} from "../model/types";
-import {getProgressList, submitCode} from "../services";
+import {Submission, SubmissionResult} from "../model/types";
+import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";
@@ -61,6 +61,7 @@ function TaskContainer() {
         if(!progress.isLoading) {
             getProgressForSelectedTask();
         }
+        // eslint-disable-next-line
     }, [progress.isLoading])
 
     useEffect(() => {
@@ -145,7 +146,7 @@ function TaskContainer() {
                     cursor="col-resize"
                 >
                     <Editor
-                        height={"45vh"}
+                        height={"40vh"}
                         width={"100%"}
                         defaultLanguage={"java"}
                         theme={"vs-dark"}
@@ -153,7 +154,7 @@ function TaskContainer() {
                         value={atob(selectedTask.task.encodedFile)}
                     />
                     <Editor
-                        height={"45vh"}
+                        height={"40vh"}
                         width={"100%"}
                         defaultLanguage={"java"}
                         theme={"vs-dark"}

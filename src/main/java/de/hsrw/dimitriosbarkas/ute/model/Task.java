@@ -70,4 +70,6 @@ public class Task {
      */
     private List<Hint> hintList;
 
+    private List<String> mutatorHintList;
+
 }
