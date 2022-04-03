@@ -2,6 +2,7 @@ package de.hsrw.dimitriosbarkas.ute.model;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,7 +65,7 @@ public class Task {
      *  - NULL_RETURNS
      *  - PRIMITIVE_RETURNS
      */
-    private List<String> mutators;
+    private List<String> mutators = new ArrayList<>();
     /**
      * A list of possible hints.
      */

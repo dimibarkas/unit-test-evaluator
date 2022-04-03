@@ -1,4 +1,4 @@
-import {Alert, Button, Container, ProgressBar, Tab, Tabs} from "react-bootstrap";
+import {Alert, Badge, Button, Container, ProgressBar, Tab, Tabs, Toast, ToastContainer} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
 import {useDispatch, useSelector} from "react-redux";
 import {State} from "../redux/reducers";
@@ -20,10 +20,13 @@ function TaskContainer() {
     const {showAlert, setShowAlert, showCustomAlert, header, variant, output, showVideoPlayer, videoTitle} = useAlert();
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
-    const editorRef = useRef(null);
     const [ciProgress, setCiProgress] = useState(0);
     const [cbProgress, setCbProgress] = useState(0);
+    const [showToast, setShowToast] = useState(true);
     const dispatch = useDispatch()
+    const editorRef = useRef(null);
+
+    const toggleShowToast = () => setShowToast(false);
 
     function submitButton() {
         return (
@@ -57,12 +60,14 @@ function TaskContainer() {
         editorRef.current = editor;
     }
 
+    
+
     useEffect(() => {
-        if(!progress.isLoading) {
+        if (!progress.isLoading) {
             getProgressForSelectedTask();
         }
         // eslint-disable-next-line
-    }, [progress.isLoading])
+    }, [progress.isLoading, selectedTask])
 
     useEffect(() => {
         if (isLoading) {
@@ -90,6 +95,14 @@ function TaskContainer() {
 
     const handleClick = () => setLoading(true);
 
+    const isCurrentTaskCompleted = (): boolean => {
+        return progress.progressList?.some(progress =>
+            progress.id === selectedTask.task.id
+            && progress.coveredBranches === 100
+            && progress.coveredInstructions === 100
+            && progress.hasAllMutationsPassed)
+    }
+
     /**
      * if no task is selected
      */
@@ -107,10 +120,26 @@ function TaskContainer() {
 
     return (
         <>
-            <Container className="text-light">
-                <h1 className="display-5 mb-4 mt-1">{selectedTask.task.name}</h1>
-                <p className="lead my-1">{selectedTask.task.shortDescription}</p>
-                <p className="lead my-1"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
+            <Container className="text-light" style={{position: "relative"}}>
+                <ToastContainer position={"top-end"} style={{zIndex: 1000}}>
+                    <Toast show={showToast} onClose={toggleShowToast}>
+                        <Toast.Header>
+                            <strong className="me-auto">Neues Feedback!</strong>
+                        </Toast.Header>
+                        <Toast.Body>
+                            <video src={`/api/video/${videoTitle}`} width="320" height="200" controls
+                                   preload="none"/>
+                        </Toast.Body>
+                    </Toast>
+                </ToastContainer>
+                <div style={{width: "70%", height: 300}}>
+                    <h1 className="display-5 my-2">{selectedTask.task.name}</h1>
+                    <small className={isCurrentTaskCompleted() ? "text-success" : "text-danger"}>
+                        {isCurrentTaskCompleted() ? "Abgeschlossen" : "Nicht abgeschlossen"}
+                    </small>
+                    {/*<p className="lead my-2">{selectedTask.task.shortDescription}</p>*/}
+                    <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
+                </div>
                 <div className="d-flex flex-row-reverse justify-content-between align-items-center mb-3">
                     <Button
                         variant={isLoading ? "secondary" : "success"}
@@ -120,14 +149,14 @@ function TaskContainer() {
                         {isLoading ? 'Verarbeitung läuft…' : submitButton()}
                     </Button>
                     <div className="w-75 d-flex justify-content-between align-items-center flex-shrink-1">
-                        <div className="text-nowrap">
+                        <small className="text-nowrap">
                             covered instructions
-                        </div>
+                        </small>
                         <ProgressBar variant={getVariant(ciProgress)} now={ciProgress} label={`${ciProgress} %`}
                                      className="w-100 m-2 text-black"/>
-                        <div className="text-nowrap">
+                        <small className="text-nowrap">
                             covered branches
-                        </div>
+                        </small>
                         <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
                                      className="w-100 m-2 text-black"/>
                     </div>
@@ -166,16 +195,7 @@ function TaskContainer() {
                     <Alert show={showAlert} variant={variant} onClose={() => setShowAlert(false)} dismissible>
                         <Alert.Heading>{header}</Alert.Heading>
                         <hr/>
-                        <div
-                            style={{
-                                display: showVideoPlayer ? "flex" : "none",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: "100%"
-                            }}>
-                            <video src={`/api/video/${videoTitle}`} width="80%" height="80%" controls
-                                   preload="none"/>
-                        </div>
+
                         <Tabs activeKey={key} onSelect={((k) => {
                             if (k === key) {
                                 setKey("")

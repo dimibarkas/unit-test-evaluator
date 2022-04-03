@@ -49,10 +49,10 @@ function TaskList() {
                                 && progress.coveredInstructions === 100
                                 && progress.hasAllMutationsPassed
                             ) ? <div className="d-flex flex-row-reverse text-success">
-                                    <div>Abgeschlossen</div>
+                                    <small>Abgeschlossen</small>
                                 </div> :
                                 <div className="d-flex flex-row-reverse text-danger">
-                                    <div>Nicht abgeschlossen</div>
+                                    <small>Nicht abgeschlossen</small>
                                 </div>
                         }
                     </div>
