@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches, BuildSummary summary) {
+    public void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches, BuildSummary summary, boolean allMutationsPassed) {
         User user = userRepository.getById(userId);
         Submission submission = new Submission();
         submission.setTaskId(taskId);
@@ -39,6 +39,7 @@ public class UserServiceImpl implements UserService {
         submission.setCoveredInstructions(coveredInstructions);
         submission.setCoveredBranches(coveredBranches);
         submission.setSummary(summary);
+        submission.setAllMutationsPassed(allMutationsPassed);
         Submission savedSubmission = submissionRepository.save(submission);
         user.addSubmission(savedSubmission);
         userRepository.save(user);

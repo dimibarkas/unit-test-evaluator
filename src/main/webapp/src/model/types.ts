@@ -48,4 +48,5 @@ export type Progress = {
     id: number;
     coveredInstructions: number;
     coveredBranches: number;
+    hasAllMutationsPassed: boolean;
 }

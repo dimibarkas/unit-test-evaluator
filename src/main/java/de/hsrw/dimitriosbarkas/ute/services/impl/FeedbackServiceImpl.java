@@ -5,6 +5,7 @@ import de.hsrw.dimitriosbarkas.ute.model.Hint;
 import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.Mutation;
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.Submission;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
 import de.hsrw.dimitriosbarkas.ute.services.FeedbackService;
@@ -19,18 +20,18 @@ import java.util.stream.Collectors;
 public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
-    public String provideFeedback(User user, Task task, SubmissionResult currentSubmission) {
+    public String provideFeedback(User user, Task task, SubmissionResult currentSubmissionResult) {
 
         // check the submissions done by this user.
         List<Submission> submissionList = user.getSubmissionList().stream().sorted().collect(Collectors.toList());
 
         // if the current build was not successful, provide more general feedback
-        if (currentSubmission.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
+        if (currentSubmissionResult.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
             log.info("Ein allgemeiner Tipp.");
         }
 
         //first try 100% lines and branches covered
-        if (currentSubmission.getSummary() == BuildSummary.BUILD_SUCCESSFUL
+        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL
                 && submissionList.get(0).getCoveredBranches() == 100
                 && submissionList.get(0).getCoveredInstructions() == 100
         ) {
@@ -38,7 +39,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
 
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
-        List<Line> lineList = currentSubmission
+        List<Line> lineList = currentSubmissionResult
                 .getReport()
                 .get_package()
                 .getSourcefile()
@@ -47,7 +48,23 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .collect(Collectors.toList()).stream().findFirst().orElseThrow(() -> new NullPointerException("sourcefile not found: ")).getLine();
 
         log.info("Mutation-Result: ");
-        currentSubmission.getMutationReport().getMutations().stream().filter(mutation -> mutation.getSourceFile().equals(task.getSourcefilename())).forEach(System.out::println);
+
+        //this list need to be empty
+        List<Mutation> mutationList = currentSubmissionResult
+                .getMutationReport()
+                .getMutations()
+                .stream()
+                .filter(mutation ->
+                        mutation.getSourceFile().equals(task.getSourcefilename())
+                        && !mutation.isDetected())
+                .collect(Collectors.toList());
+
+        if (mutationList.isEmpty()) {
+            log.info("all mutations passed");
+        } else {
+            mutationList.forEach(System.out::println);
+        }
+
 
 //        submissionList.forEach(System.out::println);
 //        lineList.forEach(System.out::println);

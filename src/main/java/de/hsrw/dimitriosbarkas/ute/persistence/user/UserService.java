@@ -18,7 +18,7 @@ public interface UserService {
      * This method saves a new submission related to the user.
      * @param userId the id of the specified user.
      */
-    void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches, BuildSummary summary);
+    void addSubmission(UUID userId, String taskId, int coveredInstructions, int coveredBranches, BuildSummary summary, boolean allMutationsPassed);
 
     /**
      * This method find a user by its id.

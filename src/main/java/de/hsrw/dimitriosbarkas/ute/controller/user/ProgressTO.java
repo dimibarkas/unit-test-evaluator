@@ -3,11 +3,9 @@ package de.hsrw.dimitriosbarkas.ute.controller.user;
 import de.hsrw.dimitriosbarkas.ute.model.Progress;
 import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.Submission;
-import de.hsrw.dimitriosbarkas.ute.persistence.submission.SubmissionTimestampComparator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -32,8 +30,8 @@ public class ProgressTO {
                     .max(Comparator.comparing(Submission::getSubmittedAt));
 
             return lastSubmission.map(
-                    submission -> new Progress(task.getId(), submission.getCoveredInstructions(), submission.getCoveredBranches()))
-                    .orElseGet(() -> new Progress(task.getId(), 0, 0));
+                    submission -> new Progress(task.getId(), submission.getCoveredInstructions(), submission.getCoveredBranches(), submission.isAllMutationsPassed()))
+                    .orElseGet(() -> new Progress(task.getId(), 0, 0, false));
         }).collect(Collectors.toList()));
     }
 }

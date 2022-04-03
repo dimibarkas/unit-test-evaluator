@@ -51,15 +51,23 @@ public class Task {
      */
     private String encodedTestTemplate;
     /**
+     * The list of the mutators which should be used for mutations tests. If no mutator is provided, then the following are applied:
+     *  - CONDITIONALS_BOUNDARY
+     *  - INCREMENTS
+     *  - INVERT_NEGATIVES
+     *  - MATH
+     *  - NEGATE_CONDITIONALS
+     *  - VOID_METHOD_CALLS
+     *  - EMPTY_RETURNS
+     *  - FALSE_RETURNS
+     *  - TRUE_RETURNS
+     *  - NULL_RETURNS
+     *  - PRIMITIVE_RETURNS
+     */
+    private List<String> mutators;
+    /**
      * A list of possible hints.
      */
     private List<Hint> hintList;
-    /**
-     * The list of the mutators which should be used for mutations tests.
-     *
-     * detail: if any mutator is provided then the following are getting used:
-     *
-     * s
-     */
-    private List<String> mutators;
+
 }

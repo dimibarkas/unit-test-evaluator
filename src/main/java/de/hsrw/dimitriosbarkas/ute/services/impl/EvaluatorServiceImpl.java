@@ -5,6 +5,8 @@ import de.hsrw.dimitriosbarkas.ute.model.*;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Counter;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport._Class;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.Mutation;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.UserService;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
@@ -14,6 +16,9 @@ import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -41,30 +46,52 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         // Get configuration for this task
         Task task = getTaskConfig(submissionTO.getTaskId());
 
-        SubmissionResult result;
+        SubmissionResult currentSubmissionResult;
         try {
             safeExecuteTestService.setupTestEnvironment(task, submissionTO.getEncodedTestContent());
-            result = safeExecuteTestService.buildAndRunTests();
+            currentSubmissionResult = safeExecuteTestService.buildAndRunTests();
 
-            if (result.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
-                CoverageResult coverageResult = getCoverageResult(result.getReport(), task);
-                userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), coverageResult.getCoveredInstructions(), coverageResult.getCoveredBranches(), result.getSummary());
+            if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
+                boolean allMutationsPassed = false;
+                List<Mutation> mutationList = getMutationResult(currentSubmissionResult.getMutationReport(), task);
+                if(mutationList.isEmpty()) allMutationsPassed = true;
+                CoverageResult coverageResult = getCoverageResult(currentSubmissionResult.getReport(), task);
+                userService.addSubmission(submissionTO.getUserId(),
+                        submissionTO.getTaskId(),
+                        coverageResult.getCoveredInstructions(),
+                        coverageResult.getCoveredBranches(),
+                        currentSubmissionResult.getSummary(),
+                        allMutationsPassed);
             } else {
-                userService.addSubmission(submissionTO.getUserId(), submissionTO.getTaskId(), 0, 0, result.getSummary());
+                userService.addSubmission(submissionTO.getUserId(),
+                        submissionTO.getTaskId(),
+                        0,
+                        0,
+                        currentSubmissionResult.getSummary(),
+                        false);
             }
 
             try {
                 User user = userService.getUserById(submissionTO.getUserId());
-                result.setFeedback(feedbackService.provideFeedback(user, task, result));
+                currentSubmissionResult.setFeedback(feedbackService.provideFeedback(user, task, currentSubmissionResult));
             } catch (NullPointerException e) {
                 log.warn("no hint provided for specific line");
             }
 
-            return result;
+            return currentSubmissionResult;
         } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }
+    }
+    @Override
+    public List<Mutation> getMutationResult(MutationReport mutationReport, Task task) {
+        return mutationReport
+                .getMutations()
+                .stream()
+                .filter(mutation -> mutation.getSourceFile().equals(task.getSourcefilename())
+                        && !mutation.isDetected())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -85,14 +112,10 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         int percentage = 0;
         try {
             Counter counter = _class.getCounter().stream().filter(c -> c.getType().equals("INSTRUCTION")).findFirst().orElseThrow(Exception::new);
-            //log.info(counter.covered);
-            //log.info(counter.missed);
             if (counter.getMissed() == 0) return 100;
             if (counter.getCovered() == 0) return 0;
-            int total = counter.getMissed() + counter.getMissed();
+            int total = counter.getMissed() + counter.getCovered();
             percentage = (int) Math.floor(((double) counter.getCovered() / (double) total) * 100);
-            //percentage = (int) (((double) counter.covered / (double) counter.missed) * 100);
-            //log.info(percentage);
         } catch (Exception e) {
             log.error(e);
         }
@@ -105,13 +128,10 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         int percentage = 0;
         try {
             Counter counter = _class.getCounter().stream().filter(c -> c.getType().equals("BRANCH")).findFirst().orElseThrow(Exception::new);
-            //log.info(counter.covered);
-            //log.info(counter.missed);
             if (counter.getMissed() == 0) return 100;
             if (counter.getCovered() == 0) return 0;
             int total = counter.getMissed() + counter.getCovered();
             percentage = (int) Math.floor(((double) counter.getCovered() / (double) total) * 100);
-            //log.info(percentage);
         } catch (Exception e) {
             log.error(e);
         }

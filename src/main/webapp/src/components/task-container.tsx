@@ -1,6 +1,6 @@
 import {Alert, Button, Container, ProgressBar, Tab, Tabs} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
@@ -16,12 +16,14 @@ function TaskContainer() {
 
     const selectedTask = useSelector((state: State) => state.selectedTask);
     const user = useSelector((state: State) => state.user);
+    const progress = useSelector((state: State) => state.progress);
     const {showAlert, setShowAlert, showCustomAlert, header, variant, output, showVideoPlayer, videoTitle} = useAlert();
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
     const editorRef = useRef(null);
     const [ciProgress, setCiProgress] = useState(0);
     const [cbProgress, setCbProgress] = useState(0);
+    const dispatch = useDispatch()
 
     function submitButton() {
         return (
@@ -32,8 +34,8 @@ function TaskContainer() {
         )
     }
 
-    function getProgressForSelectedTask(progressList: Progress[]): void {
-        progressList.filter((progress) => progress.id === selectedTask.task.id).forEach(progress => {
+    function getProgressForSelectedTask(): void {
+        progress.progressList?.filter((progress) => progress.id === selectedTask.task.id).forEach(progress => {
             setCiProgress(progress.coveredInstructions);
             setCbProgress(progress.coveredBranches);
         })
@@ -55,14 +57,11 @@ function TaskContainer() {
         editorRef.current = editor;
     }
 
-
     useEffect(() => {
-        if (user?.user?.id) {
-            getProgressList(user?.user?.id).then((progressList) => {
-                getProgressForSelectedTask(progressList);
-            })
+        if(!progress.isLoading) {
+            getProgressForSelectedTask();
         }
-    }, [selectedTask])
+    }, [progress.isLoading])
 
     useEffect(() => {
         if (isLoading) {
@@ -74,6 +73,7 @@ function TaskContainer() {
             }
             submitCode(request).then((receivedTest: SubmissionResult) => {
                 showCustomAlert(receivedTest)
+                dispatch(fetchProgressList(user.user.id));
                 setLoading(false);
             }).catch((error) => {
                 setLoading(false);
@@ -81,9 +81,7 @@ function TaskContainer() {
             });
         } else if (!isLoading) {
             if (user?.user?.id) {
-                getProgressList(user.user.id).then((progressList) => {
-                    getProgressForSelectedTask(progressList);
-                })
+                fetchProgressList(user.user.id);
             }
         }
         // eslint-disable-next-line

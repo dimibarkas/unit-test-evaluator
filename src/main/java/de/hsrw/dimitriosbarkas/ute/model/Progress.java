@@ -9,5 +9,5 @@ public class Progress {
     private String id;
     private int coveredInstructions;
     private int coveredBranches;
-
+    private boolean hasAllMutationsPassed;
 }

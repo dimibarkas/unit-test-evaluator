@@ -2,7 +2,14 @@ package com.test.app;
 
 public class BubbleSort {
 
-    void bubbleSort(int[] arr)
+    private final int array[];
+
+    public BubbleSort(int[] array) {
+        this.array = array;
+        bubbleSort(this.array);
+    }
+
+    private void bubbleSort(int[] arr)
     {
         int n = arr.length;
         for (int i = 0; i < n-1; i++)
@@ -15,4 +22,9 @@ public class BubbleSort {
                     arr[j+1] = temp;
                 }
     }
+
+    public int[] getSortedArray() {
+        return array;
+    }
+
 }

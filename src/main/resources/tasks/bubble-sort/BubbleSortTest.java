@@ -7,6 +7,6 @@ import static org.junit.Assert.*;
 public class BubbleSortTest {
 
     @Test
-    public void sort() {
+    public void test() {
     }
 }
