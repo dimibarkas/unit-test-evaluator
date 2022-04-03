@@ -1,4 +1,4 @@
-import {Alert, Badge, Button, Container, ProgressBar, Tab, Tabs, Toast, ToastContainer} from "react-bootstrap";
+import {Alert, Button, Container, ProgressBar, Tab, Tabs, Toast, ToastContainer} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
 import {useDispatch, useSelector} from "react-redux";
 import {State} from "../redux/reducers";
@@ -10,6 +10,7 @@ import useAlert from "../hooks/use-alert";
 import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";
 import {fetchProgressList} from "../redux/actions/progress";
+import {store} from "../redux/store";
 
 
 function TaskContainer() {
@@ -17,11 +18,12 @@ function TaskContainer() {
     const selectedTask = useSelector((state: State) => state.selectedTask);
     const user = useSelector((state: State) => state.user);
     const progress = useSelector((state: State) => state.progress);
-    const {showAlert, setShowAlert, showCustomAlert, header, variant, output, showVideoPlayer, videoTitle} = useAlert();
+    const {showAlert, setShowAlert, showCustomAlert, header, variant, output, videoTitle} = useAlert();
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
     const [ciProgress, setCiProgress] = useState(0);
     const [cbProgress, setCbProgress] = useState(0);
+    const [savedContent, setSavedContent] = useState("");
     const [showToast, setShowToast] = useState(true);
     const dispatch = useDispatch()
     const editorRef = useRef(null);
@@ -55,12 +57,6 @@ function TaskContainer() {
             return "success"
         }
     }
-
-    function handleEditorDidMount(editor) {
-        editorRef.current = editor;
-    }
-
-    
 
     useEffect(() => {
         if (!progress.isLoading) {
@@ -101,6 +97,42 @@ function TaskContainer() {
             && progress.coveredBranches === 100
             && progress.coveredInstructions === 100
             && progress.hasAllMutationsPassed)
+    }
+
+    function handleEditorDidMount(editor) {
+        editorRef.current = editor;
+    }
+
+    /**
+     * helper method
+     * @param state
+     */
+
+    function select(state: State) {
+        return state.selectedTask?.task?.id
+    }
+    let currentValue
+    function handleSelectedTaskChange() {
+        let previousValue = currentValue
+        currentValue = select(store.getState())
+        if(previousValue !== undefined && previousValue !== currentValue) {
+            //check if there is a value for the current task
+            if(sessionStorage.getItem(currentValue)) {
+                setSavedContent(sessionStorage.getItem(currentValue));
+            } else {
+                setSavedContent("");
+            }
+            saveEditorContent(previousValue)
+        }
+    }
+
+    useEffect(() => {
+        store.subscribe(handleSelectedTaskChange)
+        // eslint-disable-next-line
+    }, [])
+
+    const saveEditorContent = (taskId) => {
+        sessionStorage.setItem(taskId, btoa(editorRef.current.getValue()))
     }
 
     /**
@@ -188,7 +220,7 @@ function TaskContainer() {
                         defaultLanguage={"java"}
                         theme={"vs-dark"}
                         onMount={handleEditorDidMount}
-                        value={atob(selectedTask.task.encodedTestTemplate)}
+                        value={savedContent === "" ?  atob(selectedTask.task.encodedTestTemplate): atob(savedContent)}
                     />
                 </Split>
                 <div className="my-4">
