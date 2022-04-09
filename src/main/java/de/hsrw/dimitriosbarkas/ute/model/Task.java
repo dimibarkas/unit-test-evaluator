@@ -2,6 +2,7 @@ package de.hsrw.dimitriosbarkas.ute.model;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +32,10 @@ public class Task {
      */
     private String targetDescription;
     /**
+     * An optional hint for the description.
+     */
+    private String hint = null;
+    /**
      * The path to the directory with the files needed for the source files.
      */
     private String pathToDir;
@@ -51,7 +56,25 @@ public class Task {
      */
     private String encodedTestTemplate;
     /**
+     * The list of the mutators which should be used for mutations tests. If no mutator is provided, then the following are applied:
+     *  - CONDITIONALS_BOUNDARY
+     *  - INCREMENTS
+     *  - INVERT_NEGATIVES
+     *  - MATH
+     *  - NEGATE_CONDITIONALS
+     *  - VOID_METHOD_CALLS
+     *  - EMPTY_RETURNS
+     *  - FALSE_RETURNS
+     *  - TRUE_RETURNS
+     *  - NULL_RETURNS
+     *  - PRIMITIVE_RETURNS
+     */
+    private List<String> mutators = new ArrayList<>();
+    /**
      * A list of possible hints.
      */
-    private List<Hint> hintList;
+    private List<Hint> hintList = new ArrayList<>();
+
+    private List<String> mutatorHintList = new ArrayList<>();
+
 }

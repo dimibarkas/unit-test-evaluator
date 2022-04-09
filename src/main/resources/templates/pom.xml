@@ -33,6 +33,7 @@
                 <version>1.7.3</version>
                 <configuration>
                     <exportLineCoverage>true</exportLineCoverage>
+                    <outputFormats>xml</outputFormats>
                 </configuration>
             </plugin>
             <plugin>

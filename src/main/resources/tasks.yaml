@@ -3,39 +3,86 @@ tasks:
     name: 'Sortieren I'
     description: 'Die Methode InsertionSort.sort bekommt ein Array aus integer Werten welches (in-place) sortiert wird.'
     shortDescription: 'Der Sortieralgorithmus InsertionSort in Java implementiert.'
-    targetDescription: 'Erreichen Sie eine Line-Coverage von 100% für die gesamte Klasse.'
+    targetDescription: 'Erreichen Sie eine Line-Coverage von 100% für die gesamte Klasse. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
     pathToDir: 'tasks/insertion-sort/'
     sourcefilename: 'InsertionSort.java'
     testtemplatefilename: 'InsertionSortTest.java'
+    mutators:
+      - EMPTY_RETURNS
+      - FALSE_RETURNS
+      - INCREMENTS
+      - INVERT_NEGS
+      - NEGATE_CONDITIONALS
+      - NULL_RETURNS
+      - PRIMITIVE_RETURNS
+      - TRUE_RETURNS
+      - VOID_METHOD_CALLS
+    hintList:
+      - nr: 3
+        isMissedInstruction:
+          - "InsertionSortHintLine3Mi"
+      - nr: 6
+        isMissedInstruction:
+          - "InsertionSortHintLine3Mi"
+          - "InsertionSortHintLine3Mi"
+    mutatorHintList:
+      - "InsertionSortMutatorHint1"
   - id: '2'
     name: 'Sortieren II'
     description: 'Die Methode BubbleSort.bubbleSort erhält ein Array aus integer Werten und sortiert dieses (in-place).'
     shortDescription: 'Der Sortieralgorithmus BubbleSort in Java Implementiert.'
-    targetDescription: 'Erreichen Sie eine Test-Coverage von 100%.'
+    targetDescription: 'Erreichen Sie eine Test-Coverage von 100%. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
     pathToDir: 'tasks/bubble-sort/'
     sourcefilename: 'BubbleSort.java'
     testtemplatefilename : 'BubbleSortTest.java'
+    mutators:
+      - EMPTY_RETURNS
+      - FALSE_RETURNS
+      - INCREMENTS
+      - INVERT_NEGS
+      - NEGATE_CONDITIONALS
+      - NULL_RETURNS
+      - PRIMITIVE_RETURNS
+      - TRUE_RETURNS
+      - VOID_METHOD_CALLS
   - id: '3'
+    name: 'Taschenrechner'
+    description: 'Die Klasse Calculator enthält Methoden für die Operationen: Addition, Subtraktion, Multiplikation und Division.'
+    shortDescription: 'Die Klass stellt Funktionen für einfache Rechenoperationen.'
+    targetDescription: 'Schreiben Sie Unit-Tests alle Methoden der Klasse Calculator. Testen Sie Standardfälle, Randfälle und die mögliche Exception. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
+    pathToDir: 'tasks/calculator/'
+    sourcefilename: 'Calculator.java'
+    testtemplatefilename: 'CalculatorTest.java'
+  - id: '4'
     name: 'Buchstaben duplizieren'
     description: 'Die Methode nimmt einen String entgegen und dupliziert jeden Buchstaben (aus "abc!" wird "aabbcc!!"). Wird null übergeben, wird eine IllegalArgumentException geworfen. '
     shortDescription: 'Die Methode dupliziert jeden Buchstaben in einem String.'
-    targetDescription: 'Schreiben Sie Unit-Tests für die Methode StringUtil.duplicateCharactersInString. Testen Sie Standardfälle, Randfälle und die mögliche Exception.'
+    targetDescription: 'Schreiben Sie Unit-Tests für die Methode StringUtil.duplicateCharactersInString. Testen Sie Standardfälle, Randfälle und die mögliche Exception. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
     pathToDir: 'tasks/string-util/'
     sourcefilename: 'StringUtil.java'
     testtemplatefilename: 'StringUtilTest.java'
-  - id: '4'
+    hintList:
+      - nr: 3
+        isMissedInstruction:
+          - "StringUtilHintLine3Mi"
+      - nr: 12
+        isMissedBranch:
+          - "StringUtilHintLine12Mb1"
+          - "StringUtilHintLine12Mb2"
+  - id: '5'
     name: 'Statistik'
     description: 'Die Methode StatisticUtil.getAverageAge erhält einen InputStream von einer CSV-Datei. Diese Datei speichert Personen mit Vornamen, Nachnamen und Alter und gibt das Durchschnittsalter zurück. Spalten werden durch Semikolon getrennt.'
     shortDescription: 'Die Methode führt eine statistische Berechnung auf Basis von CSV-Daten aus.'
-    targetDescription: 'Schreiben Sie Unit-Tests für die Methode StatisticUtil.getAverageAge. Testen Sie Standardfälle, Randfälle und die mögliche Exception LineHasWrongSyntaxException.'
+    targetDescription: 'Schreiben Sie Unit-Tests für die Methode StatisticUtil.getAverageAge. Testen Sie Standardfälle, Randfälle und die mögliche Exception LineHasWrongSyntaxException. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
+    hint: 'Die Klasse LineHasWrongSyntax erweitert die Klasse Exception und hat zusätzlich das Attribut lineNumber. In diesem Attribut wird gespeichert an welcher Stelle die Zeile mit der falschen Syntax gefunden wurde. Benutzen Sie  hierfür die Getter-Funktion getLineNumber().'
     pathToDir: 'tasks/statistic-util/'
     sourcefilename: 'StatisticUtil.java'
     testtemplatefilename: 'StatisticUtilTest.java'
-  - id: '5'
+  - id: '6'
     name: 'Sensor Data'
     description: 'Die Klasse SensorData speichert eine Liste von Sensordaten (als Double). Die Klasse erlaubt es, Werte hinzuzufügen und auszulesen. Außerdem können statistische Werte, d.h. Minimum, Maximum und Durchschnitt ausgelesen werden.'
     shortDescription: 'Die Klasse bietet Hilfsmethoden zum Umgang mit Sensordaten.'
-    targetDescription: 'Schreiben Sie einen Unit-Test, der alle Konstruktoren und Methoden der Klasse testet. Achten Sie auch darauf, mögliche Exceptions zu testen.'
+    targetDescription: 'Schreiben Sie einen Unit-Test, der alle Konstruktoren und Methoden der Klasse testet. Achten Sie auch darauf, mögliche Exceptions zu testen. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
     pathToDir: 'tasks/sensor-data/'
     sourcefilename: 'SensorData.java'
     testtemplatefilename: 'SensorDataTest.java'

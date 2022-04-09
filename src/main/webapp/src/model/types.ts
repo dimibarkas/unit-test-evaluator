@@ -9,6 +9,7 @@ export type Task = {
     targetDescription: string;
     encodedFile: string;
     encodedTestTemplate: string;
+    hint: string;
 }
 
 /**
@@ -23,10 +24,11 @@ export enum BuildSummary {
 /**
  * This type represents the type of object wich is returned when a task is submitted.
  */
-export type TestResult = {
+export type SubmissionResult = {
     output: string,
     report: any,
     summary: BuildSummary
+    feedback: string;
 }
 
 export type Submission = {
@@ -41,4 +43,11 @@ export type Submission = {
 export type User = {
     id: string;
     createdAt: string;
+}
+
+export type Progress = {
+    id: number;
+    coveredInstructions: number;
+    coveredBranches: number;
+    hasAllMutationsPassed: boolean;
 }

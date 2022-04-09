@@ -1,6 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.model;
 
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,16 @@ public class SubmissionResult {
      */
     private Report report;
     /**
+     * The generated pitest mutation report.
+     */
+    private MutationReport mutationReport;
+    /**
      * A build summary which determines if the last build was successfully, failed or if the build was successfully but the tests failed.
      */
     private BuildSummary summary;
+
+    /**
+     * The title of the videofeedback.
+     */
+    private String feedback;
 }

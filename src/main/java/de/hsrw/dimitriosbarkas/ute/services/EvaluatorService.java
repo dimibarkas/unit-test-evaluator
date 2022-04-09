@@ -5,7 +5,11 @@ import de.hsrw.dimitriosbarkas.ute.model.CoverageResult;
 import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.Mutation;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
+
+import java.util.List;
 
 /**
  * This interfaces provides the main method that is executed when the evaluator controller is called.
@@ -18,7 +22,8 @@ public interface EvaluatorService {
      * @return TestResult assumption of execution
      * @throws CannotLoadConfigException if config file cannot be found
      * @throws TaskNotFoundException     if the specified task cannot be found
-     * @throws CompilationErrorException if an error occurred during the compilation
+     * @throws CompilationErrorException if
+     * an error occurred during the compilation
      */
     SubmissionResult evaluateTest(SubmissionTO submissionTO) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException;
 
@@ -29,5 +34,7 @@ public interface EvaluatorService {
      * @return the percentage 0-100
      */
     CoverageResult getCoverageResult(Report report, Task task);
+
+    List<Mutation> getMutationResult(MutationReport mutationReport, Task task);
 
 }

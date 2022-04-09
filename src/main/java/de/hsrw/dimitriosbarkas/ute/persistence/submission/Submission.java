@@ -20,7 +20,7 @@ import java.util.UUID;
 @Setter
 @Table(name = "submissions")
 @ToString
-public class Submission {
+public class Submission implements Comparable<Submission>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,4 +44,18 @@ public class Submission {
     @Enumerated(EnumType.STRING)
     private BuildSummary summary;
 
+    @Column(name="all_mutations_passed")
+    private boolean AllMutationsPassed;
+
+    @Override
+    public int compareTo(Submission o) {
+        if(this.submittedAt.isEqual(o.submittedAt)) {
+            return 0;
+        } else if (this.submittedAt.isAfter(o.submittedAt)) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+    }
 }

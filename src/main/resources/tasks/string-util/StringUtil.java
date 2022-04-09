@@ -8,7 +8,7 @@ public class StringUtil {
      * @return string where each character is duplicated
      * @throws IllegalArgumentException
      */
-    public static String duplicateCharactersInString(String str) {
+    public String duplicateCharactersInString(String str) {
         if (str == null) {
             throw new IllegalArgumentException("str must not be null");
         }

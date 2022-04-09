@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class Counter {
 
-    public String type;
+    private String type;
 
-    public int missed;
+    private int missed;
 
-    public int covered;
+    private int covered;
 }

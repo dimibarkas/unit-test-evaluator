@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class Sessioninfo {
 
-    public String id;
+    private String id;
 
-    public double start;
+    private double start;
 
-    public double dump;
+    private double dump;
 }

@@ -5,13 +5,20 @@ import de.hsrw.dimitriosbarkas.ute.model.*;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Counter;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport._Class;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.Mutation;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
+import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.UserService;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
+import de.hsrw.dimitriosbarkas.ute.services.FeedbackService;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -23,10 +30,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     private final UserService userService;
 
-    public EvaluatorServiceImpl(ConfigService configService, SafeExecuteTestService safeExecuteTestService, UserService userService) {
+    private final FeedbackService feedbackService;
+
+    public EvaluatorServiceImpl(ConfigService configService, SafeExecuteTestService safeExecuteTestService, UserService userService, FeedbackService feedbackService) {
         this.configService = configService;
         this.safeExecuteTestService = safeExecuteTestService;
         this.userService = userService;
+        this.feedbackService = feedbackService;
     }
 
     @Override
@@ -36,34 +46,57 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         // Get configuration for this task
         Task task = getTaskConfig(submissionTO.getTaskId());
 
-        SubmissionResult result;
+        SubmissionResult currentSubmissionResult;
         try {
             safeExecuteTestService.setupTestEnvironment(task, submissionTO.getEncodedTestContent());
-            result = safeExecuteTestService.buildAndRunTests();
+            currentSubmissionResult = safeExecuteTestService.buildAndRunTests();
 
-            if (result.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
-                CoverageResult coverageResult = getCoverageResult(result.getReport(), task);
-                userService.addSubmission(
-                        submissionTO.getUserId(),
+            if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
+                boolean allMutationsPassed = false;
+                List<Mutation> mutationList = getMutationResult(currentSubmissionResult.getMutationReport(), task);
+                if(mutationList.isEmpty()) allMutationsPassed = true;
+                CoverageResult coverageResult = getCoverageResult(currentSubmissionResult.getReport(), task);
+                userService.addSubmission(submissionTO.getUserId(),
                         submissionTO.getTaskId(),
                         coverageResult.getCoveredInstructions(),
                         coverageResult.getCoveredBranches(),
-                        result.getSummary());
+                        currentSubmissionResult.getSummary(),
+                        allMutationsPassed);
             } else {
-                userService.addSubmission(
-                        submissionTO.getUserId(),
+                userService.addSubmission(submissionTO.getUserId(),
                         submissionTO.getTaskId(),
                         0,
                         0,
-                        result.getSummary()
-                );
+                        currentSubmissionResult.getSummary(),
+                        false);
             }
 
-            return result;
+            try {
+                User user = userService.getUserById(submissionTO.getUserId());
+                currentSubmissionResult.setFeedback(feedbackService.provideFeedback(user, task, currentSubmissionResult));
+            } catch (SourcefileNotFoundException e) {
+                log.error(e.getMessage());
+            } catch (NoHintProvidedException e) {
+                String errorMessage = String.format("No hint provided for line: %d", e.getLineNumber());
+                log.error(errorMessage);
+            } catch (NoFeedbackFoundException e) {
+                log.error("The feedback list for this kind of errors is empty.");
+            }
+
+            return currentSubmissionResult;
         } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException e) {
             log.error(e);
             throw new CompilationErrorException(e);
         }
+    }
+    @Override
+    public List<Mutation> getMutationResult(MutationReport mutationReport, Task task) {
+        return mutationReport
+                .getMutations()
+                .stream()
+                .filter(mutation -> mutation.getSourceFile().equals(task.getSourcefilename())
+                        && !mutation.isDetected())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -71,7 +104,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         //TODO: make function throw a custom exception
         _Class _class = null;
         try {
-            _class = report._package._class.stream().filter(aClass -> aClass.sourcefilename.equals(task.getSourcefilename())).findFirst().orElseThrow(Exception::new);
+            _class = report.get_package().get_class().stream().filter(aClass -> aClass.getSourcefilename().equals(task.getSourcefilename())).findFirst().orElseThrow(Exception::new);
         } catch (Exception e) {
             log.error(e);
         }
@@ -83,15 +116,11 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         if (_class == null) return 0;
         int percentage = 0;
         try {
-            Counter counter = _class.counter.stream().filter(c -> c.type.equals("INSTRUCTION")).findFirst().orElseThrow(Exception::new);
-            //log.info(counter.covered);
-            //log.info(counter.missed);
-            if (counter.missed == 0) return 100;
-            if (counter.covered == 0) return 0;
-            int total = counter.missed + counter.covered;
-            percentage = (int) Math.floor(((double) counter.covered / (double) total) * 100);
-            //percentage = (int) (((double) counter.covered / (double) counter.missed) * 100);
-            //log.info(percentage);
+            Counter counter = _class.getCounter().stream().filter(c -> c.getType().equals("INSTRUCTION")).findFirst().orElseThrow(Exception::new);
+            if (counter.getMissed() == 0) return 100;
+            if (counter.getCovered() == 0) return 0;
+            int total = counter.getMissed() + counter.getCovered();
+            percentage = (int) Math.floor(((double) counter.getCovered() / (double) total) * 100);
         } catch (Exception e) {
             log.error(e);
         }
@@ -103,14 +132,11 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         if (_class == null) return 0;
         int percentage = 0;
         try {
-            Counter counter = _class.counter.stream().filter(c -> c.type.equals("BRANCH")).findFirst().orElseThrow(Exception::new);
-            //log.info(counter.covered);
-            //log.info(counter.missed);
-            if (counter.missed == 0) return 100;
-            if (counter.covered == 0) return 0;
-            int total = counter.missed + counter.covered;
-            percentage = (int) Math.floor(((double) counter.covered / (double) total) * 100);
-            //log.info(percentage);
+            Counter counter = _class.getCounter().stream().filter(c -> c.getType().equals("BRANCH")).findFirst().orElseThrow(Exception::new);
+            if (counter.getMissed() == 0) return 100;
+            if (counter.getCovered() == 0) return 0;
+            int total = counter.getMissed() + counter.getCovered();
+            percentage = (int) Math.floor(((double) counter.getCovered() / (double) total) * 100);
         } catch (Exception e) {
             log.error(e);
         }
