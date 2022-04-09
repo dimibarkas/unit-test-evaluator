@@ -3,6 +3,7 @@ package de.hsrw.dimitriosbarkas.ute.services;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
+import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 
 import java.nio.file.Path;
@@ -35,6 +36,12 @@ public interface SafeExecuteTestService {
     void generateCoverageReport(Path path) throws ErrorWhileGeneratingCoverageReport;
 
     /**
+     * This function calls the command to generate a mutation-report as xml.
+     * @param path the path to the temporary maven directory.
+     */
+    void generateMutationCoverageReport(Path path);
+
+    /**
      * This function tries to parse a report created by jacoco into a Report object.
      * @param path the path to the jacoco directory.
      * @return the parsed Report object
@@ -42,4 +49,11 @@ public interface SafeExecuteTestService {
      */
     Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException;
 
+    /**
+     * This function tries to parse a report created by pitest.
+     * @param path the path to the pitest directory.
+     * @return the parsed mutation report
+     * @throws ErrorWhileParsingReportException if the xml file could not be found.
+     */
+    MutationReport parseMutationCoverageReport(Path path) throws ErrorWhileParsingReportException;
 }

@@ -10,5 +10,6 @@ public class StatisticUtilTest {
 
     @Test
     public void test() {
+
     }
 }

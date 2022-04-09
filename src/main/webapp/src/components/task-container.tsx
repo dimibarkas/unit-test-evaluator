@@ -1,27 +1,42 @@
-import {Alert, Button, Container, ProgressBar, Tab, Tabs} from "react-bootstrap";
+import {Alert, Button, Container, ProgressBar, Tab, Tabs, Toast, ToastContainer} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
-import {Progress, Submission, SubmissionResult} from "../model/types";
-import {getProgressList, submitCode} from "../services";
+import {Submission, SubmissionResult} from "../model/types";
+import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";
 import {fetchProgressList} from "../redux/actions/progress";
+import {store} from "../redux/store";
 
 
 function TaskContainer() {
 
     const selectedTask = useSelector((state: State) => state.selectedTask);
     const user = useSelector((state: State) => state.user);
-    const {showAlert, setShowAlert, showCustomAlert, header, variant, output, showVideoPlayer, videoTitle} = useAlert();
+    const progress = useSelector((state: State) => state.progress);
+    const {
+        showAlert,
+        setShowAlert,
+        showCustomAlert,
+        toggleSetShowVideoPlayer,
+        header,
+        variant,
+        output,
+        showVideoPlayer,
+        videoTitle
+    } = useAlert();
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
-    const editorRef = useRef(null);
     const [ciProgress, setCiProgress] = useState(0);
     const [cbProgress, setCbProgress] = useState(0);
+    const [savedContent, setSavedContent] = useState("");
+    const dispatch = useDispatch()
+    const editorRef = useRef(null);
+
 
     function submitButton() {
         return (
@@ -32,8 +47,8 @@ function TaskContainer() {
         )
     }
 
-    function getProgressForSelectedTask(progressList: Progress[]): void {
-        progressList.filter((progress) => progress.id === selectedTask.task.id).forEach(progress => {
+    function getProgressForSelectedTask(): void {
+        progress.progressList?.filter((progress) => progress.id === selectedTask.task.id).forEach(progress => {
             setCiProgress(progress.coveredInstructions);
             setCbProgress(progress.coveredBranches);
         })
@@ -51,18 +66,12 @@ function TaskContainer() {
         }
     }
 
-    function handleEditorDidMount(editor) {
-        editorRef.current = editor;
-    }
-
-
     useEffect(() => {
-        if (user?.user?.id) {
-            getProgressList(user?.user?.id).then((progressList) => {
-                getProgressForSelectedTask(progressList);
-            })
+        if (!progress.isLoading) {
+            getProgressForSelectedTask();
         }
-    }, [selectedTask])
+        // eslint-disable-next-line
+    }, [progress.isLoading, selectedTask])
 
     useEffect(() => {
         if (isLoading) {
@@ -74,6 +83,7 @@ function TaskContainer() {
             }
             submitCode(request).then((receivedTest: SubmissionResult) => {
                 showCustomAlert(receivedTest)
+                dispatch(fetchProgressList(user.user.id));
                 setLoading(false);
             }).catch((error) => {
                 setLoading(false);
@@ -81,15 +91,59 @@ function TaskContainer() {
             });
         } else if (!isLoading) {
             if (user?.user?.id) {
-                getProgressList(user.user.id).then((progressList) => {
-                    getProgressForSelectedTask(progressList);
-                })
+                fetchProgressList(user.user.id);
             }
         }
         // eslint-disable-next-line
     }, [isLoading]);
 
     const handleClick = () => setLoading(true);
+
+    const isCurrentTaskCompleted = (): boolean => {
+        return progress.progressList?.some(progress =>
+            progress.id === selectedTask.task.id
+            && progress.coveredBranches === 100
+            && progress.coveredInstructions === 100
+            && progress.hasAllMutationsPassed)
+    }
+
+    function handleEditorDidMount(editor) {
+        editorRef.current = editor;
+    }
+
+    /**
+     * helper method
+     * @param state
+     */
+
+    function select(state: State) {
+        return state.selectedTask?.task?.id
+    }
+
+    let currentValue
+
+    function handleSelectedTaskChange() {
+        let previousValue = currentValue
+        currentValue = select(store.getState())
+        if (previousValue !== undefined && previousValue !== currentValue) {
+            //check if there is a value for the current task
+            if (sessionStorage.getItem(currentValue)) {
+                setSavedContent(sessionStorage.getItem(currentValue));
+            } else {
+                setSavedContent("");
+            }
+            saveEditorContent(previousValue)
+        }
+    }
+
+    useEffect(() => {
+        store.subscribe(handleSelectedTaskChange)
+        // eslint-disable-next-line
+    }, [])
+
+    const saveEditorContent = (taskId) => {
+        sessionStorage.setItem(taskId, btoa(editorRef.current.getValue()))
+    }
 
     /**
      * if no task is selected
@@ -108,10 +162,26 @@ function TaskContainer() {
 
     return (
         <>
-            <Container className="text-light">
-                <h1 className="display-5 mb-4 mt-1">{selectedTask.task.name}</h1>
-                <p className="lead my-1">{selectedTask.task.shortDescription}</p>
-                <p className="lead my-1"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
+            <Container className="text-light" style={{position: "relative"}}>
+                <ToastContainer position={"top-end"} style={{zIndex: 1000}}>
+                    <Toast show={showVideoPlayer} onClose={toggleSetShowVideoPlayer}>
+                        <Toast.Header>
+                            <strong className="me-auto">Neues Feedback!</strong>
+                        </Toast.Header>
+                        <Toast.Body>
+                            <video src={`/api/video/${videoTitle}`} width="320" height="200" controls
+                                   preload="none"/>
+                        </Toast.Body>
+                    </Toast>
+                </ToastContainer>
+                <div style={{width: "70%", height: 300}}>
+                    <h1 className="display-5 my-2">{selectedTask.task.name}</h1>
+                    <small className={isCurrentTaskCompleted() ? "text-success" : "text-danger"}>
+                        {isCurrentTaskCompleted() ? "Abgeschlossen" : "Nicht abgeschlossen"}
+                    </small>
+                    <p className="lead my-2">{selectedTask.task.description}</p>
+                    <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
+                </div>
                 <div className="d-flex flex-row-reverse justify-content-between align-items-center mb-3">
                     <Button
                         variant={isLoading ? "secondary" : "success"}
@@ -121,14 +191,14 @@ function TaskContainer() {
                         {isLoading ? 'Verarbeitung läuft…' : submitButton()}
                     </Button>
                     <div className="w-75 d-flex justify-content-between align-items-center flex-shrink-1">
-                        <div className="text-nowrap">
+                        <small className="text-nowrap">
                             covered instructions
-                        </div>
+                        </small>
                         <ProgressBar variant={getVariant(ciProgress)} now={ciProgress} label={`${ciProgress} %`}
                                      className="w-100 m-2 text-black"/>
-                        <div className="text-nowrap">
+                        <small className="text-nowrap">
                             covered branches
-                        </div>
+                        </small>
                         <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
                                      className="w-100 m-2 text-black"/>
                     </div>
@@ -147,7 +217,7 @@ function TaskContainer() {
                     cursor="col-resize"
                 >
                     <Editor
-                        height={"45vh"}
+                        height={"40vh"}
                         width={"100%"}
                         defaultLanguage={"java"}
                         theme={"vs-dark"}
@@ -155,28 +225,25 @@ function TaskContainer() {
                         value={atob(selectedTask.task.encodedFile)}
                     />
                     <Editor
-                        height={"45vh"}
+                        height={"40vh"}
                         width={"100%"}
                         defaultLanguage={"java"}
                         theme={"vs-dark"}
                         onMount={handleEditorDidMount}
-                        value={atob(selectedTask.task.encodedTestTemplate)}
+                        value={savedContent === "" ? atob(selectedTask.task.encodedTestTemplate) : atob(savedContent)}
                     />
                 </Split>
                 <div className="my-4">
+                    {selectedTask.task.hint !== null ?
+                        <Alert>
+                            <Alert.Heading>Hinweis</Alert.Heading>
+                            {selectedTask.task.hint}
+                        </Alert>
+                        : null}
                     <Alert show={showAlert} variant={variant} onClose={() => setShowAlert(false)} dismissible>
                         <Alert.Heading>{header}</Alert.Heading>
                         <hr/>
-                        <div
-                            style={{
-                                display: showVideoPlayer ? "flex" : "none",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: "100%"
-                            }}>
-                            <video src={`/api/video/${videoTitle}`} width="80%" height="80%" controls
-                                   preload="none"/>
-                        </div>
+
                         <Tabs activeKey={key} onSelect={((k) => {
                             if (k === key) {
                                 setKey("")

@@ -9,6 +9,7 @@ export type Task = {
     targetDescription: string;
     encodedFile: string;
     encodedTestTemplate: string;
+    hint: string;
 }
 
 /**
@@ -48,4 +49,5 @@ export type Progress = {
     id: number;
     coveredInstructions: number;
     coveredBranches: number;
+    hasAllMutationsPassed: boolean;
 }

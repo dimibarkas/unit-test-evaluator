@@ -18,23 +18,23 @@ public class Line {
     /**
      * Describes the line number.
      */
-    public int nr;
+    private int nr;
     /**
      * Describes the missed instructions or statements per line.
      */
-    public int mi;
+    private int mi;
     /**
      * Describes the covered instructions or statements per line.
      */
-    public int ci;
+    private int ci;
 
     /**
      * Describes the missed branches per line.
      */
-    public int mb;
+    private int mb;
 
     /**
      * Describes the covered branches per line.
      */
-    public int cb;
+    private int cb;
 }

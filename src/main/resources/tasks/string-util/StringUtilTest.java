@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 public class StringUtilTest {
 
     @Test
-    public void duplicateCharactersInString() {
+    public void test() {
+
     }
 }

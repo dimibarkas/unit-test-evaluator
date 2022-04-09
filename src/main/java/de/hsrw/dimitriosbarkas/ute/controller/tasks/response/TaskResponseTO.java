@@ -18,6 +18,8 @@ public class TaskResponseTO {
 
     private String targetDescription;
 
+    private String hint;
+
     private String encodedFile;
 
     private String encodedTestTemplate;
@@ -29,6 +31,7 @@ public class TaskResponseTO {
                 task.getDescription(),
                 task.getShortDescription(),
                 task.getTargetDescription(),
+                task.getHint(),
                 task.getEncodedFile(),
                 task.getEncodedTestTemplate()
         );
