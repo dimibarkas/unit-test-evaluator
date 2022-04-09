@@ -10,6 +10,10 @@ export default function useAlert() {
     const [showVideoPlayer, setShowVideoPlayer] = useState(false);
     const [videoTitle, setVideoTitle] = useState("");
 
+    const toggleSetShowVideoPlayer = () => {
+        setShowVideoPlayer(!showVideoPlayer);
+    }
+
     const showCustomAlert = (submissionResult: SubmissionResult) => {
         let headerString = "";
         let variant = "";
@@ -44,6 +48,6 @@ export default function useAlert() {
     }
 
     return {
-        showAlert, setShowAlert, showCustomAlert, header, variant, output, showVideoPlayer, videoTitle
+        showAlert, setShowAlert, showCustomAlert, toggleSetShowVideoPlayer,  header, variant, output, showVideoPlayer, videoTitle
     }
 }

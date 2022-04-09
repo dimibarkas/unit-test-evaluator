@@ -20,7 +20,7 @@ public class StatisticUtil {
      * @throws LineHasWrongSyntaxException if a syntax occurs in one line
      * @throws IOException if a general IO exception occurs
      */
-    public static double getAverageAge(InputStream is) throws LineHasWrongSyntaxException, IOException {
+    public double getAverageAge(InputStream is) throws LineHasWrongSyntaxException, IOException {
         long totalAge = 0;
         long count = 0;
 

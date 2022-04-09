@@ -32,6 +32,10 @@ public class Task {
      */
     private String targetDescription;
     /**
+     * An optional hint for the description.
+     */
+    private String hint = null;
+    /**
      * The path to the directory with the files needed for the source files.
      */
     private String pathToDir;
@@ -69,8 +73,8 @@ public class Task {
     /**
      * A list of possible hints.
      */
-    private List<Hint> hintList;
+    private List<Hint> hintList = new ArrayList<>();
 
-    private List<String> mutatorHintList;
+    private List<String> mutatorHintList = new ArrayList<>();
 
 }

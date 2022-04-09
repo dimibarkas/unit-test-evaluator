@@ -18,17 +18,25 @@ function TaskContainer() {
     const selectedTask = useSelector((state: State) => state.selectedTask);
     const user = useSelector((state: State) => state.user);
     const progress = useSelector((state: State) => state.progress);
-    const {showAlert, setShowAlert, showCustomAlert, header, variant, output, videoTitle} = useAlert();
+    const {
+        showAlert,
+        setShowAlert,
+        showCustomAlert,
+        toggleSetShowVideoPlayer,
+        header,
+        variant,
+        output,
+        showVideoPlayer,
+        videoTitle
+    } = useAlert();
     const [key, setKey] = useState(null)
     const [isLoading, setLoading] = useState(false);
     const [ciProgress, setCiProgress] = useState(0);
     const [cbProgress, setCbProgress] = useState(0);
     const [savedContent, setSavedContent] = useState("");
-    const [showToast, setShowToast] = useState(true);
     const dispatch = useDispatch()
     const editorRef = useRef(null);
 
-    const toggleShowToast = () => setShowToast(false);
 
     function submitButton() {
         return (
@@ -111,13 +119,15 @@ function TaskContainer() {
     function select(state: State) {
         return state.selectedTask?.task?.id
     }
+
     let currentValue
+
     function handleSelectedTaskChange() {
         let previousValue = currentValue
         currentValue = select(store.getState())
-        if(previousValue !== undefined && previousValue !== currentValue) {
+        if (previousValue !== undefined && previousValue !== currentValue) {
             //check if there is a value for the current task
-            if(sessionStorage.getItem(currentValue)) {
+            if (sessionStorage.getItem(currentValue)) {
                 setSavedContent(sessionStorage.getItem(currentValue));
             } else {
                 setSavedContent("");
@@ -154,7 +164,7 @@ function TaskContainer() {
         <>
             <Container className="text-light" style={{position: "relative"}}>
                 <ToastContainer position={"top-end"} style={{zIndex: 1000}}>
-                    <Toast show={showToast} onClose={toggleShowToast}>
+                    <Toast show={showVideoPlayer} onClose={toggleSetShowVideoPlayer}>
                         <Toast.Header>
                             <strong className="me-auto">Neues Feedback!</strong>
                         </Toast.Header>
@@ -169,7 +179,7 @@ function TaskContainer() {
                     <small className={isCurrentTaskCompleted() ? "text-success" : "text-danger"}>
                         {isCurrentTaskCompleted() ? "Abgeschlossen" : "Nicht abgeschlossen"}
                     </small>
-                    {/*<p className="lead my-2">{selectedTask.task.shortDescription}</p>*/}
+                    <p className="lead my-2">{selectedTask.task.description}</p>
                     <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
                 </div>
                 <div className="d-flex flex-row-reverse justify-content-between align-items-center mb-3">
@@ -220,10 +230,16 @@ function TaskContainer() {
                         defaultLanguage={"java"}
                         theme={"vs-dark"}
                         onMount={handleEditorDidMount}
-                        value={savedContent === "" ?  atob(selectedTask.task.encodedTestTemplate): atob(savedContent)}
+                        value={savedContent === "" ? atob(selectedTask.task.encodedTestTemplate) : atob(savedContent)}
                     />
                 </Split>
                 <div className="my-4">
+                    {selectedTask.task.hint !== null ?
+                        <Alert>
+                            <Alert.Heading>Hinweis</Alert.Heading>
+                            {selectedTask.task.hint}
+                        </Alert>
+                        : null}
                     <Alert show={showAlert} variant={variant} onClose={() => setShowAlert(false)} dismissible>
                         <Alert.Heading>{header}</Alert.Heading>
                         <hr/>

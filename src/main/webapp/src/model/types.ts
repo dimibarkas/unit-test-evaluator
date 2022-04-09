@@ -9,6 +9,7 @@ export type Task = {
     targetDescription: string;
     encodedFile: string;
     encodedTestTemplate: string;
+    hint: string;
 }
 
 /**

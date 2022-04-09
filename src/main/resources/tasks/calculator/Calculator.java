@@ -1,8 +1,5 @@
 package com.test.app;
 
-/**
- * Die Klasse stellt Funktionen für einfache Rechenoperationen zur Verfügung.
- */
 public class Calculator {
 
     /**

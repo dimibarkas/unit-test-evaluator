@@ -74,6 +74,7 @@ tasks:
     description: 'Die Methode StatisticUtil.getAverageAge erhält einen InputStream von einer CSV-Datei. Diese Datei speichert Personen mit Vornamen, Nachnamen und Alter und gibt das Durchschnittsalter zurück. Spalten werden durch Semikolon getrennt.'
     shortDescription: 'Die Methode führt eine statistische Berechnung auf Basis von CSV-Daten aus.'
     targetDescription: 'Schreiben Sie Unit-Tests für die Methode StatisticUtil.getAverageAge. Testen Sie Standardfälle, Randfälle und die mögliche Exception LineHasWrongSyntaxException. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
+    hint: 'Die Klasse LineHasWrongSyntax erweitert die Klasse Exception und hat zusätzlich das Attribut lineNumber. In diesem Attribut wird gespeichert an welcher Stelle die Zeile mit der falschen Syntax gefunden wurde. Benutzen Sie  hierfür die Getter-Funktion getLineNumber().'
     pathToDir: 'tasks/statistic-util/'
     sourcefilename: 'StatisticUtil.java'
     testtemplatefilename: 'StatisticUtilTest.java'

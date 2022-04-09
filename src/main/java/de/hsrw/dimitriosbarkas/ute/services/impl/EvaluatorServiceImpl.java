@@ -74,8 +74,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             try {
                 User user = userService.getUserById(submissionTO.getUserId());
                 currentSubmissionResult.setFeedback(feedbackService.provideFeedback(user, task, currentSubmissionResult));
-            } catch (NullPointerException e) {
-                log.warn("no hint provided for specific line");
+            } catch (SourcefileNotFoundException e) {
+                log.error(e.getMessage());
+            } catch (NoHintProvidedException e) {
+                String errorMessage = String.format("No hint provided for line: %d", e.getLineNumber());
+                log.error(errorMessage);
+            } catch (NoFeedbackFoundException e) {
+                log.error("The feedback list for this kind of errors is empty.");
             }
 
             return currentSubmissionResult;

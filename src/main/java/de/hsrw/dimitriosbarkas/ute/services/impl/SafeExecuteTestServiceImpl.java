@@ -135,7 +135,9 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             process.waitFor();
 
             // check if build was successful
-            if (process.exitValue() == 0) return getSuccessfulTestResult(path);
+            if (process.exitValue() == 0) {
+                return getSuccessfulTestResult(path);
+            }
             return getBuildOrTestErrors(process, path);
 
         } catch (IOException | InterruptedException | ErrorWhileGeneratingCoverageReport | JacocoReportXmlFileNotFoundException | ErrorWhileParsingReportException e) {

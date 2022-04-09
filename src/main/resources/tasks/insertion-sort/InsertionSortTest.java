@@ -8,5 +8,6 @@ public class InsertionSortTest {
 
     @Test
     public void test() {
+
     }
 }

@@ -3,6 +3,9 @@ package de.hsrw.dimitriosbarkas.ute.services;
 import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
+import de.hsrw.dimitriosbarkas.ute.services.exceptions.NoFeedbackFoundException;
+import de.hsrw.dimitriosbarkas.ute.services.exceptions.NoHintProvidedException;
+import de.hsrw.dimitriosbarkas.ute.services.exceptions.SourcefileNotFoundException;
 
 /**
  * This interface provides methods to provide feedback based on the submission of a user.
@@ -18,5 +21,5 @@ public interface FeedbackService {
      * @return the title of the feedback video
      *
      */
-    String provideFeedback(User user, Task task, SubmissionResult submissionResult);
+    String provideFeedback(User user, Task task, SubmissionResult submissionResult) throws SourcefileNotFoundException, NoHintProvidedException, NoFeedbackFoundException;
 }
