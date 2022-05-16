@@ -23,8 +23,15 @@ tasks:
           - "InsertionSortHintLine3Mi"
       - nr: 6
         isMissedInstruction:
-          - "InsertionSortHintLine3Mi"
-          - "InsertionSortHintLine3Mi"
+          - "InsertionSortHintLine6Mi"
+        isMissedBranch:
+          - "InsertionSortHintLine6Mb"
+      - nr: 13
+        isMissedBranch:
+          - "InsertionSortHintLine13Mb"
+      - nr: 14
+        isMissedInstruction:
+          - "InsertionSortHintLine14Mi"
     mutatorHintList:
       - "InsertionSortMutatorHint1"
   - id: '2'

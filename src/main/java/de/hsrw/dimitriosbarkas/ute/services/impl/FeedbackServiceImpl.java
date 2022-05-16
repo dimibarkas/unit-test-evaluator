@@ -36,31 +36,15 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
 
         //first try 100% lines and branches covered
-        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL
-                && submissionList.get(0).getCoveredBranches() == 100
-                && submissionList.get(0).getCoveredInstructions() == 100
-        ) {
+        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL && submissionList.get(0).getCoveredBranches() == 100 && submissionList.get(0).getCoveredInstructions() == 100) {
             log.info("Beim ersten versucht hast du sofort eine Line-Coverage von 100% erreicht? WOW!!!!");
         }
 
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
-        List<Line> lineList = currentSubmissionResult
-                .getReport()
-                .get_package()
-                .getSourcefile()
-                .stream()
-                .filter(sourcefile -> sourcefile.getName().equals(task.getSourcefilename()))
-                .collect(Collectors.toList()).stream().findAny().orElseThrow(() -> new SourcefileNotFoundException("sourcefile not found:")).getLine();
+        List<Line> lineList = currentSubmissionResult.getReport().get_package().getSourcefile().stream().filter(sourcefile -> sourcefile.getName().equals(task.getSourcefilename())).collect(Collectors.toList()).stream().findAny().orElseThrow(() -> new SourcefileNotFoundException("sourcefile not found:")).getLine();
 
         //this list need to be empty
-        List<Mutation> mutationList = currentSubmissionResult
-                .getMutationReport()
-                .getMutations()
-                .stream()
-                .filter(mutation ->
-                        mutation.getSourceFile().equals(task.getSourcefilename())
-                                && !mutation.isDetected())
-                .collect(Collectors.toList());
+        List<Mutation> mutationList = currentSubmissionResult.getMutationReport().getMutations().stream().filter(mutation -> mutation.getSourceFile().equals(task.getSourcefilename()) && !mutation.isDetected()).collect(Collectors.toList());
 
 
         if (mutationList.isEmpty()) {
@@ -70,9 +54,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 //            mutationList.forEach(System.out::println);
         }
 
-        if (submissionList.get(submissionList.size() - 1).getCoveredInstructions() == 100
-                && submissionList.get(submissionList.size() - 1).getCoveredBranches() == 100) {
-            if(mutationList.isEmpty()) return null;
+        if (submissionList.get(submissionList.size() - 1).getCoveredInstructions() == 100 && submissionList.get(submissionList.size() - 1).getCoveredBranches() == 100) {
+            if (mutationList.isEmpty()) return null;
             return getRandomHintMessage(task.getMutatorHintList());
         } else {
             return getFeedbackByLineCoverage(task, lineList);
@@ -80,20 +63,28 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     String getFeedbackByLineCoverage(Task task, List<Line> lineList) throws NoHintProvidedException, NoFeedbackFoundException {
+        log.info(lineList);
+        log.info(task.getHintList());
         List<Hint> hintList = task.getHintList();
         for (Line line : lineList) {
-            Optional<Hint> optionalHint = Optional.ofNullable(hintList.stream().filter(_hint -> _hint.getNr() == line.getNr()).findFirst().orElseThrow(() -> new NoHintProvidedException(line.getNr())));
-            if (optionalHint.isEmpty()) {
-                return null;
-            }
-            Hint hint = optionalHint.get();
+            log.info(line);
+//            lineList.stream().filter(_line -> _line.getMi() > 0).findFirst().ifPresent(value -> log.info("Mi-Hint for line " + value.getNr() + " needed right here."));
+//            lineList.stream().filter(_line -> _line.getMb() > 0).findFirst().ifPresent(value -> log.info("Mb-Hint for line " + value.getNr() + " needed right here."));
+
+            //Do i need a hint for this line?
+
+
+            Optional<Hint> optionalHint = hintList.stream().filter(_hint -> _hint.getNr() == line.getNr()).findFirst();
+//                            .orElseThrow(() -> new NoHintProvidedException(line.getNr())));
+
+//            Hint hint = optionalHint.get();
 //            log.info(String.format("found hint for line %d", hint.getNr()));
-            if (line.getMi() > 0 && hint.getIsMissedInstruction() != null) {
-                return getMissedInstructionHintForLine(hint.getIsMissedInstruction());
+            if (line.getMb() > 0 && optionalHint.isPresent()) {
+                return getMissedBranchHintForLine(optionalHint.get().getIsMissedBranch());
+            } else if (line.getMi() > 0 && optionalHint.isPresent()) {
+                return getMissedInstructionHintForLine(optionalHint.get().getIsMissedInstruction());
             }
-            if (line.getMb() > 0 && hint.getIsMissedBranch() != null) {
-                return getMissedBranchHintForLine(hint.getIsMissedBranch());
-            }
+
         }
         return null;
     }
