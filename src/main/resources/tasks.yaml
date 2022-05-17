@@ -20,20 +20,20 @@ tasks:
     hintList:
       - nr: 3
         isMissedInstruction:
-          - "InsertionSortHintLine3Mi"
+          - 'InsertionSortHintLine3Mi'
       - nr: 6
         isMissedInstruction:
-          - "InsertionSortHintLine6Mi"
+          - 'InsertionSortHintLine6Mi'
         isMissedBranch:
-          - "InsertionSortHintLine6Mb"
+          - 'InsertionSortHintLine6Mb'
       - nr: 13
         isMissedBranch:
-          - "InsertionSortHintLine13Mb"
+          - 'InsertionSortHintLine13Mb'
       - nr: 14
         isMissedInstruction:
-          - "InsertionSortHintLine14Mi"
+          - 'InsertionSortHintLine14Mi'
     mutatorHintList:
-      - "InsertionSortMutatorHint1"
+      - 'InsertionSortMutatorHint1'
   - id: '2'
     name: 'Sortieren II'
     description: 'Die Methode BubbleSort.bubbleSort erhält ein Array aus integer Werten und sortiert dieses (in-place).'
@@ -52,6 +52,18 @@ tasks:
       - PRIMITIVE_RETURNS
       - TRUE_RETURNS
       - VOID_METHOD_CALLS
+    hintList:
+      - nr: 7
+        isMissedInstruction:
+          - 'BubbleSortHintLine7Mi'
+      - nr: 17
+        isMissedBranch:
+          - 'BubbleSortHintLine17Mb'
+      - nr: 27
+        isMissedInstruction:
+          - 'BubbleSortHintLine27Mi'
+    mutatorHintList:
+      - 'BubbleSortMutatorHint1'
   - id: '3'
     name: 'Taschenrechner'
     description: 'Die Klasse Calculator enthält Methoden für die Operationen: Addition, Subtraktion, Multiplikation und Division.'
@@ -60,6 +72,26 @@ tasks:
     pathToDir: 'tasks/calculator/'
     sourcefilename: 'Calculator.java'
     testtemplatefilename: 'CalculatorTest.java'
+    hintList:
+      - nr: 3
+        isMissedInstruction:
+          - 'CalculatorHintLine3Mi'
+      - nr: 12
+        isMissedInstruction:
+          - 'CalculatorHintLine12Mi'
+      - nr: 22
+        isMissedInstruction:
+          - 'CalculatorHintLine22Mi'
+      - nr: 32
+        isMissedInstruction:
+          - 'CalculatorHintLine32Mi'
+      - nr: 42
+        isMissedBranch:
+          - 'CalculatorHintLine42Mb'
+        isMissedInstruction:
+          - 'CalculatorHintLine42Mi'
+    mutatorHintList:
+      - 'CalculatorMutatorHint1'
   - id: '4'
     name: 'Buchstaben duplizieren'
     description: 'Die Methode nimmt einen String entgegen und dupliziert jeden Buchstaben (aus "abc!" wird "aabbcc!!"). Wird null übergeben, wird eine IllegalArgumentException geworfen. '
