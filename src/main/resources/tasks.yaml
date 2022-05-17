@@ -141,3 +141,33 @@ tasks:
     pathToDir: 'tasks/sensor-data/'
     sourcefilename: 'SensorData.java'
     testtemplatefilename: 'SensorDataTest.java'
+    hintList:
+      - nr: 18
+        isMissedInstruction:
+          - 'SensorDataHintLine18Mi'
+      - nr: 26
+        isMissedInstruction:
+          - 'SensorDataHintLine26Mi'
+      - nr: 38
+        isMissedInstruction:
+          - 'SensorDataHintLine38Mi'
+      - nr: 46
+        isMissedInstruction:
+          - 'SensorDataHintLine46Mi'
+      - nr: 53
+        isMissedInstruction:
+          - 'SensorDataHintLine46Mi'
+      - nr: 63
+        isMissedInstruction:
+          - 'SensorDataHintLine46Mi'
+      - nr: 72
+        isMissedBranch:
+          - 'SensorDataHintLine72Mb'
+      - nr: 84
+        isMissedBranch:
+          - 'SensorDataHintLine72Mb'
+      - nr: 96
+        isMissedBranch:
+          - 'SensorDataHintLine72Mb'
+    mutatorHintList:
+      - 'SensorDataMutatorHint1'
