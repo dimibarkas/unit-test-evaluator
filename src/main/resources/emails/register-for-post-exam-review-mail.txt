@@ -1,0 +1,10 @@
+<html>
+    <head></head>
+    <body>
+        <p>Hallo</p>
+        <p>hier finden Sie den Link für das Tool:</p>
+        <p><a href="${url}">${url}</a></p>
+        <p>Mit freundlichen Grüßen</p>
+        <p>Dimitrios Barkas</p>
+    </body>
+</html>
