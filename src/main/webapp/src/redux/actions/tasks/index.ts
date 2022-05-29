@@ -1,5 +1,7 @@
 import {Task} from "../../../model/types";
 import {getAllTasks} from "../../../services";
+import {State} from "../../reducers";
+import {authenticateStudent} from "../user";
 
 export enum ActionType {
     REQUEST_TASKS = 'REQUEST_TASKS',
@@ -26,17 +28,21 @@ export const receiveTasks = (tasks: Task[]) => ({
     payload: tasks
 })
 
-const fetchTasks = () => dispatch => {
+const fetchTasks = (studentNumber: string, authKey: string) => dispatch => {
     dispatch(requestTasks())
-    return getAllTasks().then((tasks) => dispatch(receiveTasks(tasks)))
+    return getAllTasks(studentNumber, authKey)
+        .then((tasks) => {
+            dispatch(receiveTasks(tasks))
+            dispatch(authenticateStudent({studentNumber: studentNumber, authKey: authKey}))
+        })
 }
 
 const shouldFetchTasks = (state): boolean => {
     return state.tasks.taskList.length === 0;
 }
 
-export const fetchTasksIfNeeded = () => (dispatch, getState) => {
+export const fetchTasksIfNeeded = (studentNumber: string, authKey: string) => (dispatch, getState) => {
     if (shouldFetchTasks(getState())) {
-        return dispatch(fetchTasks())
+        return dispatch(fetchTasks(studentNumber, authKey))
     }
 }

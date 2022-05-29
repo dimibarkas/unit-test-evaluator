@@ -1,15 +1,20 @@
 import axios from "axios";
-import {Submission, Task, SubmissionResult, User, Progress} from "../model/types";
+import {Submission, Task, SubmissionResult, User, Progress, RegistrationCredentials} from "../model/types";
 
 
-export const getAllTasks = async (): Promise<Task[]> => {
+export const getAllTasks = async (studentNumber: string, authKey: string): Promise<Task[]> => {
     let taskList: Task[];
-    await axios.get("/api/tasks").then((res) => {
-        taskList = res.data?.tasks;
-    }).catch((e) => {
-        console.log(e);
-        throw new Error("tasks could not be loaded");
-    });
+    await axios
+        .get(
+            `/api/${studentNumber}/tasks`,
+            {
+                params: {authKey: authKey}
+            }).then((res) => {
+            taskList = res.data?.tasks;
+        }).catch((e) => {
+            console.log(e);
+            throw new Error("tasks could not be loaded");
+        });
     return taskList;
 
 }
@@ -49,4 +54,16 @@ export const getProgressList = async (userId: string): Promise<Progress[]> => {
         throw new Error("an error occurred while getting the progress list.");
     })
     return result;
+}
+
+export const requestAuthKey = async (authCredentials: RegistrationCredentials): Promise<void> => {
+    const {id, email} = authCredentials;
+    await axios.post(`/api/${id}/register`,
+        {},
+        {
+            params: {email: email}
+        }).catch((e) => {
+        console.log(e);
+        throw new Error("an error occurred while requesting authentication mail.");
+    })
 }

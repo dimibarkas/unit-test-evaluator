@@ -51,3 +51,14 @@ export type Progress = {
     coveredBranches: number;
     hasAllMutationsPassed: boolean;
 }
+
+export interface RegistrationCredentials {
+    id: string;
+    email: string;
+}
+
+export interface AuthCredentials {
+    studentNumber: string;
+    authKey: string;
+}
+
