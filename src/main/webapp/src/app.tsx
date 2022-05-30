@@ -1,13 +1,14 @@
 import NavigationBar from "./components/navigation-bar";
-import React, {useEffect} from "react";
+import React, {useEffect, useMemo} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import TaskContainer from "./components/task-container";
 import {fetchTasksIfNeeded} from "./redux/actions/tasks";
-import {fetchUserIfNeeded} from "./redux/actions/user";
 import {fetchProgressListIfNeeded} from "./redux/actions/progress";
 import {State} from "./redux/reducers";
 import RegistrationPage from "./components/registration-page";
 import {useSearchParams} from "react-router-dom";
+import {AuthCredentials} from "./model/types";
+import AuthenticationError from "./components/authentication-error";
 
 function App() {
 
@@ -15,24 +16,38 @@ function App() {
     const user = useSelector((state: State) => state.user);
 
     const [searchParams] = useSearchParams()
-    const studentNumber = searchParams.get("studentNumber");
+    const studentId = searchParams.get("studentNumber");
     const authKey = searchParams.get("authKey");
 
+    const authCredentials: AuthCredentials = useMemo(() => {
+        return {
+            authKey: authKey,
+            studentId: studentId
+        }
+    }, [studentId, authKey])
+
+
     useEffect(() => {
-        if (authKey != null && studentNumber != null) {
-            dispatch(fetchTasksIfNeeded(studentNumber, authKey))
-            dispatch(fetchUserIfNeeded())
-            dispatch(fetchProgressListIfNeeded())
+        if (authCredentials.authKey != null && authCredentials.studentId != null) {
+            dispatch(fetchTasksIfNeeded(authCredentials))
+            fetchProgressListIfNeeded(authCredentials)
         }
 
-    }, [authKey, dispatch])
+    }, [authCredentials, dispatch])
 
 
-    if (user.isAuthenticated === false) {
+    if (user.isAuthenticated === false && user.authenticationError == false) {
         return (
             <>
                 <NavigationBar/>
                 <RegistrationPage/>
+            </>
+        )
+    } else if (user.authenticationError && user.isAuthenticated === false) {
+        return (
+            <>
+                <NavigationBar/>
+                <AuthenticationError />
             </>
         )
     }

@@ -1,4 +1,4 @@
-import {Progress} from "../../../model/types";
+import {AuthCredentials, Progress} from "../../../model/types";
 import {getProgressList} from "../../../services";
 import {bool} from "prop-types";
 import {State} from "../../reducers";
@@ -32,13 +32,13 @@ const shouldFetchProgressList = (state: State): boolean => {
     return !state.user.isFetching;
 }
 
-export const fetchProgressList = (userId: string) => dispatch => {
+export const fetchProgressList = (authCredentials: AuthCredentials) => dispatch => {
     dispatch(requestProgressList())
-    return getProgressList(userId).then((progress) => dispatch(receiveProgressList(progress)));
+    return getProgressList(authCredentials).then((progress) => dispatch(receiveProgressList(progress)));
 }
 
-export const fetchProgressListIfNeeded = () => (dispatch, getState) => {
+export const fetchProgressListIfNeeded = (authCredentials: AuthCredentials) => (dispatch, getState) => {
     if(shouldFetchProgressList(getState())) {
-        return dispatch(getProgressList(getState().user.user.id))
+        return dispatch(getProgressList(authCredentials))
     }
 }

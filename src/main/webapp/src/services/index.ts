@@ -1,12 +1,22 @@
 import axios from "axios";
-import {Submission, Task, SubmissionResult, User, Progress, RegistrationCredentials} from "../model/types";
+import {
+    Submission,
+    Task,
+    SubmissionResult,
+    Progress,
+    RegistrationCredentials,
+    AuthCredentials
+} from "../model/types";
+import {onFulfilled, onRejected} from "../axios-interceptors";
 
+const instance = axios.create();
+instance.interceptors.response.use(onFulfilled, onRejected);
 
-export const getAllTasks = async (studentNumber: string, authKey: string): Promise<Task[]> => {
+export const getAllTasks = async (studentId: string, authKey: string): Promise<Task[]> => {
     let taskList: Task[];
-    await axios
+    await instance
         .get(
-            `/api/${studentNumber}/tasks`,
+            `/api/${studentId}/tasks`,
             {
                 params: {authKey: authKey}
             }).then((res) => {
@@ -19,9 +29,14 @@ export const getAllTasks = async (studentNumber: string, authKey: string): Promi
 
 }
 
-export const submitCode = async (submission: Submission): Promise<SubmissionResult> => {
+export const submitCode = async (authCredentials: AuthCredentials, submission: Submission): Promise<SubmissionResult> => {
     let result: SubmissionResult;
-    await axios.post("/api/evaluate", submission)
+    const {taskId, encodedTestContent} = submission;
+    const {authKey, studentId} = authCredentials;
+    await instance.post(`/api/${studentId}/evaluate`, {
+        taskId: taskId,
+        encodedTestContent: encodedTestContent
+    }, {params: {authKey: authKey}})
         .then((response) => {
             result = response.data;
         }).catch((e) => {
@@ -31,22 +46,11 @@ export const submitCode = async (submission: Submission): Promise<SubmissionResu
     return result;
 }
 
-export const fetchNewUser = async (): Promise<User> => {
-    let user: User;
-    await axios.post("/api/user")
-        .then((response) => {
-            user = {id: response.data?.id, createdAt: response.data?.createdAt};
-        }).catch((e) => {
-            console.log(e)
-            throw new Error("an error occurred while fetching user");
-        })
-    return user;
-}
-
-export const getProgressList = async (userId: string): Promise<Progress[]> => {
+export const getProgressList = async (authCredentials: AuthCredentials): Promise<Progress[]> => {
     let result: Progress[];
-    await axios.get("/api/progress", {
-        params: {userId: userId}
+    const {authKey, studentId} = authCredentials;
+    await instance.get(`/api/${studentId}/progress`, {
+        params: {authKey: authKey}
     }).then((response) => {
         result = response.data?.progressList;
     }).catch((e) => {
@@ -56,9 +60,9 @@ export const getProgressList = async (userId: string): Promise<Progress[]> => {
     return result;
 }
 
-export const requestAuthKey = async (authCredentials: RegistrationCredentials): Promise<void> => {
-    const {id, email} = authCredentials;
-    await axios.post(`/api/${id}/register`,
+export const requestAuthKey = async (registrationCredentials: RegistrationCredentials): Promise<void> => {
+    const {id, email} = registrationCredentials;
+    await instance.post(`/api/${id}/register`,
         {},
         {
             params: {email: email}

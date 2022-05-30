@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
-import {Submission, SubmissionResult} from "../model/types";
+import {AuthCredentials, Submission, SubmissionResult} from "../model/types";
 import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
@@ -74,24 +74,31 @@ function TaskContainer() {
     }, [progress.isLoading, selectedTask])
 
     useEffect(() => {
+
+        const authCredentials: AuthCredentials = {
+            authKey: user.authKey,
+            studentId: user.id
+        }
+
         if (isLoading) {
             setShowAlert(false);
+
             const request: Submission = {
                 taskId: selectedTask.task.id,
                 encodedTestContent: btoa(editorRef.current.getValue()),
-                userId: user.user.id
+                studentId: user.id
             }
-            submitCode(request).then((receivedTest: SubmissionResult) => {
+            submitCode(authCredentials, request).then((receivedTest: SubmissionResult) => {
                 showCustomAlert(receivedTest)
-                dispatch(fetchProgressList(user.user.id));
+                fetchProgressList(authCredentials);
                 setLoading(false);
             }).catch((error) => {
                 setLoading(false);
                 console.log(error)
             });
         } else if (!isLoading) {
-            if (user?.user?.id) {
-                fetchProgressList(user.user.id);
+            if (user?.student?.id) {
+                fetchProgressList(authCredentials);
             }
         }
         // eslint-disable-next-line

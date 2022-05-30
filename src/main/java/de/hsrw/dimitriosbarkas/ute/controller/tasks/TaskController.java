@@ -41,7 +41,7 @@ public class TaskController {
         Student student;
         student = studentService.getStudentById(studentId);
         if (student == null) {
-            log.error("Get review status (failed): Student ID " + studentId + ". Cannot load configuration file.");
+            log.error("Task Controller status (failed): Student with ID " + studentId + " could not be found.");
             return ErrorResponseUtil.build(HttpStatus.BAD_REQUEST, "Ungültige Anfrage.");
         }
 
