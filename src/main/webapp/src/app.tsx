@@ -28,15 +28,16 @@ function App() {
 
 
     useEffect(() => {
-        if (authCredentials.authKey != null && authCredentials.studentId != null) {
+        if (authCredentials.authKey !== null && authCredentials.studentId !== null) {
             dispatch(fetchTasksIfNeeded(authCredentials))
-            fetchProgressListIfNeeded(authCredentials)
         }
+
+        fetchProgressListIfNeeded(authCredentials)
 
     }, [authCredentials, dispatch])
 
 
-    if (user.isAuthenticated === false && user.authenticationError == false) {
+    if (user.isAuthenticated === false && user.authenticationError === false) {
         return (
             <>
                 <NavigationBar/>

@@ -90,7 +90,7 @@ function TaskContainer() {
             }
             submitCode(authCredentials, request).then((receivedTest: SubmissionResult) => {
                 showCustomAlert(receivedTest)
-                fetchProgressList(authCredentials);
+                dispatch(fetchProgressList(authCredentials));
                 setLoading(false);
             }).catch((error) => {
                 setLoading(false);

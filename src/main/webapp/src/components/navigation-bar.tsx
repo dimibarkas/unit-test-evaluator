@@ -71,6 +71,7 @@ function NavigationBar() {
                         Alle Aufgaben
                     </p>
                     <TaskList/>
+
                 </Offcanvas.Body>
             </Offcanvas>
         </>

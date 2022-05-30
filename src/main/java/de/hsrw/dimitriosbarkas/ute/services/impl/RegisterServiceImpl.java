@@ -49,6 +49,7 @@ public class RegisterServiceImpl implements RegisterService {
         // Send email
         Map<String, String> values = new HashMap<>();
         values.put("url", frontendBaseUrl + "?studentNumber=" + student.getId() + "&authKey=" + student.getAuthKey());
+        values.put("firstname", student.getFirstname());
         emailService.sendEmailWithTemplate(studentEmailAddress, "Link zum Tool", bodyTemplate, values);
     }
 }
