@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Col, Container, Form, Row} from "react-bootstrap";
+import {Alert, Button, Col, Container, Form, Row} from "react-bootstrap";
 import {requestAuthKey} from "../services";
 import {RegistrationCredentials} from "../model/types";
 
@@ -11,6 +11,7 @@ function RegistrationPage() {
     });
 
     const [validated, setValidated] = useState(false);
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
     const handleChange = (e) => {
         updateFormData({
@@ -27,19 +28,35 @@ function RegistrationPage() {
         } else {
             e.preventDefault();
             e.stopPropagation();
-            requestAuthKey(formData).then(r => console.log("authentication mail requested"))
+            requestAuthKey(formData).then(
+                () => {
+                    setFormSubmitted(true);
+                    console.log("authentication mail requested")
+                })
         }
 
         setValidated(true);
     }
 
+    if (formSubmitted) {
+        return (
+            <Container className={"my-5"}>
+                <Alert variant={"info"}>
+                    <h4>Vielen Dank!</h4>
+                    <br />
+                    <p> Der Link für das Tool wurde an <b><u> {formData.email} </u></b> geschickt.</p>
+                </Alert>
+            </Container>
+        )
+    }
+
     return (
         <Container className="text-light" style={{position: "relative"}}>
-            <h1 className="display-5 my-3">Anmeldung</h1>
-            <p>Bitte geben Sie unten Ihren Vornamen, Nachnamen und Ihre E-Mail-Adresse und Matrikelnummer ein. Sie
-                erhalten dann per E-Mail einen Link, mit dem Sie die Einsicht aufrufen können.</p>
+            <h1 className="display-5 my-3">Registrierung</h1>
+            <p>Bitte geben Sie Ihre E-Mail-Adresse und Matrikelnummer ein.<br/> <br/>Sie erhalten dann per E-Mail einen
+                Link, mit dem Sie das Tool aufrufen können.</p>
 
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form noValidate validated={validated} onSubmit={handleSubmit} className="my-5">
                 <Row>
                     <Form.Group as={Col} md={4}>
                         <Form.Label>Matrikelnummer</Form.Label>
@@ -74,8 +91,8 @@ function RegistrationPage() {
                 </Row>
                 <Row>
                     <Col>
-                        <Button type="submit" variant="success">
-                            Anmelden
+                        <Button type="submit">
+                            Senden
                         </Button>
                     </Col>
                 </Row>
