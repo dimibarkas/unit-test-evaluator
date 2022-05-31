@@ -41,7 +41,7 @@ function RegistrationPage() {
     if (formSubmitted) {
         return (
             <Container className={"my-5"}>
-                <Alert variant={"info"}>
+                <Alert variant={"success"}>
                     <h4>Vielen Dank!</h4>
                     <br />
                     <p> Der Link für das Tool wurde an <b><u> {formData.email} </u></b> geschickt.</p>

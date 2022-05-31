@@ -37,6 +37,24 @@ function TaskContainer() {
     const dispatch = useDispatch()
     const editorRef = useRef(null);
 
+    //https://reactjs.org/docs/faq-state.html
+    const timerRef = useRef(0);
+    const [timer, setTimer] = useState(0);
+
+    const tick = () => {
+        setTimer((prevState) => prevState + 1);
+    }
+
+    useEffect(() => {
+        setInterval(() => tick(), 1000)
+    }, [])
+
+    useEffect(() => {
+        console.log(timer);
+        timerRef.current = timer;
+    }, [timer])
+
+
 
     function submitButton() {
         return (
@@ -127,19 +145,30 @@ function TaskContainer() {
         return state.selectedTask?.task?.id
     }
 
-    let currentValue
+    let currentTask
 
     function handleSelectedTaskChange() {
-        let previousValue = currentValue
-        currentValue = select(store.getState())
-        if (previousValue !== undefined && previousValue !== currentValue) {
+        let previousTask = currentTask
+        currentTask = select(store.getState())
+        if (previousTask !== undefined && previousTask !== currentTask) {
             //check if there is a value for the current task
-            if (sessionStorage.getItem(currentValue)) {
-                setSavedContent(sessionStorage.getItem(currentValue));
+            if (sessionStorage.getItem(currentTask)) {
+                setSavedContent(sessionStorage.getItem(currentTask));
+                // @ts-ignore
+
             } else {
                 setSavedContent("");
             }
-            saveEditorContent(previousValue)
+            saveEditorContent(previousTask)
+
+            if(sessionStorage.getItem(`T${currentTask}`)) {
+                console.log(sessionStorage.getItem(`T${currentTask}`))
+                setTimer(() => Number(sessionStorage.getItem(`T${currentTask}`)))
+            }else {
+                setTimer(0);
+            }
+
+            saveTimePassed(previousTask)
         }
     }
 
@@ -150,6 +179,10 @@ function TaskContainer() {
 
     const saveEditorContent = (taskId) => {
         sessionStorage.setItem(taskId, btoa(editorRef.current.getValue()))
+    }
+
+    const saveTimePassed = (taskId) => {
+        sessionStorage.setItem(`T${taskId}`, Number(timerRef.current).toString(10))
     }
 
     /**
@@ -209,6 +242,7 @@ function TaskContainer() {
                         <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
                                      className="w-100 m-2 text-black"/>
                     </div>
+                    {/*{new Date(timer * 1000).toISOString().slice(14, 19)}*/}
                 </div>
                 <Split
                     className="split"
