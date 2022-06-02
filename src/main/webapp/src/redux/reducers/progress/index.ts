@@ -3,12 +3,14 @@ import {Action, ActionType} from "../../actions/progress";
 
 interface IProgressList {
     isLoading: boolean
-    progressList: Progress[]
+    progressList: Progress[],
+    hasAllTasksPassed: boolean,
 }
 
 const initialProgressList: IProgressList = {
     isLoading: false,
     progressList: null,
+    hasAllTasksPassed: false,
 }
 
 /**
@@ -28,6 +30,11 @@ export const progress = (state: IProgressList = initialProgressList, action: Act
                 ...state,
                 isLoading: false,
                 progressList: action.payload
+            }
+        case ActionType.STUDENT_HAS_PASSED_ALL_TASKS:
+            return {
+                ...state,
+                hasAllTasksPassed: true
             }
         default:
             return state

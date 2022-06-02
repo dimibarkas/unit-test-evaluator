@@ -9,8 +9,16 @@ import RegistrationPage from "./components/registration-page";
 import {useSearchParams} from "react-router-dom";
 import {AuthCredentials} from "./model/types";
 import AuthenticationError from "./components/authentication-error";
+import {connect} from "react-redux";
+import FinalPage from "./components/final-page";
 
-function App() {
+const mapStateToProps = (state: State) => {
+    return {
+        hasAllTasksPassed: state.progress.hasAllTasksPassed
+    }
+}
+
+function App({hasAllTasksPassed}) {
 
     const dispatch = useDispatch()
     const user = useSelector((state: State) => state.user);
@@ -48,7 +56,16 @@ function App() {
         return (
             <>
                 <NavigationBar/>
-                <AuthenticationError />
+                <AuthenticationError/>
+            </>
+        )
+    }
+
+    if(hasAllTasksPassed) {
+        return (
+            <>
+                <NavigationBar />
+                <FinalPage />
             </>
         )
     }
@@ -62,4 +79,4 @@ function App() {
     );
 }
 
-export default App;
+export default connect(mapStateToProps)(App);

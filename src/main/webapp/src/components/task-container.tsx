@@ -253,7 +253,7 @@ function TaskContainer({selectedTask}) {
                         <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
                                      className="w-100 m-2 text-black"/>
                     </div>
-                    {new Date(timer * 1000).toISOString().slice(14, 19)}
+                    {/*{new Date(timer * 1000).toISOString().slice(14, 19)}*/}
                 </div>
                 <Split
                     className="split"
