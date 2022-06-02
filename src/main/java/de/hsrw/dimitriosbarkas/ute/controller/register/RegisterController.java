@@ -23,22 +23,20 @@ public class RegisterController {
     }
 
     @PostMapping(value = "/api/{studentId}/register")
-    public ResponseEntity<?> registerForUnitTestEvaluator(@PathVariable("studentId") Long studentNumber,
-                                                          @RequestParam String firstname,
-                                                          @RequestParam String lastname,
+    public ResponseEntity<?> registerForUnitTestEvaluator(@PathVariable("studentId") Long studentId,
                                                           @RequestParam String email) {
-        if(email == null || firstname == null || lastname == null) {
-            return ErrorResponseUtil.build(HttpStatus.BAD_REQUEST, "Die Felder Vorname, Nachname und E-Mail sind Pflichtfelder.");
+        if(email == null || studentId == null) {
+            return ErrorResponseUtil.build(HttpStatus.BAD_REQUEST, "Die Felder Matrikelnummer und E-Mail sind Pflichtfelder.");
         }
 
         try {
-            registerService.registerForUnitTestEvaluator(studentNumber, firstname, lastname, email);
+            registerService.registerForUnitTestEvaluator(studentId, email);
         } catch (IOException e) {
             log.error("Registration (failed): Cannot load configuration file.");
             return ErrorResponseUtil.buildTechnicalServerError("Konfigurationsdatei konnte nicht geladen werden.");
         }
 
-        log.info("Registration (ok): Student ID " + studentNumber + " with e-mail address "  + email + ".");
+        log.info("Registration (ok): Student ID " + studentId + " with e-mail address "  + email + ".");
         return ResponseEntity.ok().build();
     }
 

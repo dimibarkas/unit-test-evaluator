@@ -1,45 +1,31 @@
-import {fetchNewUser} from "../../../services";
-import {User} from "../../../model/types";
+import {AuthCredentials} from "../../../model/types";
 
 export enum ActionType {
-    REQUEST_USER = "REQUEST_USER",
-    RECEIVE_USER = "RECEIVE_USER"
+    AUTHENTICATE_STUDENT = "AUTHENTICATE_STUDENT",
+    AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR"
 }
 
-interface RequestUserAction {
-    type: ActionType.REQUEST_USER,
+interface AuthenticateStudentAction {
+    type: ActionType.AUTHENTICATE_STUDENT,
+    payload: AuthCredentials
 }
 
-interface ReceiveUserAction {
-    type: ActionType.RECEIVE_USER,
-    payload: User
+interface AuthenticationError {
+    type: ActionType.AUTHENTICATION_ERROR
 }
 
-export type Action = RequestUserAction | ReceiveUserAction
+export type Action = AuthenticateStudentAction | AuthenticationError
 
-export const requestUser = (): RequestUserAction => ({
-    type: ActionType.REQUEST_USER,
+export const authenticateStudent = (authCredentials: AuthCredentials): AuthenticateStudentAction => ({
+    type: ActionType.AUTHENTICATE_STUDENT,
+    payload: authCredentials
 })
 
-export const receiveUser = (user: User): ReceiveUserAction => ({
-    type: ActionType.RECEIVE_USER,
-    payload: user
+export const authenticationError = (): AuthenticationError => ({
+    type: ActionType.AUTHENTICATION_ERROR
 })
 
-const fetchUser = () => dispatch => {
-    dispatch(requestUser())
-    return fetchNewUser().then((user) => {
-        dispatch(receiveUser(user))
-    })
+export const setAuthenticationError = () => (dispatch) => {
+    console.log("setAuthenticationError Action thrown")
+    return dispatch(authenticationError())
 }
-
-const shouldFetchNewUser = (state):boolean => {
-    return state.user.user === null;
-}
-
-export const fetchUserIfNeeded = () => (dispatch, getState) => {
-    if(shouldFetchNewUser(getState())) {
-        return dispatch(fetchUser())
-    }
-}
-

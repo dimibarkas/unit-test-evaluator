@@ -28,8 +28,8 @@ public class Submission implements Comparable<Submission>{
 
     private String taskId;
 
-    @Column(name = "user_id")
-    private UUID userid;
+    @Column(name = "student_id")
+    private Long studentId;
 
     @Column(name = "submitted_at", updatable = false, nullable = false)
     @CreationTimestamp

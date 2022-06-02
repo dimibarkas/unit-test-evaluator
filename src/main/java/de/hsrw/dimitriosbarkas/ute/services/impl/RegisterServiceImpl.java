@@ -1,6 +1,7 @@
 package de.hsrw.dimitriosbarkas.ute.services.impl;
 
-import de.hsrw.dimitriosbarkas.ute.model.Student;
+import de.hsrw.dimitriosbarkas.ute.persistence.student.Student;
+import de.hsrw.dimitriosbarkas.ute.persistence.student.StudentService;
 import de.hsrw.dimitriosbarkas.ute.services.EmailService;
 import de.hsrw.dimitriosbarkas.ute.services.RegisterService;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,14 +27,18 @@ public class RegisterServiceImpl implements RegisterService {
 
     private final EmailService emailService;
 
-    public RegisterServiceImpl(EmailService emailService) {
+    private final StudentService studentService;
+
+    public RegisterServiceImpl(EmailService emailService, StudentService studentService
+    ) {
         this.emailService = emailService;
+        this.studentService = studentService;
     }
 
     @Override
-    public void registerForUnitTestEvaluator(Long studentNumber,String studentFirstname, String studentLastname, String studentEmailAddress) throws IOException {
+    public void registerForUnitTestEvaluator(Long studentId, String studentEmailAddress) throws IOException {
 
-        Student student = Student.builder().id(studentNumber).firstname(studentFirstname).lastname(studentLastname).email(studentEmailAddress).build();
+        Student student = studentService.registerStudent(studentId, studentEmailAddress);
 
         // Read e-mail template
         String bodyTemplate;
@@ -43,7 +48,8 @@ public class RegisterServiceImpl implements RegisterService {
 
         // Send email
         Map<String, String> values = new HashMap<>();
-        values.put("url", frontendBaseUrl + "?studentNumber=" + student.getId() + "&authKey=" + student.hashCode());
+        values.put("url", frontendBaseUrl + "?studentNumber=" + student.getId() + "&authKey=" + student.getAuthKey());
+        values.put("firstname", student.getFirstname());
         emailService.sendEmailWithTemplate(studentEmailAddress, "Link zum Tool", bodyTemplate, values);
     }
 }

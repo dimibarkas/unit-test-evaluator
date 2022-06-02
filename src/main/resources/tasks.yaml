@@ -67,7 +67,7 @@ tasks:
   - id: '3'
     name: 'Taschenrechner'
     description: 'Die Klasse Calculator enthält Methoden für die Operationen: Addition, Subtraktion, Multiplikation und Division.'
-    shortDescription: 'Die Klass stellt Funktionen für einfache Rechenoperationen.'
+    shortDescription: 'Die Klasse stellt Funktionen für einfache Rechenoperationen.'
     targetDescription: 'Schreiben Sie Unit-Tests alle Methoden der Klasse Calculator. Testen Sie Standardfälle, Randfälle und die mögliche Exception. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
     pathToDir: 'tasks/calculator/'
     sourcefilename: 'Calculator.java'

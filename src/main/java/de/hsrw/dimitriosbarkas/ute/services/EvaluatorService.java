@@ -25,7 +25,7 @@ public interface EvaluatorService {
      * @throws CompilationErrorException if
      * an error occurred during the compilation
      */
-    SubmissionResult evaluateTest(SubmissionTO submissionTO) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException;
+    SubmissionResult evaluateTest(Long studentId, SubmissionTO submissionTO) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException;
 
     /**
      * This function calculates the line coverage percentage in a coverage report.

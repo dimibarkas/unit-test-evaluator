@@ -1,28 +1,41 @@
-import {ActionType, Action} from "../../actions/user";
-import {User} from "../../../model/types";
+import {Action, ActionType} from "../../actions/user";
+import {Student} from "../../../model/types";
 
 interface IUser {
     isFetching: boolean;
-    user: User;
+    student: Student;
+    isAuthenticated: boolean;
+    id: string;
+    authKey: string;
+    authenticationError: boolean;
 }
 
 const initialUserState: IUser = {
     isFetching: false,
-    user: null,
+    student: null,
+    isAuthenticated: false,
+    id: null,
+    authKey: null,
+    authenticationError: false
 }
 
 export const user = (state: IUser = initialUserState, action: Action): IUser => {
     switch (action.type) {
-        case ActionType.REQUEST_USER:
+        case ActionType.AUTHENTICATE_STUDENT:
             return {
                 ...state,
-                isFetching: true
+                isAuthenticated: true,
+                id: action.payload.studentId,
+                authKey: action.payload.authKey
             }
-        case ActionType.RECEIVE_USER:
+        case ActionType.AUTHENTICATION_ERROR:
             return {
                 ...state,
-                isFetching: false,
-                user: action.payload
+                isAuthenticated: false,
+                authenticationError: true,
+                id: null,
+                authKey: null,
+                student: null
             }
         default:
             return state

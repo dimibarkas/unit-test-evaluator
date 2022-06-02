@@ -6,8 +6,8 @@ import de.hsrw.dimitriosbarkas.ute.model.SubmissionResult;
 import de.hsrw.dimitriosbarkas.ute.model.Task;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Line;
 import de.hsrw.dimitriosbarkas.ute.model.pitest.Mutation;
+import de.hsrw.dimitriosbarkas.ute.persistence.student.Student;
 import de.hsrw.dimitriosbarkas.ute.persistence.submission.Submission;
-import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
 import de.hsrw.dimitriosbarkas.ute.services.FeedbackService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.NoFeedbackFoundException;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.NoHintProvidedException;
@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
-    public String provideFeedback(User user, Task task, SubmissionResult currentSubmissionResult) throws SourcefileNotFoundException, NoHintProvidedException, NoFeedbackFoundException {
+    public String provideFeedback(Student student, Task task, SubmissionResult currentSubmissionResult) throws SourcefileNotFoundException, NoHintProvidedException, NoFeedbackFoundException {
 
         // check the submissions done by this user.
-        List<Submission> submissionList = user.getSubmissionList().stream().sorted().collect(Collectors.toList());
+        List<Submission> submissionList = student.getSubmissionList().stream().sorted().collect(Collectors.toList());
 
 
         // if the current build was not successful, provide more general feedback (optional)
@@ -63,8 +63,8 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     String getFeedbackByLineCoverage(Task task, List<Line> lineList) throws NoHintProvidedException, NoFeedbackFoundException {
-        log.info(lineList);
-        log.info(task.getHintList());
+//        log.info(lineList);
+//        log.info(task.getHintList());
         List<Hint> hintList = task.getHintList();
         for (Line line : lineList) {
             log.info(line);

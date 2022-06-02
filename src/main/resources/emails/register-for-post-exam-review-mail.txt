@@ -1,9 +1,8 @@
 <html>
     <head></head>
     <body>
-        <p>Hallo</p>
-        <p>hier finden Sie den Link für das Tool:</p>
-        <p><a href="${url}">${url}</a></p>
+        <p>Hallo ${firstname}</p>
+        <p>hier findest du den <a href="${url}">Link</a> für das Tool.</p>
         <p>Mit freundlichen Grüßen</p>
         <p>Dimitrios Barkas</p>
     </body>

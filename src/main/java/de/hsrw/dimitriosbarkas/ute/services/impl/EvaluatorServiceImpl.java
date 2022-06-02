@@ -7,8 +7,8 @@ import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Report;
 import de.hsrw.dimitriosbarkas.ute.model.jacocoreport._Class;
 import de.hsrw.dimitriosbarkas.ute.model.pitest.Mutation;
 import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
-import de.hsrw.dimitriosbarkas.ute.persistence.user.User;
-import de.hsrw.dimitriosbarkas.ute.persistence.user.UserService;
+import de.hsrw.dimitriosbarkas.ute.persistence.student.Student;
+import de.hsrw.dimitriosbarkas.ute.persistence.student.StudentService;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.EvaluatorService;
 import de.hsrw.dimitriosbarkas.ute.services.FeedbackService;
@@ -28,19 +28,19 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     private final SafeExecuteTestService safeExecuteTestService;
 
-    private final UserService userService;
+    private final StudentService studentService;
 
     private final FeedbackService feedbackService;
 
-    public EvaluatorServiceImpl(ConfigService configService, SafeExecuteTestService safeExecuteTestService, UserService userService, FeedbackService feedbackService) {
+    public EvaluatorServiceImpl(ConfigService configService, SafeExecuteTestService safeExecuteTestService, StudentService studentService, FeedbackService feedbackService) {
         this.configService = configService;
         this.safeExecuteTestService = safeExecuteTestService;
-        this.userService = userService;
+        this.studentService = studentService;
         this.feedbackService = feedbackService;
     }
 
     @Override
-    public SubmissionResult evaluateTest(SubmissionTO submissionTO) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
+    public SubmissionResult evaluateTest(Long studentId, SubmissionTO submissionTO) throws CannotLoadConfigException, TaskNotFoundException, CompilationErrorException {
         log.info("Evaluating test for task " + submissionTO.getTaskId() + " ...");
 
         // Get configuration for this task
@@ -56,14 +56,14 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 List<Mutation> mutationList = getMutationResult(currentSubmissionResult.getMutationReport(), task);
                 if(mutationList.isEmpty()) allMutationsPassed = true;
                 CoverageResult coverageResult = getCoverageResult(currentSubmissionResult.getReport(), task);
-                userService.addSubmission(submissionTO.getUserId(),
+                studentService.addSubmission(studentId,
                         submissionTO.getTaskId(),
                         coverageResult.getCoveredInstructions(),
                         coverageResult.getCoveredBranches(),
                         currentSubmissionResult.getSummary(),
                         allMutationsPassed);
             } else {
-                userService.addSubmission(submissionTO.getUserId(),
+                studentService.addSubmission(studentId,
                         submissionTO.getTaskId(),
                         0,
                         0,
@@ -72,8 +72,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             }
 
             try {
-                User user = userService.getUserById(submissionTO.getUserId());
-                currentSubmissionResult.setFeedback(feedbackService.provideFeedback(user, task, currentSubmissionResult));
+                Student student = studentService.getStudentById(studentId);
+                currentSubmissionResult.setFeedback(feedbackService.provideFeedback(student, task, currentSubmissionResult));
             } catch (SourcefileNotFoundException e) {
                 log.error(e.getMessage());
             } catch (NoHintProvidedException e) {
