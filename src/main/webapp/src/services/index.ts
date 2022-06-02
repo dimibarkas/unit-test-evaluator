@@ -12,7 +12,8 @@ import {onFulfilled, onRejected} from "../axios-interceptors";
 const instance = axios.create();
 instance.interceptors.response.use(onFulfilled, onRejected);
 
-export const getAllTasks = async (studentId: string, authKey: string): Promise<Task[]> => {
+export const getAllTasks = async (authCredentials: AuthCredentials): Promise<Task[]> => {
+    const {authKey, studentId} = authCredentials;
     let taskList: Task[];
     await instance
         .get(
@@ -70,4 +71,7 @@ export const requestAuthKey = async (registrationCredentials: RegistrationCreden
         console.log(e);
         throw new Error("an error occurred while requesting authentication mail.");
     })
+}
+export const submitResults = async ():Promise<void> => {
+
 }

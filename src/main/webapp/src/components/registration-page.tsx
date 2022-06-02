@@ -44,7 +44,7 @@ function RegistrationPage() {
                 <Alert variant={"success"}>
                     <h4>Vielen Dank!</h4>
                     <br />
-                    <p> Der Link für das Tool wurde an <b><u> {formData.email} </u></b> geschickt.</p>
+                    <p> Der Link für das Tool wurde an <b><u> {formData.email}</u></b> geschickt.</p>
                 </Alert>
             </Container>
         )

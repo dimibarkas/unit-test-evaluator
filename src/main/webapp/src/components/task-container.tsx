@@ -15,7 +15,6 @@ import {connect} from "react-redux";
 
 
 const mapStateToProps = (state: State) => {
-    console.log(state.selectedTask)
     return {
         selectedTask: state.selectedTask
     }
@@ -61,7 +60,6 @@ function TaskContainer({selectedTask}) {
     }, [selectedTask])
 
     useEffect(() => {
-        console.log(timer);
         timerRef.current = timer;
     }, [timer])
 
@@ -122,7 +120,7 @@ function TaskContainer({selectedTask}) {
                 setLoading(false);
             }).catch((error) => {
                 setLoading(false);
-                console.log(error)
+                console.error(error)
             });
         } else if (!isLoading) {
             if (user?.student?.id) {
@@ -132,7 +130,10 @@ function TaskContainer({selectedTask}) {
         // eslint-disable-next-line
     }, [isLoading]);
 
-    const handleClick = () => setLoading(true);
+    const handleClick = () => {
+        saveTimePassed(selectedTask.task.id)
+        setLoading(true);
+    }
 
     const isCurrentTaskCompleted = (): boolean => {
         return progress.progressList?.some(progress =>
@@ -172,7 +173,7 @@ function TaskContainer({selectedTask}) {
             saveEditorContent(previousTask)
 
             if (sessionStorage.getItem(`T${currentTask}`)) {
-                console.log(sessionStorage.getItem(`T${currentTask}`))
+                // console.log(sessionStorage.getItem(`T${currentTask}`))
                 setTimer(() => Number(sessionStorage.getItem(`T${currentTask}`)))
             } else {
                 setTimer(0);

@@ -28,12 +28,11 @@ export const receiveTasks = (tasks: Task[]) => ({
 })
 
 const fetchTasks = (authCredentials: AuthCredentials) => dispatch => {
-    const {studentId, authKey} = authCredentials;
     dispatch(requestTasks())
-    return getAllTasks(studentId, authKey)
+    return getAllTasks(authCredentials)
         .then((tasks) => {
             dispatch(receiveTasks(tasks))
-            dispatch(authenticateStudent({studentId: studentId, authKey: authKey}))
+            dispatch(authenticateStudent(authCredentials))
         })
 }
 
