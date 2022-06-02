@@ -11,11 +11,18 @@ import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";
 import {fetchProgressList} from "../redux/actions/progress";
 import {store} from "../redux/store";
+import {connect} from "react-redux";
 
 
-function TaskContainer() {
+const mapStateToProps = (state: State) => {
+    console.log(state.selectedTask)
+    return {
+        selectedTask: state.selectedTask
+    }
+}
 
-    const selectedTask = useSelector((state: State) => state.selectedTask);
+function TaskContainer({selectedTask}) {
+    // const selectedTask = useSelector((state: State) => state.selectedTask);
     const user = useSelector((state: State) => state.user);
     const progress = useSelector((state: State) => state.progress);
     const {
@@ -36,24 +43,27 @@ function TaskContainer() {
     const [savedContent, setSavedContent] = useState("");
     const dispatch = useDispatch()
     const editorRef = useRef(null);
-
-    //https://reactjs.org/docs/faq-state.html
     const timerRef = useRef(0);
+
     const [timer, setTimer] = useState(0);
 
-    const tick = () => {
-        setTimer((prevState) => prevState + 1);
+    const tick = (task) => {
+        if(task !== null) {
+            setTimer((prevState) => prevState + 1);
+        }
     }
 
     useEffect(() => {
-        setInterval(() => tick(), 1000)
-    }, [])
+        const timerIntervall = setInterval(() => tick(selectedTask.task), 1000);
+        return () => {
+            clearInterval(timerIntervall);
+        }
+    }, [selectedTask])
 
     useEffect(() => {
         console.log(timer);
         timerRef.current = timer;
     }, [timer])
-
 
 
     function submitButton() {
@@ -161,10 +171,10 @@ function TaskContainer() {
             }
             saveEditorContent(previousTask)
 
-            if(sessionStorage.getItem(`T${currentTask}`)) {
+            if (sessionStorage.getItem(`T${currentTask}`)) {
                 console.log(sessionStorage.getItem(`T${currentTask}`))
                 setTimer(() => Number(sessionStorage.getItem(`T${currentTask}`)))
-            }else {
+            } else {
                 setTimer(0);
             }
 
@@ -242,7 +252,7 @@ function TaskContainer() {
                         <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
                                      className="w-100 m-2 text-black"/>
                     </div>
-                    {/*{new Date(timer * 1000).toISOString().slice(14, 19)}*/}
+                    {new Date(timer * 1000).toISOString().slice(14, 19)}
                 </div>
                 <Split
                     className="split"
@@ -305,4 +315,4 @@ function TaskContainer() {
     )
 }
 
-export default TaskContainer;
+export default connect(mapStateToProps)(TaskContainer);
