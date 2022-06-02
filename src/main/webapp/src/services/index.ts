@@ -9,7 +9,10 @@ import {
 } from "../model/types";
 import {onFulfilled, onRejected} from "../axios-interceptors";
 
-const instance = axios.create();
+const instance = axios.create({
+    baseURL: process.env.NODE_ENV === "production" ? 'https://codingprof.hs-rw.de/utebackend' : ''
+});
+
 instance.interceptors.response.use(onFulfilled, onRejected);
 
 export const getAllTasks = async (authCredentials: AuthCredentials): Promise<Task[]> => {
@@ -72,6 +75,6 @@ export const requestAuthKey = async (registrationCredentials: RegistrationCreden
         throw new Error("an error occurred while requesting authentication mail.");
     })
 }
-export const submitResults = async ():Promise<void> => {
+export const submitResults = async (): Promise<void> => {
 
 }

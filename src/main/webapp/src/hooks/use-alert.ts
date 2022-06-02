@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {BuildSummary, SubmissionResult} from "../model/types";
 
 export default function useAlert() {
