@@ -17,8 +17,4 @@ public class SubmissionTO {
      * The base 64 encoded test file.
      */
     private String encodedTestContent;
-    /**
-     * The id of the user.
-     */
-    private UUID userId;
 }

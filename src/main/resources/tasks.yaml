@@ -20,13 +20,20 @@ tasks:
     hintList:
       - nr: 3
         isMissedInstruction:
-          - "InsertionSortHintLine3Mi"
+          - 'InsertionSortHintLine3Mi'
       - nr: 6
         isMissedInstruction:
-          - "InsertionSortHintLine3Mi"
-          - "InsertionSortHintLine3Mi"
+          - 'InsertionSortHintLine6Mi'
+        isMissedBranch:
+          - 'InsertionSortHintLine6Mb'
+      - nr: 13
+        isMissedBranch:
+          - 'InsertionSortHintLine13Mb'
+      - nr: 14
+        isMissedInstruction:
+          - 'InsertionSortHintLine14Mi'
     mutatorHintList:
-      - "InsertionSortMutatorHint1"
+      - 'InsertionSortMutatorHint1'
   - id: '2'
     name: 'Sortieren II'
     description: 'Die Methode BubbleSort.bubbleSort erhält ein Array aus integer Werten und sortiert dieses (in-place).'
@@ -34,7 +41,7 @@ tasks:
     targetDescription: 'Erreichen Sie eine Test-Coverage von 100%. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
     pathToDir: 'tasks/bubble-sort/'
     sourcefilename: 'BubbleSort.java'
-    testtemplatefilename : 'BubbleSortTest.java'
+    testtemplatefilename: 'BubbleSortTest.java'
     mutators:
       - EMPTY_RETURNS
       - FALSE_RETURNS
@@ -45,14 +52,46 @@ tasks:
       - PRIMITIVE_RETURNS
       - TRUE_RETURNS
       - VOID_METHOD_CALLS
+    hintList:
+      - nr: 7
+        isMissedInstruction:
+          - 'BubbleSortHintLine7Mi'
+      - nr: 17
+        isMissedBranch:
+          - 'BubbleSortHintLine17Mb'
+      - nr: 27
+        isMissedInstruction:
+          - 'BubbleSortHintLine27Mi'
+    mutatorHintList:
+      - 'BubbleSortMutatorHint1'
   - id: '3'
     name: 'Taschenrechner'
     description: 'Die Klasse Calculator enthält Methoden für die Operationen: Addition, Subtraktion, Multiplikation und Division.'
-    shortDescription: 'Die Klass stellt Funktionen für einfache Rechenoperationen.'
+    shortDescription: 'Die Klasse stellt Funktionen für einfache Rechenoperationen.'
     targetDescription: 'Schreiben Sie Unit-Tests alle Methoden der Klasse Calculator. Testen Sie Standardfälle, Randfälle und die mögliche Exception. Ihre Testfunktionen sollten mindestens eine Assertion beinhalten.'
     pathToDir: 'tasks/calculator/'
     sourcefilename: 'Calculator.java'
     testtemplatefilename: 'CalculatorTest.java'
+    hintList:
+      - nr: 3
+        isMissedInstruction:
+          - 'CalculatorHintLine3Mi'
+      - nr: 12
+        isMissedInstruction:
+          - 'CalculatorHintLine12Mi'
+      - nr: 22
+        isMissedInstruction:
+          - 'CalculatorHintLine22Mi'
+      - nr: 32
+        isMissedInstruction:
+          - 'CalculatorHintLine32Mi'
+      - nr: 42
+        isMissedBranch:
+          - 'CalculatorHintLine42Mb'
+        isMissedInstruction:
+          - 'CalculatorHintLine42Mi'
+    mutatorHintList:
+      - 'CalculatorMutatorHint1'
   - id: '4'
     name: 'Buchstaben duplizieren'
     description: 'Die Methode nimmt einen String entgegen und dupliziert jeden Buchstaben (aus "abc!" wird "aabbcc!!"). Wird null übergeben, wird eine IllegalArgumentException geworfen. '
@@ -64,11 +103,12 @@ tasks:
     hintList:
       - nr: 3
         isMissedInstruction:
-          - "StringUtilHintLine3Mi"
+          - 'StringUtilHintLine3Mi'
       - nr: 12
         isMissedBranch:
-          - "StringUtilHintLine12Mb1"
-          - "StringUtilHintLine12Mb2"
+          - 'StringUtilHintLine12Mb'
+    mutatorHintList:
+      - 'StringUtilMutatorHint1'
   - id: '5'
     name: 'Statistik'
     description: 'Die Methode StatisticUtil.getAverageAge erhält einen InputStream von einer CSV-Datei. Diese Datei speichert Personen mit Vornamen, Nachnamen und Alter und gibt das Durchschnittsalter zurück. Spalten werden durch Semikolon getrennt.'
@@ -78,6 +118,21 @@ tasks:
     pathToDir: 'tasks/statistic-util/'
     sourcefilename: 'StatisticUtil.java'
     testtemplatefilename: 'StatisticUtilTest.java'
+    hintList:
+      - nr: 8
+        isMissedInstruction:
+          - 'StatisticUtilHintLine8Mi'
+      - nr: 24
+        isMissedInstruction:
+          - 'StatisticUtilHintLine24Mi'
+      - nr: 32
+        isMissedBranch:
+          - 'StatisticUtilHintLine32Mb'
+      - nr: 38
+        isMissedInstruction:
+          - 'StatisticUtilHintLine38Mi'
+    mutatorHintList:
+      - 'StatisticUtilMutatorHint1'
   - id: '6'
     name: 'Sensor Data'
     description: 'Die Klasse SensorData speichert eine Liste von Sensordaten (als Double). Die Klasse erlaubt es, Werte hinzuzufügen und auszulesen. Außerdem können statistische Werte, d.h. Minimum, Maximum und Durchschnitt ausgelesen werden.'
@@ -86,3 +141,33 @@ tasks:
     pathToDir: 'tasks/sensor-data/'
     sourcefilename: 'SensorData.java'
     testtemplatefilename: 'SensorDataTest.java'
+    hintList:
+      - nr: 18
+        isMissedInstruction:
+          - 'SensorDataHintLine18Mi'
+      - nr: 26
+        isMissedInstruction:
+          - 'SensorDataHintLine26Mi'
+      - nr: 38
+        isMissedInstruction:
+          - 'SensorDataHintLine38Mi'
+      - nr: 46
+        isMissedInstruction:
+          - 'SensorDataHintLine46Mi'
+      - nr: 53
+        isMissedInstruction:
+          - 'SensorDataHintLine46Mi'
+      - nr: 63
+        isMissedInstruction:
+          - 'SensorDataHintLine46Mi'
+      - nr: 72
+        isMissedBranch:
+          - 'SensorDataHintLine72Mb'
+      - nr: 84
+        isMissedBranch:
+          - 'SensorDataHintLine72Mb'
+      - nr: 96
+        isMissedBranch:
+          - 'SensorDataHintLine72Mb'
+    mutatorHintList:
+      - 'SensorDataMutatorHint1'

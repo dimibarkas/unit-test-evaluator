@@ -34,16 +34,21 @@ export type SubmissionResult = {
 export type Submission = {
     taskId: number,
     encodedTestContent: string,
-    userId: string;
+    studentId: string;
 }
 
 /**
  * This type represents a simple appuser.
  */
-export type User = {
+export type Student = {
     id: string;
+    firstname: string;
+    lastname: string;
     createdAt: string;
+    authKey: string;
 }
+
+
 
 export type Progress = {
     id: number;
@@ -51,3 +56,14 @@ export type Progress = {
     coveredBranches: number;
     hasAllMutationsPassed: boolean;
 }
+
+export interface RegistrationCredentials {
+    id: string;
+    email: string;
+}
+
+export interface AuthCredentials {
+    studentId: string;
+    authKey: string;
+}
+

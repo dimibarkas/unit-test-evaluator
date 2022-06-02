@@ -4,18 +4,24 @@ import {useDispatch, useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import React, {useEffect, useRef, useState} from "react";
 import TaskList from "./task-list";
-import {Submission, SubmissionResult} from "../model/types";
+import {AuthCredentials, Submission, SubmissionResult} from "../model/types";
 import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
 import {BsPlayFill} from "react-icons/bs";
 import {fetchProgressList} from "../redux/actions/progress";
 import {store} from "../redux/store";
+import {connect} from "react-redux";
 
 
-function TaskContainer() {
+const mapStateToProps = (state: State) => {
+    return {
+        selectedTask: state.selectedTask
+    }
+}
 
-    const selectedTask = useSelector((state: State) => state.selectedTask);
+function TaskContainer({selectedTask}) {
+    // const selectedTask = useSelector((state: State) => state.selectedTask);
     const user = useSelector((state: State) => state.user);
     const progress = useSelector((state: State) => state.progress);
     const {
@@ -36,6 +42,26 @@ function TaskContainer() {
     const [savedContent, setSavedContent] = useState("");
     const dispatch = useDispatch()
     const editorRef = useRef(null);
+    const timerRef = useRef(0);
+
+    const [timer, setTimer] = useState(0);
+
+    const tick = (task) => {
+        if(task !== null) {
+            setTimer((prevState) => prevState + 1);
+        }
+    }
+
+    useEffect(() => {
+        const timerIntervall = setInterval(() => tick(selectedTask.task), 1000);
+        return () => {
+            clearInterval(timerIntervall);
+        }
+    }, [selectedTask])
+
+    useEffect(() => {
+        timerRef.current = timer;
+    }, [timer])
 
 
     function submitButton() {
@@ -74,30 +100,40 @@ function TaskContainer() {
     }, [progress.isLoading, selectedTask])
 
     useEffect(() => {
+
+        const authCredentials: AuthCredentials = {
+            authKey: user.authKey,
+            studentId: user.id
+        }
+
         if (isLoading) {
             setShowAlert(false);
+
             const request: Submission = {
                 taskId: selectedTask.task.id,
                 encodedTestContent: btoa(editorRef.current.getValue()),
-                userId: user.user.id
+                studentId: user.id
             }
-            submitCode(request).then((receivedTest: SubmissionResult) => {
+            submitCode(authCredentials, request).then((receivedTest: SubmissionResult) => {
                 showCustomAlert(receivedTest)
-                dispatch(fetchProgressList(user.user.id));
+                dispatch(fetchProgressList(authCredentials));
                 setLoading(false);
             }).catch((error) => {
                 setLoading(false);
-                console.log(error)
+                console.error(error)
             });
         } else if (!isLoading) {
-            if (user?.user?.id) {
-                fetchProgressList(user.user.id);
+            if (user?.student?.id) {
+                fetchProgressList(authCredentials);
             }
         }
         // eslint-disable-next-line
     }, [isLoading]);
 
-    const handleClick = () => setLoading(true);
+    const handleClick = () => {
+        saveTimePassed(selectedTask.task.id)
+        setLoading(true);
+    }
 
     const isCurrentTaskCompleted = (): boolean => {
         return progress.progressList?.some(progress =>
@@ -120,19 +156,30 @@ function TaskContainer() {
         return state.selectedTask?.task?.id
     }
 
-    let currentValue
+    let currentTask
 
     function handleSelectedTaskChange() {
-        let previousValue = currentValue
-        currentValue = select(store.getState())
-        if (previousValue !== undefined && previousValue !== currentValue) {
+        let previousTask = currentTask
+        currentTask = select(store.getState())
+        if (previousTask !== undefined && previousTask !== currentTask) {
             //check if there is a value for the current task
-            if (sessionStorage.getItem(currentValue)) {
-                setSavedContent(sessionStorage.getItem(currentValue));
+            if (sessionStorage.getItem(currentTask)) {
+                setSavedContent(sessionStorage.getItem(currentTask));
+                // @ts-ignore
+
             } else {
                 setSavedContent("");
             }
-            saveEditorContent(previousValue)
+            saveEditorContent(previousTask)
+
+            if (sessionStorage.getItem(`T${currentTask}`)) {
+                // console.log(sessionStorage.getItem(`T${currentTask}`))
+                setTimer(() => Number(sessionStorage.getItem(`T${currentTask}`)))
+            } else {
+                setTimer(0);
+            }
+
+            saveTimePassed(previousTask)
         }
     }
 
@@ -143,6 +190,10 @@ function TaskContainer() {
 
     const saveEditorContent = (taskId) => {
         sessionStorage.setItem(taskId, btoa(editorRef.current.getValue()))
+    }
+
+    const saveTimePassed = (taskId) => {
+        sessionStorage.setItem(`T${taskId}`, Number(timerRef.current).toString(10))
     }
 
     /**
@@ -202,6 +253,7 @@ function TaskContainer() {
                         <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
                                      className="w-100 m-2 text-black"/>
                     </div>
+                    {/*{new Date(timer * 1000).toISOString().slice(14, 19)}*/}
                 </div>
                 <Split
                     className="split"
@@ -264,4 +316,4 @@ function TaskContainer() {
     )
 }
 
-export default TaskContainer;
+export default connect(mapStateToProps)(TaskContainer);
