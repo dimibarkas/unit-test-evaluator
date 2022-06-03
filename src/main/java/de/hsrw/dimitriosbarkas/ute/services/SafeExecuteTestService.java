@@ -19,14 +19,14 @@ public interface SafeExecuteTestService {
      * @param encodedTest the base 64 encoded test
      * @throws CouldNotSetupTestEnvironmentException if an error occurs while setting up the test environment
      */
-    void setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
+    Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException;
 
     /**
      * This function actually calls the command to compile the provided tests.
      * @return the exit value of the process
      * @throws ErrorWhileExecutingTestException if an error occurs while executing tests (compile oder test errors)
      */
-    SubmissionResult buildAndRunTests() throws ErrorWhileExecutingTestException;
+    SubmissionResult buildAndRunTests(Task task, Path path) throws ErrorWhileExecutingTestException;
 
     /**
      * This function calls the command to generate a coverage-report.xml file out of the jacoco.exe file.
