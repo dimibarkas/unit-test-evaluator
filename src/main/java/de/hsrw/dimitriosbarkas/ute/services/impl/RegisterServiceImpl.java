@@ -22,7 +22,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Value("classpath:emails/register-for-post-exam-review-mail.txt")
     private Resource emailTemplateResource;
 
-    @Value("${exam-review.frontend-base-url}")
+    @Value("${ute.frontend-base-url}")
     private String frontendBaseUrl;
 
     private final EmailService emailService;
