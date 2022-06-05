@@ -1,17 +1,18 @@
 #!/bin/bash
 
-while getopts p:m: flag
+while getopts p:m:x: flag
 do
   # shellcheck disable=SC2220
   case "${flag}" in
     p)  path=${OPTARG};;
     m)  mutators=${OPTARG};;
+    x)  x=${OPTARG};;
   esac
 done
 
-# copy pom template
+# copy pom template with needed dependencies
 echo "copy pom.xml template"
-value=$(<src/main/resources/templates/pom.xml)
+value=$(<"$x")
 
 # switch to temporary directory
 cd -- "$path"|| exit
