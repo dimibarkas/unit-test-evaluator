@@ -10,11 +10,8 @@ import de.hsrw.dimitriosbarkas.ute.model.jacocoreport.Sourcefile;
 import de.hsrw.dimitriosbarkas.ute.model.pitest.MutationReport;
 import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
-import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.codehaus.plexus.util.FileUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -30,7 +27,6 @@ import static de.hsrw.dimitriosbarkas.ute.utils.Utilities.*;
 
 @Log4j2
 @Service
-@Data
 public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
 
@@ -50,11 +46,17 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             log.info("Creating test environment in temp path ...");
             log.info(path.toAbsolutePath());
 
-            ResourceLoader resourceLoader = new DefaultResourceLoader();
-            Resource resource = resourceLoader.getResource("scripts/create-mvn-project-script.sh");
+            URL scriptResourceUrl = this.getClass().getClassLoader().getResource("scripts/create-mvn-project-script.sh");
+            URL pomTemplateResourceUrl = this.getClass().getClassLoader().getResource("templates/pom.xml");
+
+            File bashScriptFile = File.createTempFile("temp", "script.sh");
+            FileUtils.copyURLToFile(scriptResourceUrl, bashScriptFile);
+
+            File pomTemplateFile = File.createTempFile("temp", "pomTemplate.xml");
+            FileUtils.copyURLToFile(pomTemplateResourceUrl, pomTemplateFile);
+
             // Execute bash script
-            String[] command = {"bash", resource.getFile().getPath(), "-p", path.toAbsolutePath().toString()};
-            log.info(Arrays.toString(command));
+            String[] command = {"bash", bashScriptFile.getAbsolutePath(), "-p", path.toAbsolutePath().toString(), "-x", pomTemplateFile.getAbsolutePath()};
             p = Runtime.getRuntime().exec(command);
             p.waitFor();
 
@@ -68,12 +70,24 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
                 //add custom mutators to pom file
                 log.info("Using custom mutators: " + task.getMutators());
                 File pomFile = new File(path.toAbsolutePath() + "/testapp/pom.xml");
+
+//                log.info(pomFile.getAbsolutePath());
                 if (pomFile.exists()) {
                     addMutators(pomFile, task.getMutators());
                 }
             }
 
             log.info("Test environment successfully setup.");
+
+            //delete temporary files
+            if (bashScriptFile.delete()) {
+                log.info("temp script file deleted.");
+            }
+
+            if (pomTemplateFile.delete()) {
+                log.info("temp pom template file deleted.");
+            }
+
 
             // write files to test environment
             loadSourceFiles(task, path);
@@ -87,31 +101,43 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             writeFile(testFile, testData);
 
             log.info("Testfile successfully written.");
+
+
             return path;
 
         } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
             throw new CouldNotSetupTestEnvironmentException(e);
         }
     }
 
-
-    private void writeSourceFiles(Path path, List<File> sourceFiles) throws IOException {
-        for (File file : sourceFiles) {
-            File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + file.getName());
-            writeFile(taskFile, Files.readAllBytes(file.toPath()));
-        }
+    private void copyFromResource(File file, String resource) throws IOException {
+        URL dirURL = getClass().getClassLoader().getResource(resource);
+        FileUtils.copyURLToFile(dirURL, file);
     }
 
-    private void loadSourceFiles(Task task, Path forPath) throws IOException {
-        URL dirURL = getClass().getClassLoader().getResource(task.getPathToDir());
-        if (dirURL != null) {
 
-            try (Stream<Path> paths = Files.walk(Paths.get(dirURL.getPath()))) {
-                List<File> sourceFiles = paths.filter(Files::isRegularFile).filter(path -> !path.getFileName().toString().endsWith("Test.java")).map(Path::toFile).collect(Collectors.toList());
-                writeSourceFiles(forPath, sourceFiles);
-            }
-
+    /**
+     * This function loads all the source code in to the current temporary user working directory.
+     * @param task the selected task
+     * @param tempDir the temporary user working directory
+     * @throws IOException if the copy of the file goes wrong
+     */
+    private void loadSourceFiles(Task task, Path tempDir) throws IOException {
+        //add optional exception classes
+        if(!task.getAdditionalFiles().isEmpty()) {
+            task.getAdditionalFiles().forEach(file -> {
+                File exceptionFile = new File(tempDir.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + file);
+                try {
+                    copyFromResource(exceptionFile,task.getPathToDir() + file);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
+
+        File taskFile = new File(tempDir.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getSourcefilename());
+        copyFromResource(taskFile, task.getPathToDir()+ task.getSourcefilename());
     }
 
     private boolean checkIfTestsWereCorrupted(String encodedTestTemplate) {
@@ -148,7 +174,8 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
 
-    private SubmissionResult getSuccessfulTestResult(Task task, Path path) throws ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
+    private SubmissionResult getSuccessfulTestResult(Task task, Path path) throws
+            ErrorWhileGeneratingCoverageReport, JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
         log.info("Build successful");
         String filename = task.getTesttemplatefilename().replace(".java", ".txt");
         String pathToFile = path + "/testapp/target/surefire-reports/com.test.app." + filename;
@@ -162,7 +189,8 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
 
-    private SubmissionResult getBuildOrTestErrors(Process process, Path path, Task task) throws IOException, InterruptedException {
+    private SubmissionResult getBuildOrTestErrors(Process process, Path path, Task task) throws
+            IOException, InterruptedException {
         String pathToDir = path.toAbsolutePath() + "/testapp/target/surefire-reports/";
         boolean buildSucceed = new File(pathToDir).exists();
         if (buildSucceed) {
@@ -219,7 +247,8 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     }
 
     @Override
-    public Report parseCoverageReport(Path path) throws JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
+    public Report parseCoverageReport(Path path) throws
+            JacocoReportXmlFileNotFoundException, ErrorWhileParsingReportException {
         String pathToReport = path.toAbsolutePath() + "/testapp/target/site/jacoco/jacoco.xml";
         File file = new File(pathToReport);
 

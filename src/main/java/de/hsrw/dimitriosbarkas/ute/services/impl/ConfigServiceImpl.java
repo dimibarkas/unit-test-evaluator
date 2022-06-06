@@ -5,11 +5,7 @@ import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.CannotLoadConfigException;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
 import java.net.URL;

@@ -52,6 +52,10 @@ public class Task {
      */
     private String testtemplatefilename;
     /**
+     * The names of the additional files of a task. (e.g. Exception-classes)
+     */
+    private List<String> additionalFiles = new ArrayList<>();
+    /**
      * The test template file content base-64 encoded.
      */
     private String encodedTestTemplate;
