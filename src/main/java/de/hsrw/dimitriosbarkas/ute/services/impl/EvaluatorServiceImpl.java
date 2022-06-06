@@ -17,6 +17,7 @@ import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,8 +49,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
         SubmissionResult currentSubmissionResult;
         try {
-            safeExecuteTestService.setupTestEnvironment(task, submissionTO.getEncodedTestContent());
-            currentSubmissionResult = safeExecuteTestService.buildAndRunTests();
+            Path path = safeExecuteTestService.setupTestEnvironment(task, submissionTO.getEncodedTestContent());
+            currentSubmissionResult = safeExecuteTestService.buildAndRunTests(task, path);
 
             if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL) {
                 boolean allMutationsPassed = false;

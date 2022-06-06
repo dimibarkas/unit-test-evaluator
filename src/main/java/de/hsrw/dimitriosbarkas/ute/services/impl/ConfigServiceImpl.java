@@ -5,36 +5,19 @@ import de.hsrw.dimitriosbarkas.ute.model.TaskConfig;
 import de.hsrw.dimitriosbarkas.ute.services.ConfigService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.CannotLoadConfigException;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
 import java.net.URL;
 import java.util.Base64;
 
+import static de.hsrw.dimitriosbarkas.ute.utils.RessourceUtils.readFileToString;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 @Service
 @Log4j2
 public class ConfigServiceImpl implements ConfigService {
-
-    public static String readFileToString(String path) {
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource(path);
-        return asString(resource);
-    }
-
-    public static String asString(Resource resource) {
-        try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
-            return FileCopyUtils.copyToString(reader);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 
     @Override
     public TaskConfig getTaskConfig() throws CannotLoadConfigException {

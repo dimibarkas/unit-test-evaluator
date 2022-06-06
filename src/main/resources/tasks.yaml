@@ -118,6 +118,8 @@ tasks:
     pathToDir: 'tasks/statistic-util/'
     sourcefilename: 'StatisticUtil.java'
     testtemplatefilename: 'StatisticUtilTest.java'
+    additionalFiles:
+      - 'LineHasWrongSyntaxException.java'
     hintList:
       - nr: 8
         isMissedInstruction:
@@ -141,6 +143,8 @@ tasks:
     pathToDir: 'tasks/sensor-data/'
     sourcefilename: 'SensorData.java'
     testtemplatefilename: 'SensorDataTest.java'
+    additionalFiles:
+      - 'EmptySensorArrayException.java'
     hintList:
       - nr: 18
         isMissedInstruction:
