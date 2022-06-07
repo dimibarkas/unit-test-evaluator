@@ -90,7 +90,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             FileSystemUtils.deleteRecursively(path);
             return currentSubmissionResult;
         } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException e) {
-            log.error(e);
+            e.printStackTrace();
             throw new CompilationErrorException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
