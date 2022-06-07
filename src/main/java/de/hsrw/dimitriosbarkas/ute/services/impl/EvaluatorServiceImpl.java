@@ -16,7 +16,10 @@ import de.hsrw.dimitriosbarkas.ute.services.SafeExecuteTestService;
 import de.hsrw.dimitriosbarkas.ute.services.exceptions.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,12 +87,18 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 log.error("The feedback list for this kind of errors is empty.");
             }
 
+            FileSystemUtils.deleteRecursively(path);
             return currentSubmissionResult;
         } catch (CouldNotSetupTestEnvironmentException | ErrorWhileExecutingTestException e) {
             log.error(e);
             throw new CompilationErrorException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
+
+
+
     @Override
     public List<Mutation> getMutationResult(MutationReport mutationReport, Task task) {
         return mutationReport
