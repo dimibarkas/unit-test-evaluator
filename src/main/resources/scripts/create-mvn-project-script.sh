@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 while getopts p:m:x: flag
 do
   # shellcheck disable=SC2220
@@ -10,8 +11,8 @@ do
   esac
 done
 
-# copy pom template with needed dependencies
-echo "copy pom.xml template"
+#copy pom template with needed dependencies
+#echo "copy pom.xml template"
 value=$(<"$x")
 
 # switch to temporary directory
