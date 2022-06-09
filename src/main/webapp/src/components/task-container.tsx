@@ -220,7 +220,7 @@ function TaskContainer({selectedTask}) {
                             <strong className="me-auto">Neues Feedback!</strong>
                         </Toast.Header>
                         <Toast.Body>
-                            <video src={`/api/video/${videoTitle}`} width="320" height="200" controls
+                            <video src={process.env.NODE_ENV === "production" ? `/utebackend/api/video/${videoTitle}` : `/api/video/${videoTitle}` } width="320" height="200" controls
                                    preload="none"/>
                         </Toast.Body>
                     </Toast>
