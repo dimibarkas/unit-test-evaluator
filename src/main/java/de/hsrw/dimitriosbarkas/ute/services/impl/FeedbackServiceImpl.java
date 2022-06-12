@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
-    public String provideFeedback(Student student, Task task, SubmissionResult currentSubmissionResult) throws SourcefileNotFoundException, NoHintProvidedException, NoFeedbackFoundException {
+    public String provideFeedback(Student student, Task task, SubmissionResult currentSubmissionResult) throws SourcefileNotFoundException, NoFeedbackFoundException {
 
         // check the submissions done by this user.
         List<Submission> submissionList = student.getSubmissionList().stream().sorted().collect(Collectors.toList());
@@ -31,13 +31,12 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         // if the current build was not successful, provide more general feedback (optional)
         if (currentSubmissionResult.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
-            log.info("Ein allgemeiner Tipp.");
             return null;
         }
 
         //first try 100% lines and branches covered
         if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL && submissionList.get(0).getCoveredBranches() == 100 && submissionList.get(0).getCoveredInstructions() == 100) {
-            log.info("Beim ersten versucht hast du sofort eine Line-Coverage von 100% erreicht? WOW!!!!");
+            log.info("First try. 100% Line-Coverage and Mutators passed.");
         }
 
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
@@ -51,7 +50,6 @@ public class FeedbackServiceImpl implements FeedbackService {
             log.info("all mutations passed");
         } else {
             log.info("there are " + mutationList.size() + " missed mutations ");
-//            mutationList.forEach(System.out::println);
         }
 
         if (submissionList.get(submissionList.size() - 1).getCoveredInstructions() == 100 && submissionList.get(submissionList.size() - 1).getCoveredBranches() == 100) {
@@ -62,7 +60,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
     }
 
-    String getFeedbackByLineCoverage(Task task, List<Line> lineList) throws NoHintProvidedException, NoFeedbackFoundException {
+    String getFeedbackByLineCoverage(Task task, List<Line> lineList) throws  NoFeedbackFoundException {
 //        log.info(lineList);
 //        log.info(task.getHintList());
         List<Hint> hintList = task.getHintList();

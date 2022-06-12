@@ -57,7 +57,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
             // Execute bash script
             String[] command = {"bash", bashScriptFile.getAbsolutePath(), "-p", path.toAbsolutePath().toString(), "-x", pomTemplateFile.getAbsolutePath()};
-            log.info(Arrays.toString(command));
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             File logfile = new File("error-log.txt");
@@ -159,11 +158,14 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         String pathToTempProject = path.toAbsolutePath() + "/testapp";
         File dir = new File(pathToTempProject);
 
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.directory(dir);
+        pb.redirectErrorStream(true);
+
         //execute test in different thread
         Process process;
-        StringBuilder sb;
         try {
-            process = Runtime.getRuntime().exec(command, env, dir);
+            process = pb.start();
             process.waitFor();
 
             // check if build was successful
