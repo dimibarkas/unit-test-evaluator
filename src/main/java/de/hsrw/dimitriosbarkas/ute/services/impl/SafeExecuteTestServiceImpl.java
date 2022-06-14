@@ -153,8 +153,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     public SubmissionResult buildAndRunTests(Task task, Path path) throws ErrorWhileExecutingTestException {
 
         //prepare command and choose right directory
-        String[] command = {"mvn", "clean", "test"};
-        String[] env = {};
+        String[] command = {"mvn", "clean", "test", "-B"};
         String pathToTempProject = path.toAbsolutePath() + "/testapp";
         File dir = new File(pathToTempProject);
 
