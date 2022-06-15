@@ -162,6 +162,7 @@ function TaskContainer({selectedTask}) {
         let previousTask = currentTask
         currentTask = select(store.getState())
         if (previousTask !== undefined && previousTask !== currentTask) {
+            setShowAlert(false);
             //check if there is a value for the current task
             if (sessionStorage.getItem(currentTask)) {
                 setSavedContent(sessionStorage.getItem(currentTask));
