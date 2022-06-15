@@ -58,9 +58,9 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             // Execute bash script
             String[] command = {"bash", bashScriptFile.getAbsolutePath(), "-p", path.toAbsolutePath().toString(), "-x", pomTemplateFile.getAbsolutePath()};
             ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true);
-            File logfile = new File("error-log.txt");
-            processBuilder.redirectOutput(logfile);
+//            processBuilder.redirectErrorStream(true);
+//            File logfile = new File("error-log.txt");
+//            processBuilder.redirectOutput(logfile);
             p = processBuilder.start();
             p.waitFor();
 
