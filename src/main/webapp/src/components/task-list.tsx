@@ -33,7 +33,6 @@ function TaskList() {
                     key={task.id}
                     action
                     onClick={() => onTaskSelect(task)}
-                    as={"li"}
                     className={"d-flex justify-content-between align-items-start"}
                     disabled={task.id === selectedTask?.id}
                 >

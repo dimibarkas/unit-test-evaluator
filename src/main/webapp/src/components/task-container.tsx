@@ -203,7 +203,7 @@ function TaskContainer({selectedTask}) {
         return (
             <>
                 <Container>
-                    <p className="lead text-light my-4">Bitte Aufgabe wählen.</p>
+                    <p className="lead text-light my-4">Klicke auf eine Aufgabe um zu starten.</p>
                     <TaskList/>
                 </Container>
             </>
@@ -220,8 +220,7 @@ function TaskContainer({selectedTask}) {
                             <strong className="me-auto">Neues Feedback!</strong>
                         </Toast.Header>
                         <Toast.Body>
-                            <video src={process.env.NODE_ENV === "production" ? `/utebackend/api/video/${videoTitle}` : `/api/video/${videoTitle}` } width="320" height="200" controls
-                                   preload="none"/>
+                            <video src={process.env.NODE_ENV === "production" ? `/utebackend/api/video/${videoTitle}` : `/api/video/${videoTitle}` } width="320" height="200" controls preload="none" autoPlay={true}/>
                         </Toast.Body>
                     </Toast>
                 </ToastContainer>
@@ -243,12 +242,12 @@ function TaskContainer({selectedTask}) {
                     </Button>
                     <div className="w-75 d-flex justify-content-between align-items-center flex-shrink-1">
                         <small className="text-nowrap">
-                            covered instructions
+                            Gedeckte Anweisungen
                         </small>
                         <ProgressBar variant={getVariant(ciProgress)} now={ciProgress} label={`${ciProgress} %`}
                                      className="w-100 m-2 text-black"/>
                         <small className="text-nowrap">
-                            covered branches
+                            Gedeckte Abzweigungen
                         </small>
                         <ProgressBar variant={getVariant(cbProgress)} now={cbProgress} label={`${cbProgress} %`}
                                      className="w-100 m-2 text-black"/>
