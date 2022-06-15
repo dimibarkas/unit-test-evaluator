@@ -16,9 +16,12 @@ $body-bg: #2a2a2b;
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
   cursor: col-resize;
 }
-
 // Import Bootstrap and its default variables
 @import '~bootstrap/scss/bootstrap.scss';
+
+.form-check-input {
+  background-color: white;
+}
 
 .nav-tabs {
   .nav-link {
@@ -29,6 +32,8 @@ $body-bg: #2a2a2b;
     background-color: white;
   }
 }
+
+
 //
 //@media (min-width: 1400px) {
 //  .container {
