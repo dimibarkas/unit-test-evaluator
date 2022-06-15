@@ -8,7 +8,7 @@ import {AuthCredentials, Submission, SubmissionResult} from "../model/types";
 import {submitCode} from "../services";
 import useAlert from "../hooks/use-alert";
 import Split from "react-split";
-import {BsPlayFill} from "react-icons/bs";
+import {BsPlayFill, BsCheck} from "react-icons/bs";
 import {fetchProgressList} from "../redux/actions/progress";
 import {store} from "../redux/store";
 import {connect} from "react-redux";
@@ -47,7 +47,7 @@ function TaskContainer({selectedTask}) {
     const [timer, setTimer] = useState(0);
 
     const tick = (task) => {
-        if(task !== null) {
+        if (task !== null) {
             setTimer((prevState) => prevState + 1);
         }
     }
@@ -220,26 +220,37 @@ function TaskContainer({selectedTask}) {
                             <strong className="me-auto">Neues Feedback!</strong>
                         </Toast.Header>
                         <Toast.Body>
-                            <video src={process.env.NODE_ENV === "production" ? `/utebackend/api/video/${videoTitle}` : `/api/video/${videoTitle}` } width="320" height="200" controls preload="none" autoPlay={true}/>
+                            <video
+                                src={process.env.NODE_ENV === "production" ? `/utebackend/api/video/${videoTitle}` : `/api/video/${videoTitle}`}
+                                width="320" height="200" controls preload="none" autoPlay={true}/>
                         </Toast.Body>
                     </Toast>
                 </ToastContainer>
                 <div style={{width: "70%", height: 300}}>
                     <h1 className="display-5 my-2">{selectedTask.task.name}</h1>
-                    <small className={isCurrentTaskCompleted() ? "text-success" : "text-danger"}>
-                        {isCurrentTaskCompleted() ? "Abgeschlossen" : "Nicht abgeschlossen"}
-                    </small>
                     <p className="lead my-2">{selectedTask.task.description}</p>
                     <p className="lead my-2"><u>Ziel:</u> {selectedTask.task.targetDescription}</p>
                 </div>
                 <div className="d-flex flex-row-reverse justify-content-between align-items-center mb-3">
-                    <Button
-                        variant={isLoading ? "secondary" : "success"}
-                        disabled={isLoading}
-                        onClick={!isLoading ? handleClick : null}
-                    >
-                        {isLoading ? 'Verarbeitung läuft…' : submitButton()}
-                    </Button>
+                    {isCurrentTaskCompleted() ?
+                        <Button
+                            variant={"outline-success"}
+                            disabled
+                        >
+                            <div className="d-flex align-items-center">
+                                <BsCheck/>
+                                <div className="mx-2">Abgeschlossen</div>
+                            </div>
+                        </Button> :
+                        <Button
+                            variant={isLoading ? "secondary" : "success"}
+                            disabled={isLoading}
+                            onClick={!isLoading ? handleClick : null}
+                        >
+                            {isLoading ? 'Verarbeitung läuft…' : submitButton()}
+                        </Button>
+                    }
+
                     <div className="w-75 d-flex justify-content-between align-items-center flex-shrink-1">
                         <small className="text-nowrap">
                             Gedeckte Anweisungen
