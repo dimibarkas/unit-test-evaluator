@@ -24,7 +24,6 @@
     "react-icons": "^4.3.1",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "5.0.0",
     "react-split": "^2.0.14",
     "redux": "^4.1.2",
     "redux-logger": "^3.0.6",
@@ -56,5 +55,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-scripts": "^5.0.1"
   }
 }
