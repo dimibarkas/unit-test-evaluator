@@ -77,12 +77,13 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 //            Hint hint = optionalHint.get();
 //            log.info(String.format("found hint for line %d", hint.getNr()));
-            if (line.getMb() > 0 && optionalHint.isPresent()) {
-                return getMissedBranchHintForLine(optionalHint.get().getIsMissedBranch());
-            } else if (line.getMi() > 0 && optionalHint.isPresent()) {
-                return getMissedInstructionHintForLine(optionalHint.get().getIsMissedInstruction());
-            }
 
+
+            if(line.getMi() > 0 && optionalHint.isPresent()) {
+                return getMissedInstructionHintForLine(optionalHint.get().getIsMissedInstruction());
+            } else if (line.getMb() > 0 && optionalHint.isPresent()) {
+                return getMissedInstructionHintForLine(optionalHint.get().getIsMissedBranch());
+            }
         }
         return null;
     }
