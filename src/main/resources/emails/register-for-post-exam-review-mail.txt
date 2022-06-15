@@ -1,8 +1,8 @@
 <html>
     <head></head>
     <body>
-        <p>Hallo ${firstname}</p>
-        <p>Du hast dich erfolgreich für den Unit-Test-Evaluator registriert.</p>
+        <p>Hallo ${firstname},</p>
+        <p>du hast dich erfolgreich für den Unit-Test-Evaluator registriert!</p>
         <p>Hier findest du den <a href="${url}">Link</a> für das Tool.</p>
         <p>Mit freundlichen Grüßen</p>
         <p>Prof. Dr. Malte Weiß</p>
