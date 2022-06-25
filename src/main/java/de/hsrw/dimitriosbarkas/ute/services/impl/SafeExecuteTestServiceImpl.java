@@ -33,8 +33,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
     @Override
     public Path setupTestEnvironment(Task task, String encodedTest) throws CouldNotSetupTestEnvironmentException {
 
-        //TODO: bevor der Test überhaupt in die Testumgebung geschrieben wird, soll geprüft werden ob das Template verändert wurde...
-        // wenn ja, dann soll ebenfalls eine Custom-Exception geworden werden. TestTemplateCorruptedException
         byte[] testData = Base64.getDecoder().decode(encodedTest);
 
         Path path;
@@ -58,6 +56,7 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             // Execute bash script
             String[] command = {"bash", bashScriptFile.getAbsolutePath(), "-p", path.toAbsolutePath().toString(), "-x", pomTemplateFile.getAbsolutePath()};
             ProcessBuilder processBuilder = new ProcessBuilder(command);
+            //debug
 //            processBuilder.redirectErrorStream(true);
 //            File logfile = new File("error-log.txt");
 //            processBuilder.redirectOutput(logfile);
@@ -96,8 +95,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
             // write files to test environment
             loadSourceFiles(task, path);
 
-//            File taskFile = new File(path.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getSourcefilename());
-//            writeFile(taskFile, taskData);
 
             log.info("Sourcefiles successfully written.");
 
@@ -142,11 +139,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
 
         File taskFile = new File(tempDir.toAbsolutePath() + "/testapp/src/main/java/com/test/app/" + task.getSourcefilename());
         copyFromResource(taskFile, task.getPathToDir()+ task.getSourcefilename());
-    }
-
-    private boolean checkIfTestsWereCorrupted(String encodedTestTemplate) {
-        //TODO: Implement
-        return true;
     }
 
     @Override
@@ -284,7 +276,6 @@ public class SafeExecuteTestServiceImpl implements SafeExecuteTestService {
         String pathToReport = path.toAbsolutePath() + "/testapp/target/pit-reports";
         File pitTestDirectory = new File(pathToReport);
         if (!pitTestDirectory.exists()) {
-            //TODO: create custom exception
             String errorMessage = "something went wrong " + path;
             throw new Error(errorMessage);
         }

@@ -111,7 +111,6 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     @Override
     public CoverageResult getCoverageResult(Report report, Task task) {
-        //TODO: make function throw a custom exception
         _Class _class = null;
         try {
             _class = report.get_package().get_class().stream().filter(aClass -> aClass.getSourcefilename().equals(task.getSourcefilename())).findFirst().orElseThrow(Exception::new);
@@ -122,7 +121,6 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     }
 
     public int calculateCoveredInstructionsPercent(_Class _class) {
-        //TODO: make function throw a custom exception
         if (_class == null) return 0;
         int percentage = 0;
         try {
@@ -138,7 +136,6 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     }
 
     public int calculateCoveredBranchesPercent(_Class _class) {
-        //TODO: make function throw a custom exception
         if (_class == null) return 0;
         int percentage = 0;
         try {
