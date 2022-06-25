@@ -29,15 +29,18 @@ public class FeedbackServiceImpl implements FeedbackService {
         List<Submission> submissionList = student.getSubmissionList().stream().sorted().collect(Collectors.toList());
 
 
-        // if the current build was not successful, provide more general feedback (optional)
-        if (currentSubmissionResult.getSummary() != BuildSummary.BUILD_SUCCESSFUL) {
-            return null;
+        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_FAILED) {
+            return "BuildFailed";
         }
 
-        //first try 100% lines and branches covered
-        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL && submissionList.get(0).getCoveredBranches() == 100 && submissionList.get(0).getCoveredInstructions() == 100) {
-            log.info("First try. 100% Line-Coverage and Mutators passed.");
+        if (currentSubmissionResult.getSummary() == BuildSummary.TESTS_FAILED) {
+            return "TestsFailed";
         }
+
+        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL && submissionList.get(submissionList.size() - 1).getCoveredBranches() == 100 && submissionList.get(submissionList.size() - 1).getCoveredInstructions() == 100) {
+            return "TaskCompleted";
+        }
+
 
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
         List<Line> lineList = currentSubmissionResult.getReport().get_package().getSourcefile().stream().filter(sourcefile -> sourcefile.getName().equals(task.getSourcefilename())).collect(Collectors.toList()).stream().findAny().orElseThrow(() -> new SourcefileNotFoundException("sourcefile not found:")).getLine();
@@ -60,7 +63,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
     }
 
-    String getFeedbackByLineCoverage(Task task, List<Line> lineList) throws  NoFeedbackFoundException {
+    String getFeedbackByLineCoverage(Task task, List<Line> lineList) throws NoFeedbackFoundException {
 //        log.info(lineList);
 //        log.info(task.getHintList());
         List<Hint> hintList = task.getHintList();
@@ -79,7 +82,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 //            log.info(String.format("found hint for line %d", hint.getNr()));
 
 
-            if(line.getMi() > 0 && optionalHint.isPresent()) {
+            if (line.getMi() > 0 && optionalHint.isPresent()) {
                 return getMissedInstructionHintForLine(optionalHint.get().getIsMissedInstruction());
             } else if (line.getMb() > 0 && optionalHint.isPresent()) {
                 return getMissedInstructionHintForLine(optionalHint.get().getIsMissedBranch());
