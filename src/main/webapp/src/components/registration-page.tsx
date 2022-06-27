@@ -12,6 +12,7 @@ function RegistrationPage() {
 
     const [validated, setValidated] = useState(false);
     const [formSubmitted, setFormSubmitted] = useState(false);
+    const [error, setError] = useState(false);
     // const [show, setShow] = useState(false);
 
     // const handleClose = () => setShow(false);
@@ -42,9 +43,27 @@ function RegistrationPage() {
                     setFormSubmitted(true);
                     console.log("authentication mail requested")
                 })
+                .catch((e) => {
+                    if(e === "an error occurred while requesting authentication mail.") {
+                        setError(true);
+                    }
+                    console.log(e);
+                })
         }
 
         setValidated(true);
+    }
+
+    if(error) {
+        return (
+            <Container className={"my-5"}>
+                <Alert variant={"danger"}>
+                    <h4>Mail konnte nicht gesendet werden.</h4>
+                    <br />
+                    <p>Beim Versenden der Mail ist leider ein Fehler aufgetreten, bitte laden Sie die Seite neu und versuchen Sie es erneut.</p>
+                </Alert>
+            </Container>
+        )
     }
 
     if (formSubmitted) {

@@ -72,9 +72,6 @@ export const requestAuthKey = async (registrationCredentials: RegistrationCreden
             params: {email: email}
         }).catch((e) => {
         console.log(e);
-        throw new Error("an error occurred while requesting authentication mail.");
+        return Promise.reject("an error occurred while requesting authentication mail.");
     })
-}
-export const submitResults = async (): Promise<void> => {
-
 }
