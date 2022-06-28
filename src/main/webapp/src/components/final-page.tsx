@@ -6,7 +6,20 @@ import {Task} from "../model/types";
 
 function FinalPage() {
 
-    const tasks = useSelector((state: State) => state.tasks)
+    const tasks = useSelector((state: State) => state.tasks);
+    const progress = useSelector((state: State) => state.progress);
+
+    const countCompletedTasks = (): number => {
+        let numTasksPassed = 0;
+        progress?.progressList?.forEach((progress) => {
+            if (progress.coveredBranches === 100 &&
+                progress.coveredInstructions === 100 &&
+                progress.hasAllMutationsPassed) {
+                numTasksPassed++;
+            }
+        })
+        return numTasksPassed;
+    }
 
     const formatSeconds = (task: Task) => {
         const timeInSeconds = Number(sessionStorage.getItem(`T${task.id}`)) ? Number(sessionStorage.getItem(`T${task.id}`)) : 0;
@@ -19,11 +32,12 @@ function FinalPage() {
             <Container className={"my-5"}>
                 <Alert variant={"info"}>
                     <Alert.Heading>
-                        Alle Aufgaben abgeschlossen!
+                        Tool abgeschlossen!
                     </Alert.Heading>
-                    <p>
-                        Herzlichen Glückwunsch. Du hast alle Aufgaben erfolgreich abgeschlossen.
-                    </p>
+                    <div className={"d-flex align-items-center justify-content-center flex-column"}>
+                        <p>Herzlichen Glückwunsch.</p>
+                        <p>Du hast {countCompletedTasks()} von 6 Aufgaben erfolgreich abgeschlossen.</p>
+                    </div>
                     <Table striped>
                         <thead>
                         <tr>
@@ -43,7 +57,7 @@ function FinalPage() {
                         </tbody>
                     </Table>
                     <br />
-                    Bitte fahre nun mit folgender <Alert.Link href={"https://www.umfrageonline.com/c/cukc4fsz"}>Umfrage</Alert.Link> fort.
+                    Bitte fahre nun mit folgender <a target={"_blank"} href={"https://www.umfrageonline.com/c/cukc4fsz"}>Umfrage</a> fort.
                 </Alert>
             </Container>
         </>

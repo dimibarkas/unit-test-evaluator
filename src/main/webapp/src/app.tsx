@@ -14,11 +14,13 @@ import FinalPage from "./components/final-page";
 
 const mapStateToProps = (state: State) => {
     return {
-        hasAllTasksPassed: state.progress.hasAllTasksPassed
+        hasAllTasksPassed: state.progress.hasAllTasksPassed,
+        hasQuit: state.progress.hasQuit,
+        hasMinTasksPassed: state.progress.hasMinTasksPassed
     }
 }
 
-function App({hasAllTasksPassed}) {
+function App({hasAllTasksPassed, hasQuit, hasMinTasksPassed}) {
 
     const dispatch = useDispatch()
     const user = useSelector((state: State) => state.user);
@@ -61,7 +63,7 @@ function App({hasAllTasksPassed}) {
         )
     }
 
-    if(hasAllTasksPassed) {
+    if(hasAllTasksPassed || (hasMinTasksPassed && hasQuit)) {
         return (
             <>
                 <NavigationBar />
@@ -69,6 +71,8 @@ function App({hasAllTasksPassed}) {
             </>
         )
     }
+
+
 
 
     return (

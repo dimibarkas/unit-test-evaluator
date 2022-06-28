@@ -8,6 +8,7 @@ interface IUser {
     id: string;
     authKey: string;
     authenticationError: boolean;
+
 }
 
 const initialUserState: IUser = {
@@ -16,7 +17,7 @@ const initialUserState: IUser = {
     isAuthenticated: false,
     id: null,
     authKey: null,
-    authenticationError: false
+    authenticationError: false,
 }
 
 export const user = (state: IUser = initialUserState, action: Action): IUser => {

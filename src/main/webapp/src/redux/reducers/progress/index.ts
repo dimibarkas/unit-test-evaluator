@@ -5,12 +5,16 @@ interface IProgressList {
     isLoading: boolean
     progressList: Progress[],
     hasAllTasksPassed: boolean,
+    hasMinTasksPassed: boolean;
+    hasQuit: boolean;
 }
 
 const initialProgressList: IProgressList = {
     isLoading: false,
     progressList: null,
     hasAllTasksPassed: false,
+    hasMinTasksPassed: false,
+    hasQuit: false
 }
 
 /**
@@ -35,6 +39,16 @@ export const progress = (state: IProgressList = initialProgressList, action: Act
             return {
                 ...state,
                 hasAllTasksPassed: true
+            }
+        case ActionType.STUDENT_HAS_PASSED_MIN_TASKS:
+            return {
+                ...state,
+                hasMinTasksPassed: true
+            }
+        case ActionType.STUDENT_HAS_QUIT:
+            return {
+                ...state,
+                hasQuit: true
             }
         default:
             return state
