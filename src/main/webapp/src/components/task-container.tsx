@@ -204,7 +204,7 @@ function TaskContainer({selectedTask}) {
         return (
             <>
                 <Container>
-                    <p className="lead text-light my-4">Klicke auf eine Aufgabe um zu starten.</p>
+                    <p className="lead text-light my-4">Klicke auf Sie eine Aufgabe, um zu starten. Sie müssen mindestens 3 Unit-Tests schreiben.</p>
                     <TaskList/>
                 </Container>
             </>
