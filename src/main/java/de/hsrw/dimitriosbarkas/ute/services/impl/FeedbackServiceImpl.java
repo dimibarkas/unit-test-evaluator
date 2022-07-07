@@ -37,16 +37,19 @@ public class FeedbackServiceImpl implements FeedbackService {
             return "TestsFailed";
         }
 
-        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL && submissionList.get(submissionList.size() - 1).getCoveredBranches() == 100 && submissionList.get(submissionList.size() - 1).getCoveredInstructions() == 100) {
-            return "TaskCompleted";
-        }
-
-
         // if the current build was successful, provide feedback based on the last report and based on the lines with missed instructions/branches
         List<Line> lineList = currentSubmissionResult.getReport().get_package().getSourcefile().stream().filter(sourcefile -> sourcefile.getName().equals(task.getSourcefilename())).collect(Collectors.toList()).stream().findAny().orElseThrow(() -> new SourcefileNotFoundException("sourcefile not found:")).getLine();
 
         //this list need to be empty
         List<Mutation> mutationList = currentSubmissionResult.getMutationReport().getMutations().stream().filter(mutation -> mutation.getSourceFile().equals(task.getSourcefilename()) && !mutation.isDetected()).collect(Collectors.toList());
+
+        if (currentSubmissionResult.getSummary() == BuildSummary.BUILD_SUCCESSFUL
+                && submissionList.get(submissionList.size() - 1).getCoveredBranches() == 100
+                && submissionList.get(submissionList.size() - 1).getCoveredInstructions() == 100
+                && mutationList.isEmpty()
+        ) {
+            return "TaskCompleted";
+        }
 
 
         if (mutationList.isEmpty()) {
