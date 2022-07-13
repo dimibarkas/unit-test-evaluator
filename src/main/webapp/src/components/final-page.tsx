@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Container, Table} from "react-bootstrap";
+import {Alert, Button, Container, Table} from "react-bootstrap";
 import {useSelector} from "react-redux";
 import {State} from "../redux/reducers";
 import {Task} from "../model/types";
@@ -23,14 +23,13 @@ function FinalPage() {
 
     const formatSeconds = (task: Task) => {
         const timeInSeconds = Number(sessionStorage.getItem(`T${task.id}`)) ? Number(sessionStorage.getItem(`T${task.id}`)) : 0;
-        console.log(timeInSeconds)
         return new Date(timeInSeconds * 1000).toISOString().slice(14, 19)
     }
 
     return (
         <>
             <Container className={"my-5"}>
-                <Alert variant={"info"}>
+                <Alert variant={"dark"}>
                     <Alert.Heading>
                         Tool abgeschlossen!
                     </Alert.Heading>
@@ -56,8 +55,12 @@ function FinalPage() {
                         ))}
                         </tbody>
                     </Table>
-                    <br />
-                    Bitte fahre nun mit folgender <a target={"_blank"} href={"https://www.umfrageonline.com/c/cukc4fsz"}>Umfrage</a> fort.
+                    <br/>
+                    <div className={"d-grid"}>
+                        <Button href={"https://www.umfrageonline.com/c/cukc4fsz"} target={"_blank"}>
+                            Weiter zur letzten Umfrage
+                        </Button>
+                    </div>
                 </Alert>
             </Container>
         </>
